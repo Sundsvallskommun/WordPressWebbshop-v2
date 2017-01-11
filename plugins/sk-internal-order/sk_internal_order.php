@@ -165,3 +165,22 @@ function skios_get_default_product_owner() {
 
 	return isset($owners[0]) ? $owners[0] : false;
 }
+
+/**
+ * Get product owner by id
+ */
+function skios_get_product_owner_by_id($id = null) {
+
+	if(!$id) return false;
+
+	$owners = skios_get_product_owners();
+
+	foreach( $owners as $owner ) {
+		if ( $owner['id'] == $id ) {
+			return $owner;
+		}
+	}
+
+	return false;
+
+}
