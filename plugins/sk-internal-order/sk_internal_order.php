@@ -87,10 +87,11 @@ class SKIOS {
 
 		foreach ( $owners as $owner ) {
 
-			$name  = $owner[0];
-			$email = $owner[1];
+			$id    = $owner['id'];
+			$label = $owner['label'];
+			$email = $owner['email'];
 
-			$options[$email] = $name;
+			$options[$id] = $label;
 		}
 
 
@@ -138,22 +139,29 @@ function skios_get_product_owners() {
 
 	$options = get_option( 'woocommerce_skios_settings', false );
 
-	$str = $options['product_owners'];
+	$mock_owners = array(
+		array(
+			'id'    => '1',
+			'label' => 'Rickard Karlsson',
+			'email' => 'rickard@fmca.se',
+		),
+		array(
+			'id'    => '3',
+			'label' => 'Johan Linder',
+			'email' => 'johan@fmca.se',
+		)
+	);
 
-	$arr = explode( "\n", $str );
-
-	foreach ( $arr as $key => $val ) {
-		$arr[$key] = array_map( 'trim', explode( ",", $val ) );
-	}
-
-	return $arr;
+	// Return mock data or empty array (for testing purposes only)
+	return rand(0, 10) > 2.5 ? $mock_owners : array();
 
 }
 
 /**
  * Get default (first) product owner.
  */
-function skios_get_default_product_owner_email() {
+function skios_get_default_product_owner() {
 	$owners = skios_get_product_owners();
-	return $owners[0][1];
+
+	return isset($owners[0]) ? $owners[0] : false;
 }

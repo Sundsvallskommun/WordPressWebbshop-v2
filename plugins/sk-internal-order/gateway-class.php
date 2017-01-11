@@ -66,9 +66,11 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 			$product_id = $item['product_id'];
 			$owner = get_post_meta( $product_id, '_product_owner', true);
 
-			if (!$owner) $owner = skios_get_default_product_owner_email();
+			if (!$owner) $owner = skios_get_default_product_owner();
 
-			$sorted_items[$owner][] = $item;
+			$owner_id = $owner['id'];
+
+			$sorted_items[$owner_id][] = $item;
 		}
 
 		skios_handle_order_notifications( $order, $sorted_items );
