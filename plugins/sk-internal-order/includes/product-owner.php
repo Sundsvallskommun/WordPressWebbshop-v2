@@ -27,9 +27,6 @@ function skios_get_product_owners() {
 
 /**
  * Get default (first) product owner.
- */
-/**
- * Get default (first) product owner.
  * @return array Product owner
  */
 function skios_get_default_product_owner() {
