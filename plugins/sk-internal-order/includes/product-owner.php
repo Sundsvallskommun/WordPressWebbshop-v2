@@ -76,6 +76,11 @@ function skios_insert_product_owner( $args = array() ) {
 		'email'	=> $args[ 'email' ],
 	) );
 
+	// Save in options.
+	$options[ 'product_owner_count' ] = $id;
+	$options[ 'product_owners' ] = $all_product_owners;
+	update_option( 'woocommerce_skios_settings', $options );
+
 	// Return new product owner.
 	return $new_product_owner;
 }
@@ -102,14 +107,19 @@ function skios_update_product_owner( $id, $args = array() ) {
 	}
 
 	// Get all product owners.
+	$options = get_option( 'woocommerce_skios_settings' );
 	$all_product_owners = skios_get_product_owners();
 
 	// Loop through and find the correct one.
-	foreach ( $all_product_owners as (object) $product_owner ) {
-		if ( $product_owner->id === $id ) {
+	foreach ( $all_product_owners as $key => $product_owner ) {
+		if ( $product_owner['id'] === $id ) {
 			// Update properties.
-			$product_owner->label = $args[ 'label' ];
-			$product_owner->email = $args[ 'email' ];
+			$all_product_owners[ $key ][ 'label' ] = $args[ 'label' ];
+			$all_product_owners[ $key ][ 'email' ] = $args[ 'email' ];
+
+			// Save in options.
+			$options[ 'product_owners' ] = $all_product_owners;
+			update_option( 'woocommerce_skios_settings', $options );
 
 			// Return updated product owner.
 			return (array) $product_owner;
