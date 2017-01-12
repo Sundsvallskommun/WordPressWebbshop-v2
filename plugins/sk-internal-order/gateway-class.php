@@ -2,6 +2,8 @@
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
+include_once __DIR__ . '/includes/product-owner.php';
+
 /**
  * SKIOS Gateway class
  */
@@ -63,10 +65,16 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 		$sorted_items = array();
 
 		foreach ($items as $item) {
-			$product_id = $item['product_id'];
-			$owner = get_post_meta( $product_id, '_product_owner', true);
 
-			if (!$owner) $owner = skios_get_default_product_owner();
+			$product_id = $item['product_id'];
+
+			$owner_id = get_post_meta( $product_id, '_product_owner', true);
+
+			if (!$owner_id) {
+				$owner = skios_get_default_product_owner();
+			} else {
+				$owner = skios_get_product_owner_by_id($owner_id);
+			}
 
 			$owner_id = $owner['id'];
 

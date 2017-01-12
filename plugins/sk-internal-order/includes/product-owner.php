@@ -7,21 +7,7 @@ function skios_get_product_owners() {
 
 	$options = get_option( 'woocommerce_skios_settings', false );
 
-	$mock_owners = array(
-		array(
-			'id'    => '1',
-			'label' => 'Rickard Karlsson',
-			'email' => 'rickard@fmca.se',
-		),
-		array(
-			'id'    => '3',
-			'label' => 'Johan Linder',
-			'email' => 'johan@fmca.se',
-		)
-	);
-
-	// Return mock data or empty array (for testing purposes only)
-	return rand(0, 10) > 2.5 ? $mock_owners : array();
+	return isset( $options['product_owners'] ) ? $options['product_owners'] : array();
 
 }
 
@@ -133,4 +119,14 @@ function skios_update_product_owner( $id, $args = array() ) {
 	// Return WP_Error since we didn't find a product owner
 	// with that particular id.
 	return new WP_Error( 'none_existing_product_owner', __( 'En produktägare med det ID:et existerar inte.', 'skios' ) );
+}
+
+/**
+ * Handles order notification to all different product owners.
+ * @param  WC_Order $order
+ * @param  array    $sorted_items Products
+ * @return mixed
+ */
+function skios_handle_order_notifications( $order, $sorted_items ) {
+	return false;
 }

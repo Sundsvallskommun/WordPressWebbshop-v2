@@ -124,10 +124,3 @@ class SKIOS {
 
 new SKIOS;
 
-/**
- * Send email with order data to product owners. Only include the products that
- * belong to the respective owner in each email.
- */
-function skios_handle_order_notifications( $order, $sorted_items ) {
-	return false;
-}
