@@ -55,3 +55,82 @@ function skios_get_product_owner_by_id($id = null) {
 	return false;
 
 }
+
+/**
+ * Inserts a new product owner.
+ * @param  array  $args
+ * @return array|WP_Error
+ */
+function skios_insert_product_owner( $args = array() ) {
+	$defaults = array(
+		'label'	=> '',
+		'email'	=> '',
+	);
+	$args = wp_parse_args( $args, $defaults );
+
+	if ( '' === trim( $args[ 'label' ] ) ) {
+		return new WP_Error( 'empty_product_owner_name', __( 'Produktägare får inte ha en tom benämning.', 'skios' ) );
+	}
+
+	if ( '' === trim( $args[ 'email' ] ) ) {
+		return new WP_Error( 'empty_product_owner_email', __( 'Produktägare får inte ha en tom e-postadress.', 'skios' ) );
+	}
+
+	// Get the current id from options.
+	$options = get_option( 'woocommerce_skios_settings' );
+	$id = $options[ 'product_owner_count' ];
+
+	// Get all product_owners.
+	$all_product_owners = skios_get_product_owners();
+
+	// Insert the new one.
+	$all_product_owners[] = ( $new_product_owner = array(
+		'id'	=> $id,
+		'label'	=> $args[ 'label' ],
+		'email'	=> $args[ 'email' ],
+	) );
+
+	// Return new product owner.
+	return $new_product_owner;
+}
+
+/**
+ * Updates an existing product owner.
+ * @param  integer $id
+ * @param  array  $args
+ * @return array|WP_Error
+ */
+function skios_update_product_owner( $id, $args = array() ) {
+	$defaults = array(
+		'label'	=> '',
+		'email'	=> '',
+	);
+	$args = wp_parse_args( $args, $defaults );
+
+	if ( '' === trim( $args[ 'label' ] ) ) {
+		return new WP_Error( 'empty_product_owner_name', __( 'Produktägare får inte ha en tom benämning.', 'skios' ) );
+	}
+
+	if ( '' === trim( $args[ 'email' ] ) ) {
+		return new WP_Error( 'empty_product_owner_email', __( 'Produktägare får inte ha en tom e-postadress.', 'skios' ) );
+	}
+
+	// Get all product owners.
+	$all_product_owners = skios_get_product_owners();
+
+	// Loop through and find the correct one.
+	foreach ( $all_product_owners as (object) $product_owner ) {
+		if ( $product_owner->id === $id ) {
+			// Update properties.
+			$product_owner->label = $args[ 'label' ];
+			$product_owner->email = $args[ 'email' ];
+
+			// Return updated product owner.
+			return (array) $product_owner;
+		}
+	}
+
+	// Return WP_Error since we didn't find a product owner
+	// with that particular id.
+	return new WP_Error( 'none_existing_product_owner', __( 'En produktägare med det ID:et existerar inte.', 'skios' ) );
+}
