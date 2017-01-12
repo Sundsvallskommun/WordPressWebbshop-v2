@@ -64,7 +64,7 @@ function skios_insert_product_owner( $args = array() ) {
 
 	// Get the current id from options.
 	$options = get_option( 'woocommerce_skios_settings' );
-	$id = $options[ 'product_owner_count' ];
+	$id = (int) $options[ 'product_owner_count' ] + 1;
 
 	// Get all product_owners.
 	$all_product_owners = skios_get_product_owners();
