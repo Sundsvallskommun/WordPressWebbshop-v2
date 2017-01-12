@@ -17,6 +17,9 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 class SKIOS {
 
 	function __construct() {
+		// Includes.
+		$this->includes();
+
 		// Add custom gateway
 		add_action( 'plugins_loaded', array($this, 'init_skios_gateway_class' ) );
 
@@ -28,6 +31,14 @@ class SKIOS {
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'woo_add_custom_general_fields' ) );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'woo_add_custom_general_fields_save' ) );
 
+	}
+
+	/**
+	 * Include necessary files.
+	 * @return void
+	 */
+	public function includes() {
+		include __DIR__ . '/includes/define.php';
 	}
 
 	function init_skios_gateway_class() {
