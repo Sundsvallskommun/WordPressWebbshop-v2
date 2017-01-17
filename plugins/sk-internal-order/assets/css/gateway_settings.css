@@ -1,0 +1,7 @@
+tr.product-owner td {
+	padding: 15px 10px 15px 0;
+}
+
+tr.product-owner td input {
+	display: none;
+}
