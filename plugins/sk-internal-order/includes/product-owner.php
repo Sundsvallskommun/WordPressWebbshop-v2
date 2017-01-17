@@ -128,5 +128,85 @@ function skios_update_product_owner( $id, $args = array() ) {
  * @return mixed
  */
 function skios_handle_order_notifications( $order, $sorted_items ) {
-	return false;
+
+
+	if ( is_array($sorted_items) ) {
+
+		foreach( $sorted_items as $owner_id => $items ) {
+
+			$owner = skios_get_product_owner_by_id( $owner_id );
+
+			if ( !$owner ) continue;
+
+			$owner_email = $owner['email'];
+
+
+			skios_admin_new_order_email( $owner_email, $order, $items );
+
+		}
+
+	}
 }
+
+function skios_admin_new_order_email( $email_address, $order, $items ) {
+
+	ob_start();
+
+	$email = '';
+
+	$email .= "\n\n";
+	$email .= $email_address;
+	$email .= "\n\n";
+
+	$email .= "Ny order \n\n";
+
+	$email .= "Faktureringsinformation\n-----------------------\n";
+
+	$email .= "$order->billing_first_name $order->billing_last_name \n";
+	$email .= "$order->billing_email \n";
+	$email .= "$order->billing_phone \n";
+
+	$email .= "\n";
+
+	$email .= "Leveransinformation\n-----------------------\n";
+
+	$email .= "$order->shipping_first_name $order->shipping_last_name \n";
+	$email .= "$order->shipping_email \n";
+	$email .= "$order->shipping_phone \n";
+
+	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+
+	$email .= "Produkter: \n\n";
+
+	$args = array(
+			'show_sku'      => false,
+			'show_image'    => false,
+			'image_size'    => array( 32, 32 ),
+			'plain_text'    => true,
+			'sent_to_admin' => false,
+		);
+
+	$template = $args['plain_text'] ? 'emails/plain/email-order-items.php' : 'emails/email-order-items.php';
+
+	wc_get_template( $template, array(
+			'order'               => $order,
+			'items'               => $items,
+			'show_download_links' => $order->is_download_permitted(),
+			'show_sku'            => $args['show_sku'],
+			'show_purchase_note'  => $order->is_paid(),
+			'show_image'          => $args['show_image'],
+			'image_size'          => $args['image_size'],
+			'plain_text'          => $args['plain_text'],
+			'sent_to_admin'       => $args['sent_to_admin'],
+		) );
+
+	$order_items = ob_get_clean();
+
+	$email .= $order_items;
+
+	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+
+	// Send email here
+	error_log( var_export( $email, true ) );
+}
+
