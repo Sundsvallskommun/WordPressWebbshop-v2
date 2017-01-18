@@ -142,15 +142,13 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 			$owner_id = get_post_meta( $product_id, '_product_owner', true);
 
-			if (!$owner_id) {
-				$owner = skios_get_default_product_owner();
+			if ( !$owner_id || empty($owner_id) ||  false == skios_get_product_owner_by_id( $owner_id ) ) { 
+				// 0 means no owner id is set for product.
+				$sorted_items[0][] = $item;
 			} else {
-				$owner = skios_get_product_owner_by_id($owner_id);
+				$sorted_items[$owner_id][] = $item;
 			}
 
-			$owner_id = $owner['id'];
-
-			$sorted_items[$owner_id][] = $item;
 		}
 
 		skios_handle_order_notifications( $order, $sorted_items );

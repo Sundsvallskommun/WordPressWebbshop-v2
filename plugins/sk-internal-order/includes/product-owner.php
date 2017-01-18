@@ -28,7 +28,7 @@ function skios_get_default_product_owner() {
  */
 function skios_get_product_owner_by_id($id = null) {
 
-	if(!$id) return false;
+	if(!$id || 0 === $id) return false;
 
 	$owners = skios_get_product_owners();
 
@@ -139,28 +139,32 @@ function skios_update_product_owner( $id, $args = array() ) {
  */
 function skios_handle_order_notifications( $order, $sorted_items ) {
 
-
 	if ( is_array($sorted_items) ) {
 
 		foreach( $sorted_items as $owner_id => $items ) {
 
-			$owner = skios_get_product_owner_by_id( $owner_id );
+			if ( 0 == $owner_id ) {
+				// No owner associated with the id, send to admin.
+				skios_no_owner_email( get_bloginfo('admin_email'), $order, $items );
+			} else {
 
-			if ( !$owner ) continue;
+				$owner = skios_get_product_owner_by_id( $owner_id );
 
-			$owner_email = $owner['email'];
+				$owner_email = $owner['email'];
 
+				skios_owner_order_email( $owner_email, $order, $items );
 
-			skios_admin_new_order_email( $owner_email, $order, $items );
+			}
 
 		}
 
 	}
 }
 
-function skios_admin_new_order_email( $email_address, $order, $items ) {
-
-	ob_start();
+/**
+ * No owner found for these items, send email to default/shop owner.
+ */
+function skios_no_owner_email( $email_address, $order, $items ) {
 
 	$email = '';
 
@@ -168,25 +172,78 @@ function skios_admin_new_order_email( $email_address, $order, $items ) {
 	$email .= $email_address;
 	$email .= "\n\n";
 
-	$email .= "Ny order \n\n";
+	$email .= "Följande produkter saknar produktägare. \n\n";
 
-	$email .= "Faktureringsinformation\n-----------------------\n";
-
-	$email .= "$order->billing_first_name $order->billing_last_name \n";
-	$email .= "$order->billing_email \n";
-	$email .= "$order->billing_phone \n";
-
-	$email .= "\n";
-
-	$email .= "Leveransinformation\n-----------------------\n";
-
-	$email .= "$order->shipping_first_name $order->shipping_last_name \n";
-	$email .= "$order->shipping_email \n";
-	$email .= "$order->shipping_phone \n";
+	$email .= skios_email_customer_details($order);
 
 	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-	$email .= "Produkter: \n\n";
+	$email .= "Produkter";
+
+	$email .= skios_email_items($order, $items);
+
+	$email .= $order_items;
+
+	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+
+	// Send email here
+	error_log( var_export( $email, true ) );
+
+	//wp_mail
+
+}
+
+function skios_owner_order_email( $email_address, $order, $items ) {
+
+	$email = '';
+
+	$email .= "\n\n";
+	$email .= $email_address;
+	$email .= "\n\n";
+
+	$email .= "Ny order på produkter du äger \n\n";
+
+	$email .= skios_email_customer_details($order);
+
+	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+
+	$email .= "Produkter";
+
+	$email .= skios_email_items($order, $items);
+
+	$email .= $order_items;
+
+	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+
+	// Send email here
+	error_log( var_export( $email, true ) );
+
+	//wp_mail
+}
+
+function skios_email_customer_details($order) {
+
+	$text  = "Faktureringsinformation\n-----------------------\n";
+
+	$text .= "$order->billing_first_name $order->billing_last_name \n";
+	$text .= "$order->billing_email \n";
+	$text .= "$order->billing_phone \n";
+
+	$text .= "\n";
+
+	$text .= "Leveransinformation\n-----------------------\n";
+
+	$text .= "$order->shipping_first_name $order->shipping_last_name \n";
+	$text .= "$order->shipping_email \n";
+	$text .= "$order->shipping_phone \n";
+
+	return $text;
+
+}
+
+function skios_email_items($order, $items) {
+
+	ob_start();
 
 	$args = array(
 			'show_sku'      => false,
@@ -210,13 +267,6 @@ function skios_admin_new_order_email( $email_address, $order, $items ) {
 			'sent_to_admin'       => $args['sent_to_admin'],
 		) );
 
-	$order_items = ob_get_clean();
+	return $order_items = ob_get_clean();
 
-	$email .= $order_items;
-
-	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
-
-	// Send email here
-	error_log( var_export( $email, true ) );
 }
-
