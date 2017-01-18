@@ -1,0 +1,35 @@
+<?php
+/**
+ * Create Web Task
+ * ===============
+ *
+ * XML template for the WebService.
+ *
+ * @since   0.1
+ * @package SK_DeDU
+ *
+ * List of variables available:
+ * 1. $items -- array of order items
+ */
+?>
+
+<?xml version="1.0" encoding="utf-8" ?>
+<Sundsvall_ListOfWebShopTasks xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<?php foreach ( $items as $item ) : ?>
+
+		<Sundsvall_CreateWebShopTask>
+			<ADName>HELSJD</ADName>
+			<YrkeId>113</YrkeId >
+			<ArendetypId>1</ArendetypId >
+			<KategoriId >26</KategoriId>
+			<UnderkategoriId >100</UnderkategoriId >
+			<Anmarkning>Anmärkningstext</Anmarkning>
+			<PrioritetId>123</PrioritetId>
+			<Referensnummer>123</Referensnummer>
+			<InternKommentar>Internkommentar</InternKommentar>
+		</Sundsvall_CreateWebShopTask>
+
+	<?php endforeach; ?>
+
+</Sundsvall_ListOfWebShopTasks>
