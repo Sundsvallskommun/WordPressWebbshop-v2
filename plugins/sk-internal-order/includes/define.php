@@ -11,7 +11,7 @@
 
 // Set up plugin version.
 if ( ! defined( 'SKIOS_VERSION' ) ) {
-	define( 'SKIOS_VERSION', '0.1' );
+	define( 'SKIOS_VERSION', '20170105' );
 }
 
 // Set up plugin URL.
