@@ -90,7 +90,7 @@
 			$labelTd = $( '<td class="label"></td>' ),
 			$labelInput = $( '<input type="text" name="product_owners[' + i + '][label]" placeholder="' + skios.i10n.new_product_owner_label_placeholder + '" style="display: inline-block;">'),
 			$emailTd = $( '<td class="email"></td>' ),
-			$emailInput = $( '<input type="email" name="product_owners[' + i + '][email]" placeholder="' + skios.i10n.new_product_owner_email_placeholder + '" style="display: inline-block;">'),
+			$emailInput = $( '<input type="email" name="product_owners[' + i + '][identifier]" placeholder="' + skios.i10n.new_product_owner_email_placeholder + '" style="display: inline-block;">'),
 			$actionTd = $( '<td class="actions">' ),
 			$deleteAction = $( '<span class="dashicons dashicons-trash remove"></span>' ),
 			$idInput = $( '<input type="hidden" name="product_owners[' + i + '][id]" value="null">' );

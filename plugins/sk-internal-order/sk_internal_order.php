@@ -31,6 +31,8 @@ class SKIOS {
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'woo_add_custom_general_fields' ) );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'woo_add_custom_general_fields_save' ) );
 
+		// Hook in to the order notification action for the default email type.
+		add_action( 'skios_order_notification', array( $this, 'handle_order_notification' ), 10, 4 );
 	}
 
 	/**
@@ -100,7 +102,6 @@ class SKIOS {
 
 			$id    = $owner['id'];
 			$label = $owner['label'];
-			$email = $owner['email'];
 
 			$options[$id] = $label;
 		}
@@ -129,6 +130,21 @@ class SKIOS {
 		if( !empty( $product_owner ) )
 			update_post_meta( $post_id, '_product_owner', esc_attr( $product_owner ) );
 
+	}
+
+	/**
+	 * Handles the email type order notification.
+	 * @param  string   $type  Type of product owner
+	 * @param  array    $owner The product owner
+	 * @param  WC_Order $order WC_Order
+	 * @param  array    $items The order items
+	 * @return void
+	 */
+	public function handle_order_notification( $type, $owner, $order, $items ) {
+		if ( $type === 'email' ) {
+			$email = $owner[ 'identifier' ];
+			skios_owner_order_email( $email, $order, $items );
+		}
 	}
 
 }

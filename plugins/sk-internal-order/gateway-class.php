@@ -223,25 +223,29 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 									>
 								</td>
 
-								<td class="email">
-									<span class="skios-product-owner email"><?php echo $product_owner->email; ?></span>
+								<?php if ( $product_owner->type === 'email' ) : ?>
+									<td class="email">
+										<span class="skios-product-owner email"><?php echo $product_owner->identifier; ?></span>
 
-									<input
-										class=""
-										type="email"
-										name="product_owners[<?php echo $c; ?>][email]"
-										id="product_owners[<?php echo $c; ?>][email]"
-										value="<?php echo $product_owner->email; ?>"
-										placeholder="<?php _e( 'E-postadress', 'skios' ); ?>"
-									>
-								</td>
+										<input
+											class=""
+											type="email"
+											name="product_owners[<?php echo $c; ?>][identifier]"
+											id="product_owners[<?php echo $c; ?>][identifier]"
+											value="<?php echo $product_owner->identifier; ?>"
+											placeholder="<?php _e( 'E-postadress', 'skios' ); ?>"
+										>
+									</td>
+								<?php endif; ?>
 
-								<td class="actions">
-									<span class="dashicons dashicons-edit edit"></span>
-									<span class="dashicons dashicons-trash remove"></span>
+								<?php if ( $product_owner->type === 'email' ) : ?>
+									<td class="actions">
+										<span class="dashicons dashicons-edit edit"></span>
+										<span class="dashicons dashicons-trash remove"></span>
 
-									<input type="hidden" name="product_owners[<?php echo $c; ?>][id]" value="<?php echo $product_owner->id; ?>">
-								</td>
+										<input type="hidden" name="product_owners[<?php echo $c; ?>][id]" value="<?php echo $product_owner->id; ?>">
+									</td>
+								<?php endif; ?>
 							</tr>
 						<?php $c++; endforeach; ?>
 					</tbody>
@@ -368,15 +372,15 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 					$post_data[ 'product_owners' ][ $key ] = skios_update_product_owner(
 						(int) $product_owner->id,
 						array(
-							'label'		=> $product_owner->label,
-							'email'		=> $product_owner->email,
+							'label'			=> $product_owner->label,
+							'identifier'	=> $product_owner->identifier,
 						)
 					);
 				} else {
 					// Create new.
 					$post_data[ 'product_owners' ][ $key ] = skios_insert_product_owner( array(
-						'label'		=> $product_owner->label,
-						'email'		=> $product_owner->email,
+						'label'			=> $product_owner->label,
+						'identifier'	=> $product_owner->identifier,
 					) );
 				}
 			}

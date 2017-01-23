@@ -7,7 +7,9 @@ function skios_get_product_owners() {
 
 	$options = get_option( 'woocommerce_skios_settings', false );
 
-	return isset( $options['product_owners'] ) ? $options['product_owners'] : array();
+	$product_owners = isset( $options[ 'product_owners' ] ) ? $options[ 'product_owners' ] : array();
+
+	return apply_filters( 'skios_product_owners', $product_owners );
 
 }
 
@@ -49,8 +51,9 @@ function skios_get_product_owner_by_id($id = null) {
  */
 function skios_insert_product_owner( $args = array() ) {
 	$defaults = array(
-		'label'	=> '',
-		'email'	=> '',
+		'label'			=> '',
+		'type'			=> 'email',
+		'identifier'	=> '',
 	);
 	$args = wp_parse_args( $args, $defaults );
 
@@ -58,8 +61,12 @@ function skios_insert_product_owner( $args = array() ) {
 		return new WP_Error( 'empty_product_owner_name', __( 'Produktägare får inte ha en tom benämning.', 'skios' ) );
 	}
 
-	if ( '' === trim( $args[ 'email' ] ) ) {
-		return new WP_Error( 'empty_product_owner_email', __( 'Produktägare får inte ha en tom e-postadress.', 'skios' ) );
+	if ( '' === trim( $args[ 'type' ] ) ) {
+		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom in typ.', 'skios' ) );
+	}
+
+	if ( '' === trim( $args[ 'identifier' ] ) ) {
+		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom in identifierare.', 'skios' ) );
 	}
 
 	// Get the current id from options.
@@ -71,9 +78,10 @@ function skios_insert_product_owner( $args = array() ) {
 
 	// Insert the new one.
 	$all_product_owners[] = ( $new_product_owner = array(
-		'id'	=> $id,
-		'label'	=> $args[ 'label' ],
-		'email'	=> $args[ 'email' ],
+		'id'			=> $id,
+		'type'			=> $args[ 'type' ],
+		'label'			=> $args[ 'label' ],
+		'identifier'	=> $args[ 'identifier' ],
 	) );
 
 	// Save in options.
@@ -93,8 +101,9 @@ function skios_insert_product_owner( $args = array() ) {
  */
 function skios_update_product_owner( $id, $args = array() ) {
 	$defaults = array(
-		'label'	=> '',
-		'email'	=> '',
+		'label'			=> '',
+		'type'			=> 'email',
+		'identifier'	=> '',
 	);
 	$args = wp_parse_args( $args, $defaults );
 
@@ -102,8 +111,12 @@ function skios_update_product_owner( $id, $args = array() ) {
 		return new WP_Error( 'empty_product_owner_name', __( 'Produktägare får inte ha en tom benämning.', 'skios' ) );
 	}
 
-	if ( '' === trim( $args[ 'email' ] ) ) {
-		return new WP_Error( 'empty_product_owner_email', __( 'Produktägare får inte ha en tom e-postadress.', 'skios' ) );
+	if ( '' === trim( $args[ 'type' ] ) ) {
+		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom in typ.', 'skios' ) );
+	}
+
+	if ( '' === trim( $args[ 'identifier' ] ) ) {
+		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom in identifierare.', 'skios' ) );
 	}
 
 	// Get all product owners.
@@ -115,7 +128,7 @@ function skios_update_product_owner( $id, $args = array() ) {
 		if ( $product_owner['id'] === $id ) {
 			// Update properties.
 			$all_product_owners[ $key ][ 'label' ] = $args[ 'label' ];
-			$all_product_owners[ $key ][ 'email' ] = $args[ 'email' ];
+			$all_product_owners[ $key ][ 'identifier' ] = $args[ 'identifier' ];
 
 			// Save in options.
 			$options[ 'product_owners' ] = $all_product_owners;
@@ -150,10 +163,17 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 
 				$owner = skios_get_product_owner_by_id( $owner_id );
 
-				$owner_email = $owner['email'];
-
-				skios_owner_order_email( $owner_email, $order, $items );
-
+				/**
+				 * Lets other plugin / themes hook in to order notification.
+				 *
+				 * @since 20170105
+				 *
+				 * @param string   $owner[ 'type' ] The type of product owner.
+				 * @param array    $owner           The product owner.
+				 * @param WC_Order $order         The WC_Order object.
+				 * @param items    $items           The order items that belongs to this product owner.
+				 */
+				do_action( 'skios_order_notification', $owner[ 'type' ], $owner, $order, $items );
 			}
 
 		}
