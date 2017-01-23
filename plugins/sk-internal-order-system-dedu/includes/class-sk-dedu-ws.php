@@ -15,13 +15,13 @@ class Sk_DeDU_WS {
 	 * Given username.
 	 * @var string
 	 */
-	private static $WS_USERNAME = 'username';
+	private $WS_USERNAME;
 
 	/**
 	 * Given password.
 	 * @var string
 	 */
-	private static $WS_PASSWORD = 'password';
+	private $WS_PASSWORD;
 
 	/**
 	 * The URL for the login endpoint of WebService.
@@ -38,8 +38,9 @@ class Sk_DeDU_WS {
 	/**
 	 * Authenticates with the WebService on construct.
 	 */
-	public function __construct() {
-		$this->authenticate();
+	public function __construct( $username, $password ) {
+		$this->WS_USERNAME = $username;
+		$this->WS_PASSWORD = $password;
 	}
 
 	/**
