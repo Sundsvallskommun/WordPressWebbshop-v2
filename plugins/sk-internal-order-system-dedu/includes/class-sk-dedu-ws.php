@@ -27,13 +27,13 @@ class Sk_DeDU_WS {
 	 * The URL for the login endpoint of WebService.
 	 * @var string
 	 */
-	private static $WS_LOGIN_URL = 'http://www.dedu.se/DeDUService/Login?%s';
+	private static $WS_LOGIN_URL = 'https://dedu.se/DeDUservicetest/Login?%s';
 
 	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
-	private static $WS_CREATE_TASK_URL = 'http://www.dedu.se/DeDUService/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
+	private static $WS_CREATE_TASK_URL = 'https://dedu.se/DeDUservicetest/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
 
 	/**
 	 * Authenticates with the WebService on construct.
@@ -41,6 +41,14 @@ class Sk_DeDU_WS {
 	public function __construct( $username, $password ) {
 		$this->WS_USERNAME = $username;
 		$this->WS_PASSWORD = $password;
+
+		// Try to authenticate.
+		if ( $session_key = $this->authenticate() ) {
+			$this->WS_SESSION_KEY = $session_key;
+		} else {
+			// Throw an exception for invalid credentials.
+			throw new Exception( 'The credentials you provided seems to be wrong.' );
+		}
 	}
 
 	/**
@@ -50,22 +58,13 @@ class Sk_DeDU_WS {
 	 * @return
 	 */
 	public function send_order( WC_Order $order, $order_items ) {
-		if ( ! ( $session_key = $this->authenticate() ) ) {
-			// Init cURL.
-			$ch = curl_init();
-			curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $session_key ) );
+		// Init cURL.
+		$ch = curl_init();
+		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $session_key ) );
 
-			// Opening XML.
-			$xml = <<<XYZ
-<?xml version="1.0" encoding="utf-8" ?>
-<Sundsvall_ListOfWebShopTasks xmlns:xsi="&quot;"http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-XYZ;
-
-			// Create XML for each product.
-			foreach ( $order_items as $item ) {
-				
-			}
-		}
+		// Get the XML.
+		$dedu_xml = new SK_DeDU_XML( $order_items );
+		$xml = $dedu_xml->generate_xml();
 	}
 
 	/**
@@ -87,7 +86,8 @@ XYZ;
 
 		// Check if all is good.
 		if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 200 ) {
-			return $data;
+			$xml = simplexml_load_string( $data );
+			return (string) $xml->Value;
 		} else {
 			// Return false if we failed to authenticate.
 			return false;
@@ -103,13 +103,13 @@ XYZ;
 		$timestamp = gmdate( 'Y-m-d\TH:i:s\Z' );
 
 		// Data is $timestamp and username.
-		$data = self::$WS_USERNAME . $timestamp;
+		$data = $this->WS_USERNAME . $timestamp;
 
 		// Return signature as a Bas64 encoded string.
 		return http_build_query( array(
-			'username'	=> self::$WS_USERNAME,
+			'username'	=> $this->WS_USERNAME,
 			'timestamp'	=> $timestamp,
-			'hash'		=> base64_encode( hash_hmac( 'sha1', $data, self::$WS_PASSWORD, true ) ),
+			'hash'		=> str_replace( '/', '~', str_replace( '=', '_', str_replace( '+', '-', base64_encode( hash_hmac( 'sha1', $data, $this->WS_PASSWORD, true ) ) ) ) ),
 		) );
 	}
 
