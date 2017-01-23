@@ -47,4 +47,28 @@ class SK_DeDU {
 		$productfields = new SK_DeDU_Product_Fields();
 	}
 
+	/**
+	 * Adds DeDU as a product owner in the database.
+	 * @return void
+	 */
+	public function add_dedu_as_product_owner() {
+		// Check if DeDU already exists.
+		$existing_product_owners = skios_get_product_owners();
+		$found = false;
+		foreach ( $existing_product_owners as $product_owner ) {
+			if ( $product_owner[ 'type' ] === 'dedu' ) {
+				$found = true;
+			}
+		}
+
+		// If not found, add it.
+		if ( ! $found ) {
+			skios_insert_product_owner( array(
+				'label'			=> 'DeDU',
+				'type'			=> 'dedu',
+				'identifier'	=> 'dedu-product-owner',
+			) );
+		}
+	}
+
 }

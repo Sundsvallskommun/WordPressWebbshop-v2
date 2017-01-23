@@ -34,3 +34,6 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-dedu.php';
 $sk_dedu = new SK_DeDU();
+
+// Add DeDU as a product owner on plugin activate.
+register_activation_hook( __FILE__, array( $sk_dedu, 'add_dedu_as_product_owner' ) );
