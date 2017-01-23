@@ -202,8 +202,6 @@ function skios_no_owner_email( $email_address, $order, $items ) {
 
 	$email .= skios_email_items($order, $items);
 
-	$email .= $order_items;
-
 	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
 	// Send email here
@@ -230,8 +228,6 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 	$email .= "Produkter";
 
 	$email .= skios_email_items($order, $items);
-
-	$email .= $order_items;
 
 	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
