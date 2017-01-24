@@ -223,29 +223,29 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 									>
 								</td>
 
-								<?php if ( $product_owner->type === 'email' ) : ?>
-									<td class="email">
-										<span class="skios-product-owner email"><?php echo $product_owner->identifier; ?></span>
+								<td class="identifier">
+									<?php if ( $product_owner->type === 'email' ) : ?>
+										<span class="skios-product-owner identifier"><?php echo $product_owner->identifier; ?></span>
+									<?php endif; ?>
 
-										<input
-											class=""
-											type="email"
-											name="product_owners[<?php echo $c; ?>][identifier]"
-											id="product_owners[<?php echo $c; ?>][identifier]"
-											value="<?php echo $product_owner->identifier; ?>"
-											placeholder="<?php _e( 'E-postadress', 'skios' ); ?>"
-										>
-									</td>
-								<?php endif; ?>
+									<input
+										class=""
+										type="<?php echo ( $product_owner->type === 'email' ) ? 'email' : 'hidden'; ?>"
+										name="product_owners[<?php echo $c; ?>][identifier]"
+										id="product_owners[<?php echo $c; ?>][identifier]"
+										value="<?php echo $product_owner->identifier; ?>"
+										placeholder="<?php _e( 'E-postadress', 'skios' ); ?>"
+									>
+								</td>
 
 								<?php if ( $product_owner->type === 'email' ) : ?>
 									<td class="actions">
 										<span class="dashicons dashicons-edit edit"></span>
 										<span class="dashicons dashicons-trash remove"></span>
-
-										<input type="hidden" name="product_owners[<?php echo $c; ?>][id]" value="<?php echo $product_owner->id; ?>">
 									</td>
 								<?php endif; ?>
+
+								<input type="hidden" name="product_owners[<?php echo $c; ?>][id]" value="<?php echo $product_owner->id; ?>">
 							</tr>
 						<?php $c++; endforeach; ?>
 					</tbody>

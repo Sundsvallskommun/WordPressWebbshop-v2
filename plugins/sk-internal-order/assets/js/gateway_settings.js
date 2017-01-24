@@ -56,8 +56,8 @@
 	 */
 	function editProductOwner( e ) {
 		var $parent = $( this ).parent().parent(),
-			$inputs = $parent.find( '.label input, .email input' ),
-			$spans = $parent.find( '.label span, .email span' );
+			$inputs = $parent.find( '.label input, .identifier input' ),
+			$spans = $parent.find( '.label span, .identifier span' );
 
 		$inputs.show();
 		$spans.hide();
@@ -72,7 +72,7 @@
 	function deleteProductOwner( e ) {
 		var $parent = $( this ).parent().parent(),
 			label = $parent.find( '.label input' ).val(),
-			email = $parent.find( '.email input' ).val(),
+			email = $parent.find( '.identifier input' ).val(),
 			str = skios.i10n.delete_product_owner_prompt.replace( '%%', label + '(' + email + ')' );
 		if ( window.confirm( str ) ) {
 			$parent.remove();
@@ -89,7 +89,7 @@
 			$tr = $( '<tr class="product-owner"></tr>' ),
 			$labelTd = $( '<td class="label"></td>' ),
 			$labelInput = $( '<input type="text" name="product_owners[' + i + '][label]" placeholder="' + skios.i10n.new_product_owner_label_placeholder + '" style="display: inline-block;">'),
-			$emailTd = $( '<td class="email"></td>' ),
+			$emailTd = $( '<td class="identifier"></td>' ),
 			$emailInput = $( '<input type="email" name="product_owners[' + i + '][identifier]" placeholder="' + skios.i10n.new_product_owner_email_placeholder + '" style="display: inline-block;">'),
 			$actionTd = $( '<td class="actions">' ),
 			$deleteAction = $( '<span class="dashicons dashicons-trash remove"></span>' ),
