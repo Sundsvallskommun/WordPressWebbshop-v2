@@ -106,6 +106,10 @@
 
 		// Add to array.
 		$productOwners.push( $tr );
+
+		// Add event binder.
+		$tr.on( 'click', '.edit', editProductOwner );
+		$tr.on( 'click', '.remove', deleteProductOwner );
 	}
 
 	/**
