@@ -128,6 +128,7 @@ function skios_update_product_owner( $id, $args = array() ) {
 		if ( $product_owner['id'] === $id ) {
 			// Update properties.
 			$all_product_owners[ $key ][ 'label' ] = $args[ 'label' ];
+			$all_product_owners[ $key ][ 'type' ] = $args[ 'type' ];
 			$all_product_owners[ $key ][ 'identifier' ] = $args[ 'identifier' ];
 
 			// Save in options.
