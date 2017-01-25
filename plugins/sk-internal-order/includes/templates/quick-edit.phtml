@@ -1,0 +1,21 @@
+<?php defined( 'ABSPATH' ) or die( 'No script kiddies please!' ); ?>
+
+<fieldset class="inline-edit-col-left">
+	<div id="sku-fields" class="inline-edit-col">
+		<label>
+			<span class="title" style="width: 7em;"><?php _e( 'Produktägare', 'skios' ); ?></span>
+			<span class="input-text-wrap">
+				<select class="product_owner" name="_product_owner">
+				<?php
+					$options = skios_get_product_owners();
+					echo '<option value="0">--Ingen vald--</option>';
+					foreach ( $options as $value ) {
+						echo '<option value="' . esc_attr( $value[ 'id' ] ) . '">'. $value[ 'label' ] .'</option>';
+					}
+				?>
+				</select>
+			</span>
+		</label>
+		<br class="clear" />
+
+</fieldset>

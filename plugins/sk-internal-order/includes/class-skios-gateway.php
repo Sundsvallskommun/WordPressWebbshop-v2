@@ -1,21 +1,29 @@
 <?php
+/**
+ * SKIOS_Gateway
+ * =============
+ *
+ * A WooCommerce payment gateway which serves as
+ * the internal order system.
+ *
+ * @since   20170105
+ * @package SKIOS
+ */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-include_once __DIR__ . '/includes/product-owner.php';
-
-/**
- * SKIOS Gateway class
- */
 class SKIOS_Gateway extends WC_Payment_Gateway {
 
+	/**
+	 * Sets up the class.
+	 */
 	function __construct() {
 		$this->id                 = 'skios';
 		$this->icon               = '';
 		$this->has_fields         = false;
 		$this->title              = 'TITLE';
 		$this->method_title       = 'SK Internal Order System';
-		$this->method_description = 'Varje produkt tillhör en ägare och när ordern läggs går ett mejl iväg till respektive ägare om beställningen.';
+		$this->method_description = __( 'Varje produkt tillhör en ägare och när ordern läggs går ett mejl iväg till respektive ägare om beställningen.', 'skios' );
 
 		$this->init_form_fields();
 		$this->init_settings();
@@ -34,7 +42,11 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 		add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 	}
 
-	function init_form_fields() {
+	/**
+	 * Initiates the form fields on the admin setting page.
+	 * @return void
+	 */
+	public function init_form_fields() {
 
 		$admin_email = get_bloginfo( 'admin_email');
 
@@ -84,8 +96,6 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		wp_register_script( 'skios-admin-gateway-js', SKIOS_PLUGIN_URL . '/assets/js/gateway_settings.js', array( 'jquery' ), SKIOS_VERSION, true );
-
 		if ( is_admin()
 			&& ( ! empty( $_REQUEST[ 'page' ] ) && $_REQUEST[ 'page' ] === 'wc-settings' )
 			&& ( ! empty( $_REQUEST[ 'tab' ] ) && $_REQUEST[ 'tab' ] === 'checkout' )
@@ -124,8 +134,12 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 		}
 	}
 
-	function process_payment( $order_id ) {
-
+	/**
+	 * Processes a order payment.
+	 * @param  integer $order_id
+	 * @return boolean
+	 */
+	public function process_payment( $order_id ) {
 		global $woocommerce;
 
 		$order = new WC_Order( $order_id );
@@ -153,21 +167,22 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 		skios_handle_order_notifications( $order, $sorted_items );
 
+		// Return false is for debugging purposes.
 		return false;
 
-		// Mark as on-hold (we're awaiting the cheque)
-		$order->update_status('wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ));
+		// Mark as on-hold (we're awaiting the cheque).
+		$order->update_status( 'wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ) );
 
-		// Reduce stock levels
+		// Reduce stock levels.
 		$order->reduce_order_stock();
 
-		// Remove cart
+		// Remove cart.
 		$woocommerce->cart->empty_cart();
 
 		// Return thankyou redirect
 		return array(
-			'result' => 'success',
-			'redirect' => $this->get_return_url( $order )
+			'result'	=> 'success',
+			'redirect'	=> $this->get_return_url( $order )
 		);
 	}
 
