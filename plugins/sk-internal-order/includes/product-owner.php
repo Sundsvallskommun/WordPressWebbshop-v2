@@ -62,11 +62,11 @@ function skios_insert_product_owner( $args = array() ) {
 	}
 
 	if ( '' === trim( $args[ 'type' ] ) ) {
-		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom in typ.', 'skios' ) );
+		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom typ.', 'skios' ) );
 	}
 
 	if ( '' === trim( $args[ 'identifier' ] ) ) {
-		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom in identifierare.', 'skios' ) );
+		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom identifierare.', 'skios' ) );
 	}
 
 	// Get the current id from options.
@@ -112,11 +112,11 @@ function skios_update_product_owner( $id, $args = array() ) {
 	}
 
 	if ( '' === trim( $args[ 'type' ] ) ) {
-		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom in typ.', 'skios' ) );
+		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom typ.', 'skios' ) );
 	}
 
 	if ( '' === trim( $args[ 'identifier' ] ) ) {
-		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom in identifierare.', 'skios' ) );
+		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom identifierare.', 'skios' ) );
 	}
 
 	// Get all product owners.
