@@ -46,7 +46,7 @@ class SKIOS {
 	 */
 	public function includes() {
 		include __DIR__ . '/define.php';
-		include __DIR__ . '/product-owner.php';
+		include __DIR__ . '/skios-product-owner-functions.php';
 		include __DIR__ . '/class-skios-admin-columns.php';
 		include __DIR__ . '/class-skios-product-owner.php';
 	}
