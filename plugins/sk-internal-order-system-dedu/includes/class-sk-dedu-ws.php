@@ -60,11 +60,30 @@ class Sk_DeDU_WS {
 	public function send_order( WC_Order $order, $order_items ) {
 		// Init cURL.
 		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $session_key ) );
+		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $this->WS_SESSION_KEY ) );
+
+		curl_setopt( $ch, CURLOPT_HEADER, true );
+		curl_setopt( $ch, CURLOPT_POST, true );
 
 		// Get the XML.
 		$dedu_xml = new SK_DeDU_XML( $order_items );
 		$xml = $dedu_xml->generate_xml();
+
+		// Make sure all is fine.
+		if ( ! is_wp_error( $xml ) ) {
+			echo  $xml;
+			// Set data.
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, 'xmlFile=' . $xml );
+
+			// Execute request.
+			$data = curl_exec( $ch );
+
+			// Return result.
+			return ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 200 );
+			} else {
+		} else {
+			return $xml;
+		}
 	}
 
 	/**

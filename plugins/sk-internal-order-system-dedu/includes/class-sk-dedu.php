@@ -21,6 +21,9 @@ class SK_DeDU {
 
 		// Init classes.
 		$this->init_classes();
+
+		// Hook in to the order notification action.
+		add_action( 'skios_order_notification', array( $this, 'handle_dedu_order_notification' ), 10, 4 );
 	}
 
 	/**
@@ -68,6 +71,26 @@ class SK_DeDU {
 				'type'			=> 'dedu',
 				'identifier'	=> 'dedu-product-owner',
 			) );
+		}
+	}
+
+	/**
+	 * Creates and sends an order to DeDU.
+	 * @param  string $type  Type of product owner
+	 * @param  array  $owner The product owner
+	 * @param  array  $order WC_Order
+	 * @param  array  $items The products associated with this product owner
+	 * @return void
+	 */
+	public function handle_dedu_order_notification( $type, $owner, $order, $items ) {
+		// Only handle DeDU orders.
+		// Also make sure we have credentials in $_SERVER.
+		if ( $type === 'dedu' && ! empty( $credentials = $_SERVER[ 'dedu_credentials' ] ) ) {
+			// Init WS class.
+			$dedu_ws = new SK_DeDU_WS( $credentials[ 'username' ], $credentials[ 'password' ] );
+
+			// Send order.
+			$dedu_ws->send_order( $order, $items );
 		}
 	}
 
