@@ -31,10 +31,10 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 		$this->title              = $this->get_option( 'title' );
 
 		// Enqueues JS.
-		$this->enqueue_scripts();
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ), 20 );
 
 		// Localize JS.
-		$this->localize_scripts();
+		add_action( 'admin_enqueue_scripts', array( $this, 'localize_scripts' ), 15 );
 
 		// Enqueue CSS.
 		$this->enqueue_styles();

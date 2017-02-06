@@ -24,7 +24,7 @@ class SKIOS {
 		$this->init_classes();
 
 		// Register scripts.
-		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'register_scripts' ), 10 );
 
 		// Enqueue scripts.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' )	 );
