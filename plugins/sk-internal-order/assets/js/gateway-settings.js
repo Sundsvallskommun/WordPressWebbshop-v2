@@ -30,6 +30,9 @@
 	 * @return {Void}
 	 */
 	function init() {
+		// Set form to novalidate.
+		$( '#mainform' ).attr( 'novalidate', 'true' );
+
 		// All product owners.
 		$productOwners = $( '.product-owner' );
 
