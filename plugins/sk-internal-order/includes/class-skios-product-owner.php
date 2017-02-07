@@ -84,7 +84,7 @@ class SKIOS_Product_Owner {
 		// Always save a product owner on the post.
 		// If one was provided we'll save that, otherwise
 		// we'll default to saving a 0 (which means none is selected).
-		$product_owner = $_REQUEST[ self::$METAKEY_NAME ];
+		$product_owner = ( ! empty( $_REQUEST[ self::$METAKEY_NAME ] ) ) ? $_REQUEST[ self::$METAKEY_NAME ] : '';
 		if( strlen( $product_owner ) > 0 ) {
 			update_post_meta( $post_id, self::$METAKEY_NAME, esc_attr( $product_owner ) );
 		} else {

@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Make sure WooCommerce is active.
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
-	exit;
+	return;
 }
 
 // Include main plugin class.
