@@ -3,18 +3,18 @@
  * WooCommerce > FDT Avance integration
  *
  * @link     http://www.fmca.se/
- * @package  SK_DeDU
+ * @package  SK_Webshop
  *
  * @wordpress-plugin
- * Plugin Name:		DeDU for SK Internal Order System
+ * Plugin Name:		SK Webshop
  * Plugin URI:		http://www.fmca.se/
- * Description:		Extends the SK Internal Order System. Provides an integration with the DeDU system.
+ * Description:		Base plugin for Sundsvall Kommun Webshop.
  * Version:			0.9
  * Author:			FMCA
  * Author URI:		http://www.fmca.se/
  * Developer:		FMCA
  * Developer URI:	http://www.fmca.se/
- * Text Domain:		sk-dedu
+ * Text Domain:		sk-smex
  * Domain Path:		/languages
  * Copyright:       © 2009-2015 WooThemes.
  * License:         GNU General Public License v3.0
@@ -25,14 +25,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if acccessed directly.
 }
 
-// Make sure all dependencies are active.
-if ( ! in_array( 'sk-webshop/sk-webshop.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+// Make sure WooCommerce is active.
+if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
 	return;
 }
 
 // Include main plugin class.
-require_once __DIR__ . '/includes/class-sk-dedu.php';
-$sk_dedu = new SK_DeDU();
+require_once __DIR__ . '/includes/class-sk-webshop.php';
 
-// Add DeDU as a product owner on plugin activate.
-register_activation_hook( __FILE__, array( $sk_dedu, 'add_dedu_as_product_owner' ) );
+
+/**
+ * Main instance of SK_Webshop.
+ *
+ * Returns the main instance of SK_Webshop to prevent the need to use globals.
+ *
+ * @since  2.1
+ * @return SK_Webshop
+ */
+function SKW() {
+	return SK_Webshop::get_instance();
+}
