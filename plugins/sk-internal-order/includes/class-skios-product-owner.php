@@ -22,11 +22,32 @@ class SKIOS_Product_Owner {
 	 * Registers hooks and filters.
 	 */
 	public function __construct() {
+
+		add_action( 'woocommerce_single_product_summary', array( $this, 'display_product_owner'), 20 );
+
 		// Display owner option on product admin screen.
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_owner_field' ) );
 
 		// Save product owner option on product admin screen.
 		add_action( 'save_post', array( $this, 'save_product_owner_field' ) );
+	}
+
+	/**
+	 * Display information on product view about who is the product owner
+	 */
+	public function display_product_owner() {
+
+		try {
+
+			global $product;
+
+			$owner_id = get_post_meta( $product->id, self::$METAKEY_NAME, true );
+			$owner = skios_get_product_owner_by_id($owner_id);
+
+			printf('<p class="product-owner">%s</p>', sprintf( __('Produkten tillhör <strong>%s</strong>', 'skios'), $owner['label'] ) );
+
+		} catch (Exception $e) { }
+
 	}
 
 	/**
