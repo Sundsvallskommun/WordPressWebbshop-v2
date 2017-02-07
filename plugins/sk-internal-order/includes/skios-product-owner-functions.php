@@ -187,55 +187,45 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
  */
 function skios_no_owner_email( $email_address, $order, $items ) {
 
-	$email = '';
+	$message = '';
 
-	$email .= "\n\n";
-	$email .= $email_address;
-	$email .= "\n\n";
+	$message .= "Följande produkter saknar produktägare. \n\n";
 
-	$email .= "Följande produkter saknar produktägare. \n\n";
+	$message .= skios_email_customer_details($order);
 
-	$email .= skios_email_customer_details($order);
+	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+	$message .= "Produkter";
 
-	$email .= "Produkter";
+	$message .= skios_email_items($order, $items);
 
-	$email .= skios_email_items($order, $items);
+	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+	$subject = __( 'Ny order på produkter som saknar ägare', 'skios' );
 
-	// Send email here
-	error_log( var_export( $email, true ) );
-
-	//wp_mail
+	wp_mail( $to = $email_address, $subject, $message );
 
 }
 
 function skios_owner_order_email( $email_address, $order, $items ) {
 
-	$email = '';
+	$message = '';
 
-	$email .= "\n\n";
-	$email .= $email_address;
-	$email .= "\n\n";
+	$message .= "Ny order på produkter du äger \n\n";
 
-	$email .= "Ny order på produkter du äger \n\n";
+	$message .= skios_email_customer_details($order);
 
-	$email .= skios_email_customer_details($order);
+	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+	$message .= "Produkter";
 
-	$email .= "Produkter";
+	$message .= skios_email_items($order, $items);
 
-	$email .= skios_email_items($order, $items);
+	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
-	$email .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
+	$subject = __( 'Ny order på era produkter', 'skios' );
 
-	// Send email here
-	error_log( var_export( $email, true ) );
-
-	//wp_mail
+	wp_mail( $to = $email_address, $subject, $message );
 }
 
 function skios_email_customer_details($order) {

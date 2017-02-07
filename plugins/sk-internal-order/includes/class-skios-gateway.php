@@ -167,9 +167,6 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 		skios_handle_order_notifications( $order, $sorted_items );
 
-		// Return false is for debugging purposes.
-		return false;
-
 		// Mark as on-hold (we're awaiting the cheque).
 		$order->update_status( 'wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ) );
 
