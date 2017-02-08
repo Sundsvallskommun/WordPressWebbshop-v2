@@ -44,7 +44,7 @@ class SKIOS_Product_Owner {
 			$owner_id = get_post_meta( $product->id, self::$METAKEY_NAME, true );
 			$owner = skios_get_product_owner_by_id($owner_id);
 
-			printf('<p class="product-owner">%s</p>', sprintf( __('Produkten tillhör <strong>%s</strong>', 'skios'), $owner['label'] ) );
+			printf('<p class="product-owner"><em>%s</em></p>', $owner['label'] );
 
 		} catch (Exception $e) { }
 
