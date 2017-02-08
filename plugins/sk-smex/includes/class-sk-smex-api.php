@@ -35,6 +35,11 @@ class SK_SMEX_API {
 	private function __construct() {
 		if ( ! defined( 'SMEX_URL' ) ) {
 			throw new Exception( __( 'SMEX_URL is not defined!', 'sk-smex' ) );
+		} else {
+			$soap_client = $this->get_soap_client();
+			if ( is_wp_error( $soap_client ) ) {
+				throw new Exception( $soap_client->get_error_message() );
+			}
 		}
 	}
 
@@ -64,12 +69,12 @@ class SK_SMEX_API {
 					'loginname'	=> $username,
 				) );
 				if ( empty( $result->GetPortalPersonDataResult ) ) {
-					return new WP_Error( __( 'Couldn\'t retrieve info about logged in user from SMEX.', 'sk-smex' ) );
+					return new WP_Error( 'user_not_found_in_smex', __( 'Couldn\'t retrieve info about logged in user from SMEX.', 'sk-smex' ) );
 				} else {
 					$this->user_data = $result->GetPortalPersonDataResult->PortalPersonData;
 				}
 			} else {
-				return new WP_Error( __( 'User isn\'t logged in.', 'sk-smex' ) );
+				return new WP_Error( 'user_not_logged_in', __( 'User isn\'t logged in.', 'sk-smex' ) );
 			}
 		}
 
@@ -81,7 +86,7 @@ class SK_SMEX_API {
 		}
 
 		// Return WP_Error if property doesn't exist.
-		return new WP_Error( __( "{$property} doesn't exist.", 'sk-smex' ) );
+		return new WP_Error( 'property_not_existing', __( "{$property} doesn't exist.", 'sk-smex' ) );
 	}
 
 	/**
@@ -90,12 +95,16 @@ class SK_SMEX_API {
 	 */
 	private function get_soap_client() {
 		if ( is_null( $this->soap ) ) {
-			$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
-				'trace'			=> true,
-				'cache_wsdl'	=> WSDL_CACHE_NONE,
-				'soap_version'	=> SOAP_1_1,
-			) );
-			$this->soap->__setLocation( SMEX_URL . '/basic' );
+			try {
+				$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
+					'trace'			=> true,
+					'cache_wsdl'	=> WSDL_CACHE_NONE,
+					'soap_version'	=> SOAP_1_1,
+				) );
+				$this->soap->__setLocation( SMEX_URL . '/basic' );
+			} catch ( Exception $e ) {
+				return new WP_Error( 'smex_unreachable', __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
+			}
 		}
 		return $this->soap;
 	}
