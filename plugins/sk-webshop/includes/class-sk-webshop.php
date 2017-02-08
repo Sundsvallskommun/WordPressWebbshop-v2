@@ -32,9 +32,9 @@ class SK_Webshop {
 	 */
 	public static function get_instance() {
 		if ( is_null( self::$instance ) ) {
-			$instance = new self();
+			self::$instance = new self();
 		}
-		return $instance;
+		return self::$instance;
 	}
 
 	/**
