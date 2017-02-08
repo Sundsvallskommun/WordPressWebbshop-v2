@@ -49,7 +49,13 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function init_hooks() {
-		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_checkout_fields' ) );
+		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_checkout_fields' ), 10 );
+		add_filter( 'woocommerce_form_field_args', array( $this, 'set_readonly_checkout_fields' ), 10, 3 );
+		add_filter( 'woocommerce_checkout_get_value', array( $this, 'populate_checkout_fields' ), 10, 2 );
+
+		// Filters that will make sure that some fields aren't altered.
+		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'check_billing_first_name' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'check_billing_last_name' ) );
 	}
 
 	/**
@@ -72,10 +78,74 @@ class SK_SMEX {
 					'required'		=> true,
 					'clear'			=> true,
 					'label_class'	=> '',
+					'default'		=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
 				);
 			break;
 		}
 		return $fields;
+	}
+
+	/**
+	 * Modifies some of the checkout fields to be readonly.
+	 * @param  array $args
+	 * @param  string $key
+	 * @param  string $value
+	 * @return array
+	 */
+	public function set_readonly_checkout_fields( $args, $key, $value ) {
+		// Only modify on checkout.
+		if ( is_checkout() ) {
+			if ( $key === 'billing_first_name' || $key === 'billing_last_name' ) {
+				$args[ 'custom_attributes' ][ 'readonly' ] = 'readonly';
+			}
+		}
+		return $args;
+	}
+
+	/**
+	 * Sets the value of some of the fields in checkout.
+	 * @param  string $value
+	 * @param  string $input
+	 * @return string
+	 */
+	public function populate_checkout_fields( $value, $input ) {
+		// Only modify checkout fields.
+		if ( is_checkout() ) {
+			switch ( $input ) {
+				case 'billing_first_name':
+					$value = $this->smex_api->get_user_data( 'Givenname' );
+				break;
+				
+				case 'billing_last_name':
+					$value = $this->smex_api->get_user_data( 'Lastname' );
+				break;
+
+				case 'billing_reference_number':
+					$value = $this->smex_api->get_user_data( 'ReferenceNumber' );
+				break;
+			}
+		}
+		return $value;
+	}
+
+	/**
+	 * Makes sure that the billing first name is set to
+	 * the current users first name.
+	 * @param  string $value
+	 * @return string
+	 */
+	public function check_billing_first_name( $value ) {
+		return $this->smex_api->get_user_data( 'Givenname' );
+	}
+
+	/**
+	 * Makes sure that the billing last name is set to
+	 * the current users last name.
+	 * @param  string $value
+	 * @return string
+	 */
+	public function check_billing_last_name( $value ) {
+		return $this->smex_api->get_user_data( 'Lastname' );
 	}
 
 }
