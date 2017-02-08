@@ -193,13 +193,9 @@ function skios_no_owner_email( $email_address, $order, $items ) {
 
 	$message .= skios_email_customer_details($order);
 
-	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
-
-	$message .= "Produkter";
+	$message .= "Produkter\n-----------------------\n";
 
 	$message .= skios_email_items($order, $items);
-
-	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
 	$subject = __( 'Ny order på produkter som saknar ägare', 'skios' );
 
@@ -215,13 +211,9 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message .= skios_email_customer_details($order);
 
-	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
-
-	$message .= "Produkter";
+	$message .= "Produkter\n-----------------------\n";
 
 	$message .= skios_email_items($order, $items);
-
-	$message .= "=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
 	$subject = __( 'Ny order på era produkter', 'skios' );
 
