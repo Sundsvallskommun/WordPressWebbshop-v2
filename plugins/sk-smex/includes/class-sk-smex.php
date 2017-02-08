@@ -63,7 +63,7 @@ class SK_SMEX {
 	 * @return array
 	 */
 	public function change_checkout_fields( $fields ) {
-		switch ( (int) $this->smex_api->get_user_organization() ) {
+		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
 			case 1:
 				$fields[ 'billing' ][ 'billing_reference_number' ] = array(
 					'type'			=> 'text',

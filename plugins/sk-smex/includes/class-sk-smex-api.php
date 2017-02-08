@@ -51,19 +51,11 @@ class SK_SMEX_API {
 	}
 
 	/**
-	 * Returns the user organization.
-	 * @return string|WP_Error
-	 */
-	public function get_user_organization() {
-		return $this->get_user_data( 'CompanyId' );
-	}
-
-	/**
 	 * Returns the value from a given property.
 	 * @param  string $property
 	 * @return string
 	 */
-	private function get_user_data( $property ) {
+	public function get_user_data( $property ) {
 		// Make sure we have retrieved user data.
 		if ( is_null( $this->user_data ) ) {
 			if ( wp_get_current_user() !== 0 && ! empty( $username = wp_get_current_user()->user_login ) ) {
@@ -88,8 +80,8 @@ class SK_SMEX_API {
 			}
 		}
 
-		// Return false if property doesn't exist.
-		return false;
+		// Return WP_Error if property doesn't exist.
+		return new WP_Error( __( "{$property} doesn't exist.", 'sk-smex' ) );
 	}
 
 	/**
