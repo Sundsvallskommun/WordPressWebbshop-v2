@@ -33,6 +33,8 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-webshop.php';
 
+// Create an instance of the main class.
+$skw = SK_Webshop::get_instance();
 
 /**
  * Main instance of SK_Webshop.
