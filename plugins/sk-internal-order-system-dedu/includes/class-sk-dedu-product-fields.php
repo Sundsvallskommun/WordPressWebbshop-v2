@@ -17,18 +17,18 @@ class SK_DeDU_Product_Fields {
 	 * The post meta key name.
 	 * @var string
 	 */
-	private $FIELDS_META_KEY = 'sk_dedu_fields';
+	private static $FIELDS_META_KEY = 'sk_dedu_fields';
 
 	/**
 	 * The fields that we are interested in.
 	 * @var array
 	 */
 	private $FIELDS = array(
-		'YrkeId',
-		'ArendetypId',
-		'KategoriId',
-		'UnderkategoriId',
-		'PrioritetId'
+		'YrkeId'			=> 113,
+		'ArendetypId'		=> 1,
+		'KategoriId'		=> 26,
+		'UnderkategoriId'	=> 100,
+		'PrioritetId'		=> -1,
 	);
 
 	/**
@@ -42,7 +42,7 @@ class SK_DeDU_Product_Fields {
 		add_action( 'woocommerce_product_data_panels', array( $this, 'add_dedu_fields' ) );
 
 		// Save the DeDU data.
-		add_action( 'woocommerce_process_product_meta', array( $this, 'save_dedu_data' ) );
+		add_action( 'save_post', array( $this, 'save_dedu_data' ) );
 	}
 
 	/**
@@ -72,16 +72,16 @@ class SK_DeDU_Product_Fields {
 		<div id="sk_dedu_product_data_tab" class="panel woocommerce_options_panel">
 			<?php
 			// Get the saved values.
-			$values = get_post_meta( $post->ID, $this->FIELDS_META_KEY, true );
+			$values = get_post_meta( $post->ID, self::$FIELDS_META_KEY, true );
 
 			// Create text inputs for each fields.
-			foreach ( $this->FIELDS as $field ) {
+			foreach ( $this->FIELDS as $field => $default_value ) {
 				// Check if we have a saved value.
-				$value = ( $values && isset( $values[ $field ] ) ) ? $values[ $field ] : '';
+				$value = ( $values && ! empty( $values[ $field ] ) ) ? $values[ $field ] : $default_value;
 
 				// Create field.
 				woocommerce_wp_text_input( array(
-					'id'			=> 'sk_dedu[' . $field . ']',
+					'id'			=> self::$FIELDS_META_KEY . '[' . $field . ']',
 					'wrapper_class'	=> 'show_if_simple',
 					'label'			=> $field,
 					'description'	=> sprintf( __( 'Fyll i %s.', 'sk-dedu' ), $field ),
@@ -101,11 +101,24 @@ class SK_DeDU_Product_Fields {
 	 * @return void
 	 */
 	public function save_dedu_data( $post_id ) {
-		if ( ! empty( $_POST[ 'sk_dedu' ] ) && is_array( $_POST[ 'sk_dedu' ] ) ) {
-			$fields = $_POST[ 'sk_dedu' ];
+		// Don't save unless it's a product.
+		if ( get_post_type( $post_id ) !== 'product' ) {
+			return false;
+		}
 
-			// Save as postmeta.
-			update_post_meta( $post_id, $this->FIELDS_META_KEY, $fields );
+		// Don't save revisions or autosaves.
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return $post_id;
+		}
+
+		// Always save dedu fields on the post.
+		// If one is provided, we'll save that,
+		// otherwise we'll save the default values.
+		$dedu_fields = ( ! empty( $_REQUEST[ self::$FIELDS_META_KEY ] ) ) ? $_REQUEST[ self::$FIELDS_META_KEY ] : '';
+		if( ! empty( $dedu_fields ) ) {
+			update_post_meta( $post_id, self::$FIELDS_META_KEY, $dedu_fields );
+		} else {
+			update_post_meta( $post_id, self::$FIELDS_META_KEY, $this->FIELDS );
 		}
 	}
 
