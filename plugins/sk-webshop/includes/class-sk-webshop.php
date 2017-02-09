@@ -23,6 +23,7 @@ class SK_Webshop {
 	 * Inits the class.
 	 */
 	public function __construct() {
+		add_action( 'save_post', array( $this, 'add_sku_if_missing' ), 10, 3 );
 	}
 
 	/**
@@ -38,19 +39,44 @@ class SK_Webshop {
 	}
 
 	/**
+	 * Checks if post has a SKU and generates one if
+	 * it doesn't.
+	 * @param  integer $post_id
+	 * @return void
+	 */
+	public function add_sku_if_missing( $post_id, $post, $update ) {
+		// Don't save unless it's a product.
+		if ( get_post_type( $post_id ) !== 'product' ) {
+			return false;
+		}
+
+		// Don't save revisions or autosaves.
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return $post_id;
+		}
+
+		// Save an auto-generated SKU if one doesn't exist.
+		if ( empty( $_REQUEST[ '_sku' ] ) ) {
+			update_post_meta( $post_id, '_sku', $this->generate_sku( $post ) );
+		}
+	}
+
+	/**
 	 * Generates a SKU.
 	 * @param  WC_Product|post_id $product
 	 * @return void
 	 */
 	public function generate_sku( $product ) {
 		if ( is_int( $product ) ) {
-			$post_title = get_the_title( $product );
+			$post_id = $product;
 		} else if ( is_a( $product, 'WC_Product' ) ) {
-			$post_title = $product->post->post_title;
+			$post_id = $product->id;
+		} else if ( is_a( $product, 'WP_Post' ) ) {
+			$post_id = $product->ID;
 		} else {
-			throw new WP_Error( __( 'Parameter must be instance of WC_Product or integer.', 'sk-webshop' ) );
+			throw new WP_Error( __( 'Parameter must be instance of WC_Product, WP_Post or integer.', 'sk-webshop' ) );
 		}
-		return sanitize_title( $post_title );
+		return sprintf( 'SK-ART-%d', $post_id );
 	}
 
 }
