@@ -25,7 +25,6 @@ class SK_SMEX {
 	public function __construct() {
 		$this->includes();
 		$this->init_classes();
-		$this->init_hooks();
 	}
 
 	/**
@@ -41,7 +40,12 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function init_classes() {
-		$this->smex_api = SK_SMEX_API::get_instance();
+		try {
+			$this->smex_api = SK_SMEX_API::get_instance();
+			$this->init_hooks();
+		} catch ( Exception $e ) {
+			error_log( $e );
+		}
 	}
 
 	/**
