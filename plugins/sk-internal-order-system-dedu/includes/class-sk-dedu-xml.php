@@ -35,14 +35,18 @@ class Sk_DeDU_XML {
 
 		$xml .= '<Sundsvall_ListOfWebShopTasks xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">';
 
-			// Get the XML for the order items.
-			$order_items = $this->generate_order_items_xml( $this->items );
-			if ( ! is_wp_error( $order_items ) ) {
-				$xml .= $order_items;
-			} else {
-				// Otherwise return the instance of the WP_Error.
-				return $order_items;
-			}
+			$xml .= '<listOfTasks>';
+
+				// Get the XML for the order items.
+				$order_items = $this->generate_order_items_xml( $this->items );
+				if ( ! is_wp_error( $order_items ) ) {
+					$xml .= $order_items;
+				} else {
+					// Otherwise return the instance of the WP_Error.
+					return $order_items;
+				}
+
+			$xml .= '</listOfTasks>';
 
 		$xml .= '</Sundsvall_ListOfWebShopTasks>';
 
