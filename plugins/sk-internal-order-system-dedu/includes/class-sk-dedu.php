@@ -90,7 +90,7 @@ class SK_DeDU {
 			$dedu_ws = new SK_DeDU_WS( $credentials[ 'username' ], $credentials[ 'password' ] );
 
 			// Send order.
-			$dedu_ws->send_order( $order, $items );
+			return $dedu_ws->send_order( $order, $items );
 		}
 	}
 
