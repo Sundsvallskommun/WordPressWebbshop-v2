@@ -65,7 +65,7 @@ class Sk_DeDU_WS {
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 
 		// Get the XML.
-		$dedu_xml = new SK_DeDU_XML( $order_items );
+		$dedu_xml = new SK_DeDU_XML( $order, $order_items );
 		$xml = $dedu_xml->generate_xml();
 
 		// Make sure all is fine.

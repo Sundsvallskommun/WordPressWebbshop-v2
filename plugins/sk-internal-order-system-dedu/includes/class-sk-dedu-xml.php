@@ -22,7 +22,8 @@ class Sk_DeDU_XML {
 	 *
 	 * Saves the order_items as a property.
 	 */
-	public function __construct( $items ) {
+	public function __construct( WC_Order $order, $items ) {
+		$this->order = $order;
 		$this->items = $items;
 	}
 
