@@ -39,7 +39,7 @@ class Sk_DeDU_XML {
 			$xml .= '<listOfTasks>';
 
 				// Get the XML for the order items.
-				$order_items = $this->generate_order_items_xml( $this->items );
+				$order_items = $this->generate_order_items_xml( $this->order, $this->items );
 				if ( ! is_wp_error( $order_items ) ) {
 					$xml .= $order_items;
 				} else {
@@ -56,9 +56,11 @@ class Sk_DeDU_XML {
 
 	/**
 	 * Generates a XML string from a template.
+	 * @param  WC_Order $order
+	 * @param  array    $items
 	 * @return string
 	 */
-	private function generate_order_items_xml( $items ) {
+	private function generate_order_items_xml( WC_Order $order, $items ) {
 			// Loop through $items and get the values.
 			foreach ( $items as $item ) {
 				// Get the fields first.
