@@ -78,8 +78,8 @@ class Sk_DeDU_WS {
 			$data = curl_exec( $ch );
 
 			// Return result.
-			return ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 200 );
-			} else {
+			// We're expecting HTTP code 201 for created if success.
+			return ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 );
 		} else {
 			return $xml;
 		}
