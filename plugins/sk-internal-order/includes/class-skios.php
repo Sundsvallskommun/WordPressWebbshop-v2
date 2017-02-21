@@ -37,7 +37,7 @@ class SKIOS {
 		add_filter( 'wc_order_statuses', array( $this, 'add_internal_to_order_statuses' ) );
 
 		// Hook in to the order notification action for the default email type.
-		add_action( 'skios_order_notification', array( $this, 'handle_order_notification' ), 10, 4 );
+		add_filter( 'skios_order_notification', array( $this, 'handle_order_notification' ), 10, 5 );
 	}
 
 	/**
@@ -143,11 +143,13 @@ class SKIOS {
 	 * @param  array    $items The order items
 	 * @return void
 	 */
-	public function handle_order_notification( $type, $owner, $order, $items ) {
+	public function handle_order_notification( $result, $type, $owner, $order, $items ) {
 		if ( $type === 'email' ) {
 			$email = $owner[ 'identifier' ];
 			skios_owner_order_email( $email, $order, $items );
 		}
+
+		return $result;
 	}
 
 }

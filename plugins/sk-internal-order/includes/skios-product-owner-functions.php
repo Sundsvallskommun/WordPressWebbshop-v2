@@ -155,6 +155,8 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 
 	if ( is_array($sorted_items) ) {
 
+		$result = array();
+
 		foreach( $sorted_items as $owner_id => $items ) {
 
 			if ( 0 == $owner_id ) {
@@ -169,17 +171,25 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 				 *
 				 * @since 20170105
 				 *
+				 * @param boolean  true
 				 * @param string   $owner[ 'type' ] The type of product owner.
 				 * @param array    $owner           The product owner.
 				 * @param WC_Order $order         The WC_Order object.
 				 * @param items    $items           The order items that belongs to this product owner.
 				 */
-				do_action( 'skios_order_notification', $owner[ 'type' ], $owner, $order, $items );
+				if ( apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $items ) ) {
+					$result[ $owner_id ] = $items;
+				}
 			}
 
 		}
 
+		return ( count( $result ) === count( $sorted_items ) );
+
 	}
+
+	return false;
+
 }
 
 /**
