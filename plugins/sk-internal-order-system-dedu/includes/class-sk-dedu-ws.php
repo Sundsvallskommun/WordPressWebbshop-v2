@@ -61,9 +61,8 @@ class Sk_DeDU_WS {
 		// Init cURL.
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $this->WS_SESSION_KEY ) );
-
-		curl_setopt( $ch, CURLOPT_HEADER, true );
 		curl_setopt( $ch, CURLOPT_POST, true );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 
 		// Get the XML.
 		$dedu_xml = new SK_DeDU_XML( $order_items );
