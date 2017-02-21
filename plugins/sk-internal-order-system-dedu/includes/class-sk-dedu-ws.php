@@ -73,7 +73,7 @@ class Sk_DeDU_WS {
 		if ( ! is_wp_error( $xml ) ) {
 			echo  $xml;
 			// Set data.
-			curl_setopt( $ch, CURLOPT_POSTFIELDS, 'xmlFile=' . $xml );
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $xml );
 
 			// Execute request.
 			$data = curl_exec( $ch );
