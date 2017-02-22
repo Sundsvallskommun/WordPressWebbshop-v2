@@ -63,6 +63,7 @@ class Sk_DeDU_WS {
 		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $this->WS_SESSION_KEY ) );
 		curl_setopt( $ch, CURLOPT_POST, true );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_HEADER, true );
 
 		// Get the XML.
 		$dedu_xml = new SK_DeDU_XML( $order, $order_items );
@@ -76,9 +77,23 @@ class Sk_DeDU_WS {
 			// Execute request.
 			$data = curl_exec( $ch );
 
-			// Return result.
-			// We're expecting HTTP code 201 for created if success.
-			return ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 );
+			// Check if we had any errors and if the HTTP status code was 201.
+			if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 ) {
+				return true;
+			} else {
+				// Otherwise return a WP_Error with the ErrorDescription header
+				// as the message.
+				
+				// Get headers.
+				$headers = SKW()->get_headers_from_curl( $data );
+
+				// Make sure 'ErrorDescription' is set.
+				if ( ! empty( $error_description = $headers[ 'ErrorDescription' ] ) ) {
+					return new WP_Error( 'webservice_error', $error_description );
+				} else {
+					return new WP_Error( 'unknown_error', __( 'Something unexpected went wrong when trying to send order to DeDU.', 'sk-dedu' ) );
+				}
+			}
 		} else {
 			return $xml;
 		}
