@@ -79,4 +79,33 @@ class SK_Webshop {
 		return sprintf( 'SK-ART-%d', $post_id );
 	}
 
+	/**
+	 * Returns an array of all response headers
+	 * from a cURL response.
+	 * @param  string $response
+	 * @return array
+	 */
+	public function get_headers_from_curl( $response ) {
+
+		/**
+		 * Split the headers text by newline and then process
+		 * each part individually and make sure that they are
+		 * a valid header and then add them to the array.
+		 */
+
+		$headers = array();
+		$response = explode( "\n", $response );
+		$headers[ 'Status' ] = $response[ 0 ];
+		array_shift( $response );
+		foreach ( $response as $part ) {
+			if ( ! empty( $part ) && strpos( $part, ':' ) !== false ) {
+				$middle = explode( ':', $part );
+				$headers[ trim( $middle[ 0 ] ) ] = trim( $middle[ 1 ] );
+			}
+		}
+
+		// Return all headers.
+		return $headers;
+	}
+
 }
