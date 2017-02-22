@@ -72,14 +72,14 @@ class Sk_DeDU_XML {
 				// Opening tag.
 				$xml = '<Sundsvall_CreateWebShopTask>';
 
-					$xml .= '<ADName>HELSJD</ADName>';
+					$xml .= "<ADName>{$this->get_adname()}</ADName>";
 					$xml .= '<YrkeId>' . $item[ 'dedu_fields' ][ 'YrkeId' ] . '</YrkeId>';
 					$xml .= '<ArendetypId>' . $item[ 'dedu_fields' ][ 'ArendetypId' ] . '</ArendetypId>';
 					$xml .= '<KategoriId>' . $item[ 'dedu_fields' ][ 'KategoriId' ] . '</KategoriId>';
 					$xml .= '<UnderkategoriId>' . $item[ 'dedu_fields' ][ 'UnderkategoriId' ] . '</UnderkategoriId>';
 					$xml .= "<Anmarkning>{$this->generate_anmarkning_xml( $items )}</Anmarkning>";
 					$xml .= '<PrioritetId>' . $item[ 'dedu_fields' ][ 'PrioritetId' ] . '</PrioritetId>';
-					$xml .= "<Referensnummer>123</Referensnummer>";
+					$xml .= "<Referensnummer>{$order->billing_reference_number}</Referensnummer>";
 					$xml .= "<InternKommentar>{$this->generate_internkommentar_xml( $order, $items )}</InternKommentar>";
 
 				// Closing tag.
@@ -88,6 +88,19 @@ class Sk_DeDU_XML {
 
 		// Return XML string.
 		return $xml;
+	}
+
+	/**
+	 * Returns ADName for DeDU.
+	 * @return string
+	 */
+	private function get_adname() {
+		$current_user = wp_get_current_user();
+		if ( $current_user->ID > 0 ) {
+			return $current_user->user_login;
+		} else {
+			throw new WP_Error( __( 'User is not logged in!', 'sk-dedu' ) );
+		}
 	}
 
 	/**
