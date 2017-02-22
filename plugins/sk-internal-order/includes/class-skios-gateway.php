@@ -167,7 +167,7 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 		// Check if all order notifications were successful.
 		$result = skios_handle_order_notifications( $order, $sorted_items );
-		if ( $result ) {
+		if ( ! is_wp_error( $result ) ) {
 			// Mark as on-hold (we're awaiting the cheque).
 			$order->update_status( 'wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ) );
 
@@ -183,7 +183,10 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 				'redirect'	=> $this->get_return_url( $order )
 			);
 		} else {
-			return false;
+			// WooCommerce documentation dictates that if an error occurs we should
+			// set a notice and return null.
+			wc_add_notice( $result->get_error_message(), 'error' );
+			return;
 		}
 	}
 

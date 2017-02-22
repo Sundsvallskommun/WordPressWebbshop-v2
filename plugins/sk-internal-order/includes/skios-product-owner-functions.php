@@ -155,7 +155,7 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 
 	if ( is_array($sorted_items) ) {
 
-		$result = array();
+		$successful_filters = array();
 
 		foreach( $sorted_items as $owner_id => $items ) {
 
@@ -177,14 +177,16 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 				 * @param WC_Order $order         The WC_Order object.
 				 * @param items    $items           The order items that belongs to this product owner.
 				 */
-				if ( apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $items ) ) {
-					$result[ $owner_id ] = $items;
+				if ( ! is_wp_error( $result = apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $items ) ) ) {
+					$successful_filters[ $owner_id ] = $items;
+				} else {
+					return $result;
 				}
 			}
 
 		}
 
-		return ( count( $result ) === count( $sorted_items ) );
+		return ( count( $successful_filters ) === count( $sorted_items ) );
 
 	}
 
