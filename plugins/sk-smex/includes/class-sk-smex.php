@@ -124,6 +124,10 @@ class SK_SMEX {
 					$value = $this->smex_api->get_user_data( 'Lastname' );
 				break;
 
+				case 'billing_company':
+					$value = $this->smex_api->get_user_data( 'Company' );
+				break;
+
 				case 'billing_reference_number':
 					$value = $this->smex_api->get_user_data( 'ReferenceNumber' );
 				break;
