@@ -142,14 +142,14 @@ class Sk_DeDU_XML {
 
 		// Add shipping address.
 		$string .= sprintf( __( "Leveransadress: %s\n%s\n%s %s\n", 'sk-dedu' ),
-			$order->billing_city,
+			$order->billing_company,
 			$order->billing_address_1,
 			$order->billing_zipcode,
 			$order->billing_city );
 
 		// Add billing address.
 		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n%s\n%s %s\n", 'sk-dedu' ),
-			$order->shipping_city,
+			$order->shipping_company,
 			$order->shipping_address_1,
 			$order->shipping_zipcode,
 			$order->shipping_city );
