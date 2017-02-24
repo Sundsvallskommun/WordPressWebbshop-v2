@@ -25,6 +25,8 @@ class SK_Privacy_Products {
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_custom_product_field' ) );
 		add_action( 'woocommerce_process_product_meta', array( $this, 'add_custom_product_field_save' ) );
 		add_action( 'woocommerce_order_status_changed', array( $this, 'remove_privacy_data' ), 10, 3 );
+
+		add_action( 'woocommerce_single_product_summary', array( $this, 'display_privacy_info'), 15 );
 	}
 
 	/**
@@ -54,6 +56,10 @@ class SK_Privacy_Products {
 	public function add_custom_product_field_save($post_id) {
 		$woocommerce_checkbox = isset( $_POST['_privacy_enabled'] ) ? 'yes' : 'no';
 		update_post_meta( $post_id, '_privacy_enabled', $woocommerce_checkbox );
+	}
+
+	public function display_privacy_info() {
+		echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretessprodukt</strong></p>';
 	}
 
 	public function remove_privacy_data( $order_id, $old_status, $new_status ) {
