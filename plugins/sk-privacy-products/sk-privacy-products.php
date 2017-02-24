@@ -27,4 +27,4 @@ if ( ! in_array( 'sk-webshop/sk-webshop.php', apply_filters( 'active_plugins', g
 
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-privacy-products.php';
-$sk_smex = new SK_Privacy_Products();
+$sk_privacy_products = new SK_Privacy_Products();
