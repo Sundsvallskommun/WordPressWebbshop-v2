@@ -14,6 +14,12 @@
 class SK_DeDU {
 
 	/**
+	 * Singleton instance of class.
+	 * @var null|SK_DeDU
+	 */
+	private static $instance = null;
+
+	/**
 	 * Sets up the plugin correctly regarding hooks etc.
 	 */
 	public function __construct() {
@@ -24,6 +30,18 @@ class SK_DeDU {
 
 		// Hook in to the order notification action.
 		add_filter( 'skios_order_notification', array( $this, 'handle_dedu_order_notification' ), 10, 5 );
+	}
+
+	/**
+	 * Returns Singleton instance of class.
+	 * @return SK_DeDU
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
 	}
 
 	/**
