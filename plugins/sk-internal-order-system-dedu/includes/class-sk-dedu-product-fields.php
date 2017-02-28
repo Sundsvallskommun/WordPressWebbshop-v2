@@ -46,6 +46,16 @@ class SK_DeDU_Product_Fields {
 	}
 
 	/**
+
+	/**
+	 * Returns the default fields.
+	 * @return array
+	 */
+	public function get_default_fields() {
+		return $this->FIELDS;
+	}
+
+	/**
 	 * Adds our custom tab to the data tabs in the admin
 	 * section for products.
 	 * @param  array $tabs
