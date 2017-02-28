@@ -23,7 +23,7 @@ class SKIOS_Product_Owner {
 	 */
 	public function __construct() {
 
-		add_action( 'woocommerce_single_product_summary', array( $this, 'display_product_owner'), 20 );
+		add_action( 'woocommerce_single_product_summary', array( $this, 'display_product_owner' ), 20 );
 
 		// Display owner option on product admin screen.
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_owner_field' ) );
