@@ -1,0 +1,77 @@
+/*
+ Theme Name:   Storefront Child
+ Theme URI:
+ Description:  Storefront Child Theme
+ Author:       FMCA/Sundsvalls Kommun
+ Author URI:
+ Template:     storefront
+ Version:      1.0.0
+ License:
+ License URI:
+ Tags:
+ Text Domain:  storefront-child
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,400i,700,700i');
+
+body {
+	font-family: Arial, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: 'Raleway', sans-serif;
+}
+
+/**
+ * Site header
+ */
+@media (min-width: 768px) {
+
+	.site-branding {
+		width: 30%;
+	}
+
+	.woocommerce-active .site-header .site-search,
+	.site-header .site-search {
+		width: 70%;
+	}
+
+	.storefront-primary-navigation {
+		background: transparent;
+		border-bottom: 4px solid #DEE4E9;
+	}
+	.storefront-primary-navigation .nav-menu a {
+		font-weight: 400;
+		color: black !important;
+	}
+
+}
+input[type="search"] {
+	background: white;
+	font-size: 1.0625rem;
+	padding: .8em 1.5em !important;
+	height: 3.62rem;
+	border: 1px solid #e8e8ea;
+	box-shadow: none;
+	border-radius: 0.25rem;
+	width: 100%;
+}
+
+input[type="search"]:focus {
+	background: white;
+	border: 1px solid #a90074;
+}
+
+form[role="search"]:before {
+	color: #a90074;
+	font-size: 2em;
+	left: auto !important;
+	right: 1em !important;
+	top: .5em !important;
+
+}
