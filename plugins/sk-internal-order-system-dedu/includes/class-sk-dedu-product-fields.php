@@ -14,6 +14,12 @@
 class SK_DeDU_Product_Fields {
 
 	/**
+	 * Singleton instance of class.
+	 * @var null|SK_DeDU
+	 */
+	private static $instance = null;
+
+	/**
 	 * The post meta key name.
 	 * @var string
 	 */
@@ -46,6 +52,16 @@ class SK_DeDU_Product_Fields {
 	}
 
 	/**
+	 * Returns Singleton instance of class.
+	 * @return SK_DeDU
+	 */
+	public static function get_instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
 
 	/**
 	 * Returns the default fields.

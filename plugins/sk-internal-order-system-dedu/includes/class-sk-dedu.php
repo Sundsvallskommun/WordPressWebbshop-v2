@@ -65,7 +65,7 @@ class SK_DeDU {
 	 * @return void
 	 */
 	private function init_classes() {
-		$productfields = new SK_DeDU_Product_Fields();
+		$this->productfields = SK_DeDU_Product_Fields::get_instance();
 	}
 
 	/**
