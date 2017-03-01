@@ -265,7 +265,7 @@ class SK_CSV_Importer extends WP_Importer {
 		echo '<div class="narrow">';
 		echo '<p>' . __( 'Hejsan! Ladda upp en CSV fil innehållandes produkter för att importera till din e-butik. Välj en .csv fil att ladda upp, klicka sedan på "Ladda upp fil och importera".', 'sk-csvimporter' ).'</p>';
 
-		echo '<p>' . sprintf( __( 'Produkter måste vara definerade med kolumner i en specifik ordning (8 kolumner). <a href="%s">Klicka här för att ladda ner ett exempel</a>.', 'sk-csvimporter' ), SK_CVS_IMPORTER_PLUGIN_URL . '/dummy-data/sample_products.csv' ) . '</p>';
+		echo '<p>' . sprintf( __( 'Produkter måste vara definerade med kolumner i en specifik ordning (11 kolumner). <a href="%s">Klicka här för att ladda ner ett exempel</a>.', 'sk-csvimporter' ), SK_CVS_IMPORTER_PLUGIN_URL . '/dummy-data/sample_products.csv' ) . '</p>';
 
 		$action = 'admin.php?import=sk_product_import_csv&step=1';
 
