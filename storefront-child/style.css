@@ -32,6 +32,9 @@ h6 {
  */
 @media (min-width: 768px) {
 
+	.site-header {
+		background-color: #f9f9f9;
+	}
 	.site-branding {
 		width: 30%;
 	}
