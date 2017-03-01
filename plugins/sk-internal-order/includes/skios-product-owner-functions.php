@@ -45,6 +45,40 @@ function skios_get_product_owner_by_id($id = null) {
 }
 
 /**
+ * Get product owner by label.
+ * @param  string $label
+ * @return array         Product owner
+ */
+function skios_get_product_owner_by_label( $label ) {
+	$owners = skios_get_product_owners();
+
+	foreach ( $owners as $owner ) {
+		if ( $owner[ 'label' ] === $label ) {
+			return $owner;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Get product owner by identifier.
+ * @param  string $identifier
+ * @return array              Product owner
+ */
+function skios_get_product_owner_by_identifier( $identifier ) {
+	$owners = skios_get_product_owners();
+
+	foreach ( $owners as $owner ) {
+		if ( $owner[ 'identifier' ] === $identifier ) {
+			return $owner;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Inserts a new product owner.
  * @param  array  $args
  * @return array|WP_Error

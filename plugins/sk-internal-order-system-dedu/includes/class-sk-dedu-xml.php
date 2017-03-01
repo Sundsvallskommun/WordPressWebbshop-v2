@@ -111,7 +111,7 @@ class Sk_DeDU_XML {
 	private function generate_anmarkning_xml( $items ) {
 		// Add header.
 		$string = sprintf( __( "Beställningsnummer: %d\n\n", 'sk-dedu' ), $this->order->id );
-		$string .= __( "Antal\t\t\tAnrtikel nr\t\t\t\t\tArtikel\n\n", 'sk-dedu' );
+		$string .= __( "Antal\t\t\t\tAnrtikel nr\t\t\t\t\tArtikel\n\n", 'sk-dedu' );
 
 		// Loop through all items.
 		foreach ( $items as $item ) {
@@ -144,14 +144,14 @@ class Sk_DeDU_XML {
 		$string .= sprintf( __( "Leveransadress: %s\n%s\n%s %s\n", 'sk-dedu' ),
 			$order->billing_company,
 			$order->billing_address_1,
-			$order->billing_zipcode,
+			$order->billing_postcode,
 			$order->billing_city );
 
 		// Add billing address.
 		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n%s\n%s %s\n", 'sk-dedu' ),
 			$order->shipping_company,
 			$order->shipping_address_1,
-			$order->shipping_zipcode,
+			$order->shipping_postcode,
 			$order->shipping_city );
 		return $string;
 	}

@@ -122,53 +122,89 @@ class SK_CSV_Importer extends WP_Importer {
 
 		$this->import_start();
 
+		// Count every loop iteration.
 		$loop = 0;
+
+		// Count every successful product import.
+		$added_product = 0;
 
 		if ( ( $handle = fopen( $file, "r" ) ) !== false ) {
 			$header = fgetcsv( $handle, 0, $this->delimiter );
 
-			if ( 8 === sizeof( $header ) ) {
+			// Get default DeDU fields.
+			$dedu_pf = SK_DeDU_Product_Fields::get_instance()->get_default_fields();
+
+			// Make sure we have the right number of columns.
+			if ( 11 === sizeof( $header ) ) {
 				while ( ( $row = fgetcsv( $handle, 0, $this->delimiter ) ) !== false ) {
-					list( $post_title, $post_content, $sku, $price, $yrke_id, $arendetyp_id, $kategori_id, $underkategori_id ) = $row;
+					list(
+						$post_title,
+						$post_content,
+						$sku,
+						$price,
+						$price_unit,
+						$yrke_id,
+						$arendetyp_id,
+						$kategori_id,
+						$underkategori_id,
+						$prioritet_id,
+						$product_owner ) = $row;
 
-					$args = array(
-						'post_title'	=> $post_title,
-						'post_content'	=> $post_content,
-						'post_type'		=> 'product',
-					);
-					if ( ( $post_id = wp_insert_post( $args ) ) !== 0 ) {
-						// Add DeDU fields.
-						$dedu_fields = array(
-							'YrkesId'			=> $yrke_id,
-							'ArendetypId'		=> $arendetyp_id,
-							'KategoriId'		=> $kategori_id,
-							'UnderkategorId'	=> $underkategori_id,
+					// Skip every row that don't have a SKU.
+					if ( ! empty( $sku ) ) {
+						$args = array(
+							'post_title'	=> $post_title,
+							'post_content'	=> $post_content,
+							'post_type'		=> 'product',
 						);
-						update_post_meta( $post_id, 'sk_dedu_fields', $dedu_fields );
+						if ( ( $post_id = wp_insert_post( $args ) ) !== 0 ) {
+							// Add SKU.
+							$sku = ( empty( $sku ) ) ? SKW()->generate_sku( $post_id ) : $sku;
+							update_post_meta( $post_id, '_sku', $sku );
 
-						// Add SKU.
-						$sku = ( empty( $sku ) ) ? SKW()->generate_sku( $post_id ) : $sku;
-						update_post_meta( $post_id, '_sku', $sku );
+							// Add price.
+							update_post_meta( $post_id, '_regular_price', $price );
+							update_post_meta( $post_id, '_price', $price );
 
-						// Add price.
-						update_post_meta( $post_id, '_regular_price', $price );
-						update_post_meta( $post_id, '_price', $price );
+							// Try to get the taxonomy term for
+							// this unit type.
+							if ( $term = get_term_by( 'slug', sanitize_title( $price_unit ), 'product_unit_type' ) ) {
+								wp_set_object_terms( $post_id, $term->term_id, 'product_unit_type' );
+							}
 
-						// Count up loop.
-						$loop++;
+							// Add DeDU fields.
+							$dedu_fields = array(
+								'YrkeId'			=> ( ! empty( $yrke_id ) ) ? $yrke_id : $dedu_pf[ 'YrkeId' ],
+								'ArendetypId'		=> ( ! empty( $arendetyp_id ) ) ? $arendetyp_id : $dedu_pf[ 'ArendetypId' ],
+								'KategoriId'		=> ( ! empty( $kategori_id ) ) ? $kategori_id : $dedu_pf[ 'KategoriId' ],
+								'UnderkategoriId'	=> ( ! empty( $underkategori_id ) ) ? $underkategori_id : $dedu_pf[ 'UnderkategoriId' ],
+								'PrioritetId'		=> ( ! empty( $PrioritetId ) ) ? $prioritet_id : $dedu_pf[ 'PrioritetId' ],
+							);
+							update_post_meta( $post_id, 'sk_dedu_fields', $dedu_fields );
+
+							// Add product owner if we found one.
+							if ( $product_owner = skios_get_product_owner_by_label( $product_owner ) ) {
+								update_post_meta( $post_id, '_product_owner', $product_owner[ 'id' ] );
+							}
+
+							// Count up.
+							$added_product++;
+						}
 					}
+
+					// Count up loop.
+					$loop++;
 				}
 			} else {
 				$this->import_error( __( 'CSV filen är felformaterad.', 'sk-csvimporter' ) );
 			}
 
 			fclose( $handle );
-			exit;
 		}
 
 		// Show Result
 		echo '<div class="updated settings-error"><p>
-		' . sprintf( __( 'Import klar - importerade <strong>%s</strong> produkter.', 'sk-csvimporter' ), $loop ) . '
+		' . sprintf( __( 'Import klar - importerade <strong>%s</strong> produkter.', 'sk-csvimporter' ), $added_product ) . '
 		</p></div>';
 
 		$this->import_end();
