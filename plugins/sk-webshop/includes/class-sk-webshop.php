@@ -45,6 +45,10 @@ class SK_Webshop {
 		return self::$instance;
 	}
 
+	/**
+	 * Include all class files.
+	 * @return void
+	 */
 	private function includes() {
 		include __DIR__ . '/class-sk-webshop-taxonomies.php';
 	}
