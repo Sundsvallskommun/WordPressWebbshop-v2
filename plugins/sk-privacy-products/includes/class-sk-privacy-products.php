@@ -59,7 +59,12 @@ class SK_Privacy_Products {
 	}
 
 	public function display_privacy_info() {
-		echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretessprodukt</strong></p>';
+		global $post;
+
+		if( 'yes' == get_post_meta( $post->ID, '_privacy_enabled', true ) ) {
+			echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretessprodukt</strong></p>';
+		}
+
 	}
 
 	public function remove_privacy_data( $order_id, $old_status, $new_status ) {
