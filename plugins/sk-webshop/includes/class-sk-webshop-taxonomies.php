@@ -141,7 +141,7 @@ class SK_Webshop_Taxonomies {
 
 		// Saving is different depending for bulk/quick edit so
 		// we need to check for that and do it abit differently.
-		if ( $_REQUEST[ 'bulk_edit' ] || $_REQUEST[ 'woocommerce_quick_edit' ] ) {
+		if ( ! empty( $_REQUEST[ 'bulk_edit' ] ) || ! empty( $_REQUEST[ 'woocommerce_quick_edit' ] ) ) {
 			// Check if a unit type was provided.
 			if ( ! empty( $_REQUEST[ 'tax_input' ][ self::$UNIT_TYPE_META ] ) ) {
 				wp_set_object_terms( $post_id, (int) $_REQUEST[ 'tax_input' ][ self::$UNIT_TYPE_META ], self::$UNIT_TYPE_TAX );
