@@ -79,7 +79,7 @@ class SK_Webshop {
 		}
 
 		// Save an auto-generated SKU if one doesn't exist.
-		if ( empty( $_REQUEST[ '_sku' ] ) ) {
+		if ( empty( $_REQUEST[ '_sku' ] ) && ( empty( $_REQUEST[ 'bulk_edit' ] ) && empty( $_REQUEST[ 'woocommerce_quick_edit' ] ) ) ) {
 			update_post_meta( $post_id, '_sku', $this->generate_sku( $post ) );
 		}
 	}
