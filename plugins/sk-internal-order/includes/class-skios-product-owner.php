@@ -107,6 +107,13 @@ class SKIOS_Product_Owner {
 		// we'll default to saving a 0 (which means none is selected).
 		$product_owner = ( ! empty( $_REQUEST[ self::$METAKEY_NAME ] ) ) ? $_REQUEST[ self::$METAKEY_NAME ] : '';
 		if( strlen( $product_owner ) > 0 ) {
+			// If the $product_owner is set to 'nc' that means it hasn't
+			// been changed and we should just return.
+			// This is a quick and dirty fix for the bulk edit error.
+			if ( $product_owner === 'nc' ) {
+				return;
+			}
+
 			update_post_meta( $post_id, self::$METAKEY_NAME, esc_attr( $product_owner ) );
 		} else {
 			update_post_meta( $post_id, self::$METAKEY_NAME, 0 );

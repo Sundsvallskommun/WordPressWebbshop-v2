@@ -9,7 +9,13 @@
 					<select class="change_product_owner change_to" name="_product_owner">
 					<?php
 						$options = skios_get_product_owners();
+
+						// Add the 'no changes' option.
+						echo '<option value="nc">' . __( '— Ingen förändring —', 'skios' ) . '</option>';
+
+						// Add the 'none chosen' option.
 						echo '<option value="0">--Ingen vald--</option>';
+
 						foreach ( $options as $value ) {
 							echo '<option value="' . esc_attr( $value[ 'id' ] ) . '">' . $value[ 'label' ] . '</option>';
 						}
