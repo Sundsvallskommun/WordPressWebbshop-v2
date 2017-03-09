@@ -73,8 +73,21 @@ class SK_SMEX {
 	 * @return array
 	 */
 	public function change_checkout_fields( $fields ) {
+
+		// Change labels.
+		$fields[ 'billing' ][ 'billing_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
+		$fields[ 'shipping' ][ 'shipping_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
+
+		/**
+		 * Add / remove fields depending on which organization the
+		 * user belongs to.
+		 *
+		 * case 1: Sundsvalls Kommun
+		 */
+
 		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
-			case 1:
+			// Sundsvalls Kommun.
+			case 2:
 				$fields[ 'billing' ][ 'billing_reference_number' ] = array(
 					'type'			=> 'text',
 					'label'			=> __( 'Referensnummer', 'sk-smex' ),
@@ -85,7 +98,57 @@ class SK_SMEX {
 					'default'		=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
 				);
 			break;
+
+			// Servicecenter IT.
+			case 1:
+				$fields[ 'billing' ][ 'billing_responsibility_number' ] = array(
+					'type'				=> 'text',
+					'label'				=> __( 'Ansvarsnummer', 'sk-smex' ),
+					'class'				=> array(),
+					'required'			=> true,
+					'clear'				=> true,
+					'label_class'		=> '',
+					'default'			=> '',
+				);
+				$fields[ 'billing' ][ 'billing_occupation_number' ] =  array(
+					'type'				=> 'text',
+					'label'				=> __( 'Verksamhetsnummer', 'sk-smex' ),
+					'class'				=> array(),
+					'required'			=> true,
+					'clear'				=> true,
+					'label_class'		=> '',
+					'default'			=> '',
+				);
+				$fields[ 'billing' ][ 'billing_activity_number' ] = array(
+					'type'				=> 'text',
+					'label'				=> __( 'Aktivitetsnummer', 'sk-smex' ),
+					'class'				=> array(),
+					'required'			=> false,
+					'clear'				=> true,
+					'label_class'		=> '',
+					'default'			=> '',
+				);
+				$fields[ 'billing' ][ 'billing_project_number' ] = array(
+					'type'						=> 'text',
+					'label'						=> __( 'Projektnummer', 'sk-smex' ),
+					'class'						=> array(),
+					'required'					=> false,
+					'clear'						=> true,
+					'label_class'				=> '',
+					'default'					=> '',
+				);
+				$fields[ 'billing' ][ 'billing_object_number' ] = array(
+					'type'						=> 'text',
+					'label'						=> __( 'Objektnummer', 'sk-smex' ),
+					'class'						=> array(),
+					'required'				=> false,
+					'clear'				=> true,
+					'label_class'		=> '',
+					'default'			=> '',
+				);
+			break;
 		}
+
 		return $fields;
 	}
 
