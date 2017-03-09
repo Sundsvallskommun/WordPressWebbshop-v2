@@ -158,6 +158,9 @@ class SK_CSV_Importer extends WP_Importer {
 							'post_type'		=> 'product',
 						);
 						if ( ( $post_id = wp_insert_post( $args ) ) !== 0 ) {
+							// Set visiblity.
+							update_post_meta( $post_id, '_visibility', 'visible' );
+
 							// Add SKU.
 							$sku = ( empty( $sku ) ) ? SKW()->generate_sku( $post_id ) : $sku;
 							update_post_meta( $post_id, '_sku', $sku );
