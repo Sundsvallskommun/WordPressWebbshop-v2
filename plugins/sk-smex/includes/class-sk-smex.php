@@ -117,15 +117,26 @@ class SK_SMEX {
 		if ( is_checkout() ) {
 			switch ( $input ) {
 				case 'billing_first_name':
+				case 'shipping_first_name':
 					$value = $this->smex_api->get_user_data( 'Givenname' );
 				break;
 				
 				case 'billing_last_name':
+				case 'shipping_last_name':
 					$value = $this->smex_api->get_user_data( 'Lastname' );
 				break;
 
 				case 'billing_company':
+				case 'shipping_company':
 					$value = $this->smex_api->get_user_data( 'Company' );
+				break;
+
+				case 'billing_email':
+					$value = $this->smex_api->get_user_data( 'Email' );
+				break;
+
+				case 'billing_phone':
+					$value = $this->smex_api->get_user_data( 'WorkPhone' );
 				break;
 
 				case 'billing_reference_number':
