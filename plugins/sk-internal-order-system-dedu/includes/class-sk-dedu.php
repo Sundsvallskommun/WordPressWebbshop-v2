@@ -85,7 +85,7 @@ class SK_DeDU {
 		// If not found, add it.
 		if ( ! $found ) {
 			skios_insert_product_owner( array(
-				'label'			=> 'DeDU',
+				'label'			=> 'Kontorsservice',
 				'type'			=> 'dedu',
 				'identifier'	=> 'dedu-product-owner',
 			) );
