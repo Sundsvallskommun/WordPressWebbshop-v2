@@ -30,29 +30,44 @@ h6 {
 /**
  * Site header
  */
+
+.site-header {
+	background-color: #f9f9f9;
+}
+
+.site-header p {
+	color: #000;
+}
+
+.site-branding h1 a,
+.site-title a {
+	color: #000;
+}
+.storefront-primary-navigation .nav-menu a {
+	font-weight: 400;
+	color: black !important;
+}
+
+
+
 @media (min-width: 768px) {
 
-	.site-header {
-		background-color: #f9f9f9;
-	}
-	.site-branding {
+	.site-header .site-branding {
 		width: 30%;
+		margin: 0;
+		padding-right: 1em;
 	}
 
 	.woocommerce-active .site-header .site-search,
 	.site-header .site-search {
 		width: 70%;
+		margin-top: 2.25em;
 	}
 
 	.storefront-primary-navigation {
 		background: transparent;
 		border-bottom: 4px solid #DEE4E9;
 	}
-	.storefront-primary-navigation .nav-menu a {
-		font-weight: 400;
-		color: black !important;
-	}
-
 }
 input[type="search"] {
 	background: white;
