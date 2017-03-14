@@ -27,6 +27,7 @@ class SK_Privacy_Products {
 		add_action( 'woocommerce_order_status_changed', array( $this, 'remove_privacy_data' ), 10, 3 );
 
 		add_action( 'woocommerce_single_product_summary', array( $this, 'display_privacy_info'), 15 );
+		add_action( 'woocommerce_after_shop_loop_item_title', array( $this, 'display_privacy_info'), 15 );
 	}
 
 	/**
@@ -62,7 +63,7 @@ class SK_Privacy_Products {
 		global $post;
 
 		if( 'yes' == get_post_meta( $post->ID, '_privacy_enabled', true ) ) {
-			echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretessprodukt</strong></p>';
+			echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretess</strong></p>';
 		}
 
 	}
