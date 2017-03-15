@@ -11,7 +11,7 @@
  * @package SK_Webshop
  */
 
-class SK_Webshop_Taxonomies {
+class SK_Webshop_Unittype {
 
 	/**
 	 * The class instance.
@@ -43,6 +43,10 @@ class SK_Webshop_Taxonomies {
 
 		// Save unit type option on product admin screen.
 		add_action( 'save_post', array( $this, 'save_unit_type_field' ) );
+
+		add_action( 'save_post', array( $this, 'save_unit_type_field' ) );
+
+		add_filter( 'woocommerce_get_price_html', array( $this, 'display_unittype'), 15, 2 );
 	}
 
 	/**
@@ -55,6 +59,17 @@ class SK_Webshop_Taxonomies {
 			self::$instance = new self();
 		}
 		return self::$instance;
+	}
+
+	public function display_unittype($price, $product) {
+		$unit_type = wp_get_post_terms( $product->id, self::$UNIT_TYPE_TAX );
+
+		if(isset($unit_type[0])) {
+			$unit_type_name = $unit_type[0]->name;
+			return $price . ' ' . $unit_type_name;
+		}
+
+		return $price;
 	}
 
 	/**

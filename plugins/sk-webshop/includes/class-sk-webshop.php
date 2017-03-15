@@ -50,7 +50,7 @@ class SK_Webshop {
 	 * @return void
 	 */
 	private function includes() {
-		include __DIR__ . '/class-sk-webshop-taxonomies.php';
+		include __DIR__ . '/class-sk-webshop-unittype.php';
 	}
 
 	/**
@@ -58,7 +58,7 @@ class SK_Webshop {
 	 * @return void
 	 */
 	private function init_classes() {
-		$this->taxonomies = new SK_Webshop_Taxonomies();
+		$this->taxonomies = new SK_Webshop_Unittype();
 	}
 
 	/**
