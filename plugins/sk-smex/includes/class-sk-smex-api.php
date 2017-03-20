@@ -33,6 +33,12 @@ class SK_SMEX_API {
 	 * Check if URL to SMEX is defined.
 	 */
 	private function __construct() {
+
+    $smex_url = get_option('smex_api_url');
+		if( !empty($smex_url) ) {
+			define('SMEX_URL', $smex_url);
+		}
+
 		if ( ! defined( 'SMEX_URL' ) ) {
 			throw new Exception( __( 'SMEX_URL is not defined!', 'sk-smex' ) );
 		} else {

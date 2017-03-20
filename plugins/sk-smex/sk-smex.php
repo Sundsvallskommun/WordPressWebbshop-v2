@@ -33,3 +33,6 @@ if ( ! in_array( 'sk-webshop/sk-webshop.php', apply_filters( 'active_plugins', g
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-smex.php';
 $sk_smex = new SK_SMEX();
+
+require_once __DIR__ . '/includes/class-sk-smex-settings.php';
+$sk_smex_settings = new SK_SMEX_Settings();
