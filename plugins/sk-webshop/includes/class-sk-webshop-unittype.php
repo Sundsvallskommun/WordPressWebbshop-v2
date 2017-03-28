@@ -100,8 +100,9 @@ class SK_Webshop_Unittype {
 			'public'						=> false,
 			'show_ui'						=> true,
 			'show_admin_column'				=> true,
-			'show_in_nav_menus'				=> true,
-			'show_tagcloud'					=> true,
+			'show_in_nav_menus'				=> false,
+			'show_tagcloud'					=> false,
+			'meta_box_cb'                => false
 		);
 		register_taxonomy( self::$UNIT_TYPE_TAX, 'product', $args );
 		register_taxonomy_for_object_type( self::$UNIT_TYPE_TAX, 'product' );
