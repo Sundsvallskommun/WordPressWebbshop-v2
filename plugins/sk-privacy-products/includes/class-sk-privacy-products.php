@@ -63,7 +63,53 @@ class SK_Privacy_Products {
 		global $post;
 
 		if( 'yes' == get_post_meta( $post->ID, '_privacy_enabled', true ) ) {
-			echo '<p class="privacy-info"><strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretess</strong></p>';
+			?>
+			<style media="screen">
+				.privacy-info {
+					position: relative;
+				}
+				.privacy-info .privacy-tooltip {
+					text-align: left;
+					color: white;
+					font-weight: 400;
+					font-size: 0.875em;
+					line-height: 1.2;
+					padding: 1em;
+					display: none;
+					position: absolute;
+					top: -10px;
+					background: #e2401c;
+					left: 50%;
+					width: 200px;
+					transform: translate( -50%, -100%);
+				}
+
+				.privacy-tooltip:after {
+					content: '';
+					display: inline-block;
+					position: absolute;
+					width: 0em;
+					height: 0em;
+					background: transparent;
+					border: .3em solid #e2401c;
+					border-left-color: transparent;
+					border-bottom-color: transparent;
+					border-right-color: transparent;
+					bottom: 0;
+					left: 50%;
+					transform: translate( -50%, 100%);
+
+				}
+
+				.privacy-info strong:hover + .privacy-tooltip {
+					display: inline-block;
+				}
+			</style>
+			<?php
+			echo '<p class="privacy-info">
+				<strong style="background-color:#e2401c; color: white; padding: .5em;">Sekretess</strong>
+				<span class="privacy-tooltip">Efter lagd order som innehåller sekretessprodukter rensas all produkt- och kundinformation från ordern.</span>
+				</p>';
 		}
 
 	}
