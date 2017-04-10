@@ -26,6 +26,10 @@ class SK_Webshop {
 		// Add SKU to products if it's missing when saving.
 		add_action( 'save_post', array( $this, 'add_sku_if_missing' ), 10, 3 );
 
+		add_filter( 'woocommerce_variable_free_price_html',  array( $this, 'hide_free_price_notice' ) );
+		add_filter( 'woocommerce_free_price_html',           array( $this, 'hide_free_price_notice' ) );
+		add_filter( 'woocommerce_variation_free_price_html', array( $this, 'hide_free_price_notice' ) );
+
 		// Include all class files.
 		$this->includes();
 
@@ -129,6 +133,13 @@ class SK_Webshop {
 
 		// Return all headers.
 		return $headers;
+	}
+
+	/**
+	* Show 0kr instead of "Free" (gratis)
+	*/
+	function hide_free_price_notice( $price ) {
+		return wc_price(0);
 	}
 
 }
