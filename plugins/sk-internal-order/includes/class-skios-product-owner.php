@@ -23,7 +23,7 @@ class SKIOS_Product_Owner {
 	 */
 	public function __construct() {
 
-		add_action( 'woocommerce_single_product_summary', array( $this, 'display_product_owner' ), 20 );
+		add_action( 'woocommerce_product_meta_start', array( $this, 'display_product_owner' ), 30 );
 
 		// Display owner option on product admin screen.
 		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'add_product_owner_field' ) );
@@ -44,7 +44,9 @@ class SKIOS_Product_Owner {
 			$owner_id = get_post_meta( $product->id, self::$METAKEY_NAME, true );
 			$owner = skios_get_product_owner_by_id($owner_id);
 
-			printf('<p class="product-owner"><em>%s</em></p>', $owner['label'] );
+			if ( isset( $owner['label'] ) ) {
+				printf('<span class="product-owner">Levereras av %s</span>', $owner['label'] );
+			}
 
 		} catch (Exception $e) { }
 
