@@ -68,7 +68,7 @@ class SKIOS_Product_Owner {
 		foreach ( $owners as $owner ) {
 
 			$id    = $owner['id'];
-			$label = $owner['label'];
+			$label = sprintf( '%s (%s)', $owner['label'], $owner['identifier'] );
 
 			$options[$id] = $label;
 		}
