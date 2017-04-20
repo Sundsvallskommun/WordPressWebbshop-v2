@@ -118,12 +118,13 @@ class SK_Privacy_Products {
 			<style media="screen">
 				.privacy-info {
 					position: relative;
+					display: inline-block;
 				}
 				.privacy-info .privacy-tooltip {
 					text-align: left;
 					color: white;
 					font-weight: 400;
-					font-size: 0.875em;
+					font-size: 0.75rem;
 					line-height: 1.2;
 					padding: 1em;
 					display: none;
