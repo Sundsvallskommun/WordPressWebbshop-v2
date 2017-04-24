@@ -63,6 +63,15 @@ class SK_Webshop_Unittype {
 
 	public function display_unittype($price, $product) {
 		$unit_type = wp_get_post_terms( $product->id, self::$UNIT_TYPE_TAX );
+		$is_quotation = 'yes' === get_post_meta( $product->id, '_quotation_price', true );
+
+		if ( $is_quotation && 0 == $product->price ) {
+			return 'Offert';
+		}
+
+		if ( $is_quotation ) {
+			return $price . ' offert';
+		}
 
 		if(isset($unit_type[0])) {
 			$unit_type_name = $unit_type[0]->name;
@@ -136,6 +145,15 @@ class SK_Webshop_Unittype {
 
 			echo '</select></p>';
 
+			woocommerce_wp_checkbox(
+				array(
+					'id'            => '_quotation_price',
+					'label'         => __('Offert', 'sk_shop' ),
+					'description'   => __( 'Pris på offert', 'sk_shop' )
+					)
+				);
+
+
 		echo '</div>';
 	}
 
@@ -154,6 +172,9 @@ class SK_Webshop_Unittype {
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return $post_id;
 		}
+
+		$quotation_checkbox = isset( $_POST['_quotation_price'] ) ? 'yes' : 'no';
+		update_post_meta( $post_id, '_quotation_price', $quotation_checkbox );
 
 		// Saving is different depending for bulk/quick edit so
 		// we need to check for that and do it abit differently.
