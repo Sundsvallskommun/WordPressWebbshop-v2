@@ -41,6 +41,13 @@ class SKIOS_Product_Owner {
 
 			global $product;
 
+			// Only show on simple and variable products, as those are the only ones
+			// with owner option. (But owner can be set i type is changed after saving)
+			$type = $product->get_type();
+			if ( !in_array( $type, array( 'simple', 'variable' ) ) ) {
+				return false;
+			}
+
 			$owner_id = get_post_meta( $product->id, self::$METAKEY_NAME, true );
 			$owner = skios_get_product_owner_by_id($owner_id);
 
@@ -80,6 +87,7 @@ class SKIOS_Product_Owner {
 		woocommerce_wp_select(
 			array(
 				'id'      => '_product_owner',
+				'wrapper_class' => array( 'show_if_simple', 'show_if_variable' ),
 				'label'   => __( 'Produktägare', 'woocommerce' ),
 				'options' => $options
 			)
