@@ -30,6 +30,8 @@ class SK_Webshop {
 		add_filter( 'woocommerce_free_price_html',           array( $this, 'hide_free_price_notice' ) );
 		add_filter( 'woocommerce_variation_free_price_html', array( $this, 'hide_free_price_notice' ) );
 
+		add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_settings'));
+
 		// Include all class files.
 		$this->includes();
 
@@ -140,6 +142,40 @@ class SK_Webshop {
 	*/
 	function hide_free_price_notice( $price ) {
 		return wc_price(0);
+	}
+
+	private function get_tinymce_toolbar_items($toolbar = 1) {
+		if ( 1 === intval($toolbar) ) return 'formatselect, bold, link, unlink, blockquote, bullist, numlist, table, spellchecker, eservice_button, youtube_button, sk_collapse, rml_folder';
+		if ( 2 === intval($toolbar) ) return 'pastetext, removeformat, charmap, undo, redo';
+		return false;
+	}
+
+	/**
+	* TinyMCE-settings
+	*
+	* @author Johan Linder <johan@flatmate.se>
+	*/
+	function tiny_mce_settings($settings) {
+		/**
+		* Select what to be shown in tinymce toolbars.
+		*
+		* Original settings:
+		*
+		* toolbar1 = 'bold,italic,strikethrough,bullist,numlist,blockquote,hr,alignleft,aligncenter,alignright,link,unlink,wp_more,spellchecker,fullscreen,wp_adv,eservice_button'
+		* toolbar2 = 'formatselect,underline,alignjustify,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help'
+		*/
+		$settings['toolbar1'] = $this->get_tinymce_toolbar_items(1);
+		$settings['toolbar2'] = $this->get_tinymce_toolbar_items(2);
+		/**
+		* Always show toolbar 2
+		*/
+		$settings['wordpress_adv_hidden'] = false;
+		/**
+		* Block formats to show in editor dropdown. We remove h1 as we set page
+		* title to h1 in the theme.
+		*/
+		$settings['block_formats'] = 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;';
+		return $settings;
 	}
 
 }
