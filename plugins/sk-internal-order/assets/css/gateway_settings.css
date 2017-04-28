@@ -5,3 +5,7 @@ tr.product-owner td {
 tr.product-owner td input {
 	display: none;
 }
+
+tr.product-owner td select {
+	display: none;
+}
