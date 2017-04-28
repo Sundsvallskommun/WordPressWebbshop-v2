@@ -61,11 +61,17 @@ class SK_Webshop_Unittype {
 		return self::$instance;
 	}
 
-	public function display_unittype($price, $product) {
-		$unit_type = wp_get_post_terms( $product->id, self::$UNIT_TYPE_TAX );
-		$is_quotation = 'yes' === get_post_meta( $product->id, '_quotation_price', true );
+	/**
+	 * Outputs the unit type for the product.
+	 * @param  integer $price
+	 * @param  WC_Product $product
+	 * @return string
+	 */
+	public function display_unittype( $price, $product ) {
+		$unit_type = wp_get_post_terms( $product->get_id(), self::$UNIT_TYPE_TAX );
+		$is_quotation = 'yes' === get_post_meta( $product->get_id(), '_quotation_price', true );
 
-		if ( $is_quotation && 0 == $product->price ) {
+		if ( $is_quotation && 0 == $product->get_price() ) {
 			return 'Offert';
 		}
 
