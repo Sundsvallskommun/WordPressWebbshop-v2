@@ -43,6 +43,16 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * Returns all product owner types.
+	 * @return array
+	 */
+	private function get_product_owner_types() {
+		return apply_filters( 'skios_product_owner_types', array(
+			'email'	=> __( 'E-post', 'skios' ),
+		) );
+	}
+
+	/**
 	 * Initiates the form fields on the admin setting page.
 	 * @return void
 	 */
@@ -111,15 +121,21 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 	 */
 	public function localize_scripts() {
 		$localized = array(
-			'i10n'	=> array(
-				'new_product_owner_label'				=> __( 'Ny produktägare', 'skios' ),
-				'new_product_owner_label_placeholder'	=> __( 'Benämning', 'skios' ),
-				'new_product_owner_email_placeholder'	=> __( 'E-postadress', 'skios' ),
-				'delete_product_owner_prompt'			=> __( 'Är du säker på att du vill ta bort %% som produktägare?', 'skios' ),
-				'empty_product_owners_not_allowed'		=> __( 'Det måste finnas åtminstone en produktägare!', 'skios' )
-			),
+			'new_product_owner_label'				=> __( 'Ny produktägare', 'skios' ),
+			'new_product_owner_label_placeholder'	=> __( 'Benämning', 'skios' ),
+			'new_product_owner_email_placeholder'	=> __( 'E-postadress', 'skios' ),
+			'delete_product_owner_prompt'			=> __( 'Är du säker på att du vill ta bort %% som produktägare?', 'skios' ),
+			'empty_product_owners_not_allowed'		=> __( 'Det måste finnas åtminstone en produktägare!', 'skios' )
 		);
-		wp_localize_script( 'skios-admin-gateway-js', 'skios', $localized );
+
+		// Pass all types through a filter to let third-party add their own
+		// product owner types.
+		$product_owner_types = $this->get_product_owner_types();
+
+		wp_localize_script( 'skios-admin-gateway-js', 'skios', array(
+			'i10n'					=> $localized,
+			'product_owner_types'	=> $product_owner_types
+		) );
 	}
 
 	/**
@@ -222,6 +238,7 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 				<table>
 					<thead>
 						<th><?php _e( 'Namn', 'skios' ); ?></th>
+						<th><?php _e( 'Typ', 'skios' ); ?></th>
 						<th><?php _e( 'E-post', 'skios' ); ?></th>
 						<th></th>
 					</thead>
@@ -242,6 +259,23 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 									>
 								</td>
 
+								<td class="type">
+									<?php $product_owner_types = $this->get_product_owner_types(); ?>
+
+									<span class="skios-product-owner type"><?php echo $product_owner_types[ $product_owner->type ]; ?></span>
+
+									<select
+										name="product_owners[<?php echo $c; ?>][type]"
+										id="product_owners[<?php echo $c; ?>][type]"
+										value="<?php echo $product_owner->type; ?>"
+										placeholder="<?php _e( 'Typ', 'skios' ); ?>"
+									>
+										<?php foreach( $product_owner_types as $type => $label ) : ?>
+											<option value="<?php echo $type; ?>" <?php selected( $product_owner->type, $type, true ); ?>><?php echo $label; ?></option>
+										<?php endforeach; ?>
+									</select>
+								</td>
+
 								<td class="identifier">
 									<?php if ( $product_owner->type === 'email' ) : ?>
 										<span class="skios-product-owner identifier"><?php echo $product_owner->identifier; ?></span>
@@ -257,12 +291,10 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 									>
 								</td>
 
-								<?php if ( $product_owner->type === 'email' ) : ?>
-									<td class="actions">
-										<span class="dashicons dashicons-edit edit"></span>
-										<span class="dashicons dashicons-trash remove"></span>
-									</td>
-								<?php endif; ?>
+								<td class="actions">
+									<span class="dashicons dashicons-edit edit"></span>
+									<span class="dashicons dashicons-trash remove"></span>
+								</td>
 
 								<input type="hidden" name="product_owners[<?php echo $c; ?>][id]" value="<?php echo $product_owner->id; ?>">
 							</tr>
@@ -392,15 +424,22 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 						(int) $product_owner->id,
 						array(
 							'label'			=> $product_owner->label,
+							'type'			=> $product_owner->type,
 							'identifier'	=> $product_owner->identifier,
 						)
 					);
 				} else {
 					// Create new.
-					$post_data[ 'product_owners' ][ $key ] = skios_insert_product_owner( array(
+					$new_owner = skios_insert_product_owner( array(
 						'label'			=> $product_owner->label,
+						'type'			=> $product_owner->type,
 						'identifier'	=> $product_owner->identifier,
 					) );
+
+					// Check for errors.
+					if ( ! is_wp_error( $new_owner ) ) {
+						$post_data[ 'product_owners' ][ $key ] = $new_owner;
+					}
 				}
 			}
 

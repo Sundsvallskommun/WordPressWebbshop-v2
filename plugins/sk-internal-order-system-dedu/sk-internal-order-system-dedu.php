@@ -33,6 +33,3 @@ if ( ! in_array( 'sk-webshop/sk-webshop.php', apply_filters( 'active_plugins', g
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-dedu.php';
 $sk_dedu = SK_DeDU::get_instance();
-
-// Add DeDU as a product owner on plugin activate.
-register_activation_hook( __FILE__, array( $sk_dedu, 'add_dedu_as_product_owner' ) );

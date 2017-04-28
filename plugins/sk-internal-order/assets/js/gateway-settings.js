@@ -59,8 +59,8 @@
 	 */
 	function editProductOwner( e ) {
 		var $parent = $( this ).parent().parent(),
-			$inputs = $parent.find( '.label input, .identifier input' ),
-			$spans = $parent.find( '.label span, .identifier span' );
+			$inputs = $parent.find( '.label input, .identifier input, .type select' ),
+			$spans = $parent.find( '.label span, .identifier span, .type span' );
 
 		$inputs.show();
 		$spans.hide();
@@ -91,15 +91,42 @@
 		var i = $productOwners.length,
 			$tr = $( '<tr class="product-owner"></tr>' ),
 			$labelTd = $( '<td class="label"></td>' ),
-			$labelInput = $( '<input type="text" name="product_owners[' + i + '][label]" placeholder="' + skios.i10n.new_product_owner_label_placeholder + '" style="display: inline-block;">'),
+			$labelInput = $( '<input>'),
+			$typeTd = $( '<td class="type"></td>' ),
+			$typeSelect = $( '<select></select>' ),
 			$emailTd = $( '<td class="identifier"></td>' ),
-			$emailInput = $( '<input type="email" name="product_owners[' + i + '][identifier]" placeholder="' + skios.i10n.new_product_owner_email_placeholder + '" style="display: inline-block;">'),
+			$emailInput = $( '<input>' ),
 			$actionTd = $( '<td class="actions">' ),
 			$deleteAction = $( '<span class="dashicons dashicons-trash remove"></span>' ),
 			$idInput = $( '<input type="hidden" name="product_owners[' + i + '][id]" value="null">' );
 
+		// Set label input attributes.
+		$labelInput
+			.attr( 'type', 'text' )
+			.attr( 'name', 'product_owners[' + i + '][label]' )
+			.attr( 'placeholder', skios.i10n.new_product_owner_label_placeholder )
+			.attr( 'style', 'display: inline-block' );
+
+		// Set type select attributes.
+		$typeSelect
+			.attr( 'name', 'product_owners[' + i + '][type]' )
+			.attr( 'style', 'display: inline-block' );
+
+		// Set the email input attributes.
+		$emailInput
+			.attr( 'type', 'email' )
+			.attr( 'name', 'product_owners[' + i + '][identifier]' )
+			.attr( 'placeholder', skios.i10n.new_product_owner_email_placeholder )
+			.attr( 'style', 'display: inline-block' );
+
+		// Append all product owner types.
+		$.each( skios.product_owner_types, function( type, label ) {
+			$typeSelect.append( $( '<option value="' + type + '">' + label + '</option>' ) );
+		} );
+
 		// Build the product owner row.
-		$tr.append( $labelTd ).append( $emailTd ).append( $actionTd );
+		$tr.append( $labelTd ).append( $typeTd ).append( $emailTd ).append( $actionTd );
+		$typeTd.append( $typeSelect );
 		$labelTd.append( $labelInput );
 		$emailTd.append( $emailInput );
 		$actionTd.append( $deleteAction ).append( $idInput );

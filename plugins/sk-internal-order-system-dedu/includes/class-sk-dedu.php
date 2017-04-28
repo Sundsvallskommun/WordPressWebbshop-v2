@@ -28,6 +28,9 @@ class SK_DeDU {
 		// Init classes.
 		$this->init_classes();
 
+		// Add our product owner type.
+		add_filter( 'skios_product_owner_types', array( $this, 'add_dedu_as_product_owner_type' ) );
+
 		// Hook in to the order notification action.
 		add_filter( 'skios_order_notification', array( $this, 'handle_dedu_order_notification' ), 10, 5 );
 	}
@@ -69,27 +72,15 @@ class SK_DeDU {
 	}
 
 	/**
-	 * Adds DeDU as a product owner in the database.
-	 * @return void
+	 * Adds DeDU as a product owner type.
+	 * @param  array $types
+	 * @return array
 	 */
-	public function add_dedu_as_product_owner() {
-		// Check if DeDU already exists.
-		$existing_product_owners = skios_get_product_owners();
-		$found = false;
-		foreach ( $existing_product_owners as $product_owner ) {
-			if ( $product_owner[ 'type' ] === 'dedu' ) {
-				$found = true;
-			}
+	public function add_dedu_as_product_owner_type( $types ) {
+		if ( empty( $types[ 'dedu' ] ) ) {
+			$types[ 'dedu' ] = 'DeDU';
 		}
-
-		// If not found, add it.
-		if ( ! $found ) {
-			skios_insert_product_owner( array(
-				'label'			=> 'Kontorsservice',
-				'type'			=> 'dedu',
-				'identifier'	=> 'dedu-product-owner',
-			) );
-		}
+		return $types;
 	}
 
 	/**

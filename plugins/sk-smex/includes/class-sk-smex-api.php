@@ -33,9 +33,8 @@ class SK_SMEX_API {
 	 * Check if URL to SMEX is defined.
 	 */
 	private function __construct() {
-
-    $smex_url = get_option('smex_api_url');
-		if( !empty($smex_url) ) {
+		$smex_url = get_option( 'smex_api_url' );
+		if( ! empty( $smex_url ) ) {
 			define('SMEX_URL', $smex_url);
 		}
 
@@ -102,7 +101,7 @@ class SK_SMEX_API {
 	private function get_soap_client() {
 		if ( is_null( $this->soap ) ) {
 			try {
-				$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
+				@$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
 					'trace'			=> true,
 					'cache_wsdl'	=> WSDL_CACHE_NONE,
 					'soap_version'	=> SOAP_1_1,

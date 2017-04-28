@@ -33,10 +33,11 @@ class SKIOS_Product_Owner {
 	}
 
 	/**
-	 * Display information on product view about who is the product owner
+	 * Display informatio non product view about who
+	 * is the product owner.
+	 * @return void
 	 */
 	public function display_product_owner() {
-
 		try {
 
 			global $product;
@@ -48,15 +49,14 @@ class SKIOS_Product_Owner {
 				return false;
 			}
 
-			$owner_id = get_post_meta( $product->id, self::$METAKEY_NAME, true );
-			$owner = skios_get_product_owner_by_id($owner_id);
+			$owner_id = get_post_meta( $product->get_id(), self::$METAKEY_NAME, true );
+			$owner = skios_get_product_owner_by_id( $owner_id );
 
-			if ( isset( $owner['label'] ) ) {
-				printf('<span class="product-owner">Levereras av %s</span>', $owner['label'] );
+			if ( isset( $owner[ 'label' ] ) ) {
+				printf('<span class="product-owner">Levereras av %s</span>', $owner[ 'label' ] );
 			}
 
-		} catch (Exception $e) { }
-
+		} catch (Exception $e) {}
 	}
 
 	/**

@@ -44,7 +44,7 @@ class SK_SMEX {
 			$this->smex_api = SK_SMEX_API::get_instance();
 			$this->init_hooks();
 		} catch ( Exception $e ) {
-			error_log( $e );
+			error_log( __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
 		}
 	}
 
@@ -162,7 +162,7 @@ class SK_SMEX {
 	public function set_readonly_checkout_fields( $args, $key, $value ) {
 		// Only modify on checkout.
 		if ( is_checkout() ) {
-			if ( $key === 'billing_first_name' || $key === 'billing_last_name' ) {
+			if ( $key === 'billing_first_name' || $key === 'billing_last_name' || $key === 'billing_company' ) {
 				$args[ 'custom_attributes' ][ 'readonly' ] = 'readonly';
 			}
 		}
