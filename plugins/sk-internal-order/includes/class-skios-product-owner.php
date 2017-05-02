@@ -87,7 +87,7 @@ class SKIOS_Product_Owner {
 		woocommerce_wp_select(
 			array(
 				'id'      => '_product_owner',
-				'wrapper_class' => array( 'show_if_simple', 'show_if_variable' ),
+				'wrapper_class' => 'show_if_simple show_if_variable',
 				'label'   => __( 'Produktägare', 'woocommerce' ),
 				'options' => $options
 			)
