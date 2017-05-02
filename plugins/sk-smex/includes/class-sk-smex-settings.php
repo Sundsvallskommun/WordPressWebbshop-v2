@@ -50,7 +50,7 @@ class SK_SMEX_Settings {
   	if ( !current_user_can( 'manage_options' ) ) return;
 
     // Only show error if setting has not been set.
-    if ( !empty( get_option('smex_api_url') ) ) return;
+    if ( !empty( get_option('smex_api_url') ) || defined( 'SMEX_URL' ) ) return;
 
     $class = 'notice notice-error';
   	$message = __( 'För att SMEX-integrationen ska fungera som tänkt måste korrekt URL till metakatalogen anges under inställningar > SMEX.', 'sk-smex' );

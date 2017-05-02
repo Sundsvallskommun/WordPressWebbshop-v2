@@ -34,7 +34,7 @@ class SK_SMEX_API {
 	 */
 	private function __construct() {
 		$smex_url = get_option( 'smex_api_url' );
-		if( ! empty( $smex_url ) ) {
+		if( ! empty( $smex_url ) && ! defined( 'SMEX_URL' ) ) {
 			define('SMEX_URL', $smex_url);
 		}
 
