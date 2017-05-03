@@ -222,6 +222,9 @@ class SK_Privacy_Products {
 		$order->set_address( $address, 'billing' );
 		$order->set_address( $address, 'shipping' );
 
+		// Remove the customer user.
+		update_post_meta( $order_id, '_customer_user', 0 );
+
 		// Remove all item data from order
 		$order->remove_order_items();
 	}
