@@ -20,11 +20,27 @@ class SK_SMEX {
 	private $smex_api;
 
 	/**
+	 * Checks if SMEX is active or not.
+	 * @var boolean
+	 */
+	private $is_smex_active = false;
+
+	/**
 	 * Inits hooks and class.
 	 */
 	public function __construct() {
 		$this->includes();
-		$this->init_classes();
+		
+		// Check if we can successfully connect to SMEX.
+		$this->is_smex_active = $this->init_smex();
+		if ( $this->is_smex_active ) {
+			$this->init_hooks();
+		}
+
+		// Add action to make sure that SMEX is accessible before allowing users to checkout.
+		// Note: since we want to disable checkout if SMEX isn't active this hook is added
+		// outside of init_hooks() where only hooks related to SMEX is added.
+		add_action( 'wp', array( $this, 'check_smex_before_checkout' ) );
 	}
 
 	/**
@@ -36,15 +52,17 @@ class SK_SMEX {
 	}
 
 	/**
-	 * Instanciates all necessary classes.
-	 * @return void
+	 * Inits smex.
+	 * @return boolean
 	 */
-	private function init_classes() {
+	private function init_smex() {
 		try {
 			$this->smex_api = SK_SMEX_API::get_instance();
-			$this->init_hooks();
+			
+			return true;
 		} catch ( Exception $e ) {
 			error_log( __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
+			return false;
 		}
 	}
 
@@ -228,6 +246,20 @@ class SK_SMEX {
 	 */
 	public function check_billing_last_name( $value ) {
 		return $this->smex_api->get_user_data( 'Lastname' );
+	}
+
+	/**
+	 * Redirects users from the checkout with an error message if
+	 * they are trying to access the checkout but SMEX is
+	 * unavailable.
+	 * @return void
+	 */
+	public function check_smex_before_checkout() {
+		if ( is_checkout() && ! $this->is_smex_active ) {
+			wc_add_notice( __( 'Vi kan inte slutföra din order nu eftersom det verkar vara något problem med uppkopplingen mot Metakatalogen.', 'sk-smex' ), 'error' );
+			wp_redirect( wc_get_cart_url() );
+			exit;
+		}
 	}
 
 }
