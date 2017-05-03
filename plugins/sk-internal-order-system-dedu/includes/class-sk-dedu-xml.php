@@ -115,7 +115,15 @@ class Sk_DeDU_XML {
 
 		// Loop through all items.
 		foreach ( $items as $item ) {
-			$string .= $item[ 'qty' ] . "\t\t\t\t" . get_post_meta( $item[ 'product_id' ], '_sku', true ) . "\t\t\t\t\t" . $item[ 'name' ] . "\n";
+			$string .= $item[ 'qty' ] . "\t\t\t\t" . get_post_meta( $item[ 'product_id' ], '_sku', true ) . "\t\t\t\t\t" . $item[ 'name' ];
+
+			// Add all meta data at the end of the line.
+			foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+				$string .= sprintf( ' %s: %s', $meta->key, $meta->value );
+			}
+
+			// Add the new line.
+			$string .= "\n";
 		}
 
 		return $string;
