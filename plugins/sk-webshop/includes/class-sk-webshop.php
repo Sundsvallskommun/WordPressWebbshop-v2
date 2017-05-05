@@ -32,6 +32,12 @@ class SK_Webshop {
 
 		add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_settings'));
 
+		// Filter the description on my address on my account.
+		add_filter( 'woocommerce_my_account_my_address_description', array( $this, 'change_my_address_description' ) );
+
+		// Filter the address titles on my account.
+		add_filter( 'woocommerce_my_account_get_addresses', array( $this, 'change_address_titles' ) );
+
 		// Include all class files.
 		$this->includes();
 
@@ -176,6 +182,27 @@ class SK_Webshop {
 		*/
 		$settings['block_formats'] = 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;';
 		return $settings;
+	}
+
+	/**
+	 * Changes the description of addresses.
+	 * @param  string $description
+	 * @return string
+	 */
+	public function change_my_address_description( $description ) {
+		return __( 'Följande uppgifter kommer att användas i kassan.', 'sk-webshop' );
+	}
+
+	/**
+	 * Changes the titles of the address endpoints.
+	 * @param  array $addresses
+	 * @return array
+	 */
+	public function change_address_titles( $addresses ) {
+		return array(
+			'billing'	=> __( 'Faktureringsuppgifter', 'sk-webshop' ),
+			'shipping'	=> __( 'Leveransuppgifter', 'sk-webshop' ),
+		);
 	}
 
 }

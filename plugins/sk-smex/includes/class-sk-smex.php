@@ -75,6 +75,12 @@ class SK_SMEX {
 		add_filter( 'woocommerce_form_field_args', array( $this, 'set_readonly_checkout_fields' ), 10, 3 );
 		add_filter( 'woocommerce_checkout_get_value', array( $this, 'populate_checkout_fields' ), 10, 2 );
 
+		// Change fields on my account.
+		add_filter( 'woocommerce_my_account_my_address_formatted_address', array( $this, 'change_my_account_formatted_address' ), 10, 3 );
+		add_filter( 'woocommerce_formatted_address_replacements', array( $this, 'add_values_to_my_account_formatted_address' ), 10, 2 );
+		add_filter( 'woocommerce_billing_fields', array( $this, 'change_my_account_billing_fields' ) );
+		add_filter( 'woocommerce_shipping_fields', array( $this, 'change_my_account_shipping_fields' ) );
+
 		// Filters that will make sure that some fields aren't altered.
 		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'check_billing_first_name' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'check_billing_last_name' ) );
@@ -101,6 +107,7 @@ class SK_SMEX {
 		 * user belongs to.
 		 *
 		 * case 1: Sundsvalls Kommun
+		 * case 2: Servicecenter IT
 		 */
 
 		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
@@ -178,11 +185,8 @@ class SK_SMEX {
 	 * @return array
 	 */
 	public function set_readonly_checkout_fields( $args, $key, $value ) {
-		// Only modify on checkout.
-		if ( is_checkout() ) {
-			if ( $key === 'billing_first_name' || $key === 'billing_last_name' || $key === 'billing_company' ) {
-				$args[ 'custom_attributes' ][ 'readonly' ] = 'readonly';
-			}
+		if ( $key === 'billing_first_name' || $key === 'billing_last_name' || $key === 'billing_company' ) {
+			$args[ 'custom_attributes' ][ 'readonly' ] = 'readonly';
 		}
 		return $args;
 	}
@@ -226,6 +230,237 @@ class SK_SMEX {
 			}
 		}
 		return $value;
+	}
+
+	/**
+	 * Changes the fields used in the formatted address.
+	 * @param  array   $values
+	 * @param  integer $customer_id
+	 * @param  string  $name
+	 * @return array
+	 */
+	public function change_my_account_formatted_address( $values, $customer_id, $name ) {
+		$values = array(
+			'first_name'		=> get_user_meta( $customer_id, $name . '_first_name', true ),
+			'last_name'			=> get_user_meta( $customer_id, $name . '_last_name', true ),
+			'company'			=> get_user_meta( $customer_id, $name . '_company', true ),
+			'reference_number'	=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
+		);
+
+		/**
+		 * We'll add additional fields depending on what company
+		 * the user belongs to. About the same thing as in checkout.
+		 *
+		 * case 1: Sundsvalls Kommun
+		 * case 2: Servicecenter IT
+		 */
+		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
+			// Sundsvalls Kommun.
+			case 2:
+			break;
+
+			// Servicecenter IT.
+			case 1:
+				$values[ 'responsibility_number' ] = get_user_meta( $customer_id, $name . '_responsibility_number', true );
+				$values[ 'occupation_number' ] =  get_user_meta( $customer_id, $name . '_occupation_number', true );
+				$values[ 'activity_number' ] = get_user_meta( $customer_id, $name . '_activity_number', true );
+				$values[ 'project_number' ] = get_user_meta( $customer_id, $name . '_project_number', true );
+				$values[ 'object_number' ] = get_user_meta( $customer_id, $name . '_object_number', true );
+			break;
+		}
+
+		return $values;
+	}
+
+	/**
+	 * Adds our custom values to the formatted address.
+	 * @param  array $values
+	 * @param  array $args
+	 * @return array
+	 */
+	public function add_values_to_my_account_formatted_address( $values, $args ) {
+		$values[ '{reference_number}' ] = $args[ 'reference_number' ];
+		$values[ '{reference_number_upper}' ] = $args[ 'reference_number' ];
+		$values[ '{responsibility_number}' ] = $args[ 'responsibility_number' ];
+		$values[ '{responsibility_number_upper}' ] = $args[ 'responsibility_number' ];
+		$values[ '{occupation_number}' ] = $args[ 'occupation_number' ];
+		$values[ '{occupation_number_upper}' ] = $args[ 'occupation_number' ];
+		$values[ '{activity_number}' ] = $args[ 'activity_number' ];
+		$values[ '{activity_number_upper}' ] = $args[ 'activity_number' ];
+		$values[ '{project_number}' ] = $args[ 'project_number' ];
+		$values[ '{project_number_upper}' ] = $args[ 'project_number' ];
+		$values[ '{object_number}' ] = $args[ 'object_number' ];
+		$values[ '{object_number_upper}' ] = $args[ 'object_number' ];
+		var_dump( $values );
+		return $values;
+	}
+
+	/**
+	 * Changes the fields on my account.
+	 * @param  array $fields
+	 * @return array
+	 */
+	public function change_my_account_billing_fields( $fields ) {
+		// Change labels.
+		$fields[ 'billing_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
+
+		/**
+		 * Add / remove fields depending on which organization the
+		 * user belongs to.
+		 *
+		 * case 1: Sundsvalls Kommun
+		 * case 2: Servicecenter IT
+		 */
+
+		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
+			// Sundsvalls Kommun.
+			case 2:
+				$fields[ 'billing_reference_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Referensnummer', 'sk-smex' ),
+					'class'			=> '',
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
+				);
+			break;
+
+			// Servicecenter IT.
+			case 1:
+				$fields[ 'billing_responsibility_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Ansvarsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'billing_occupation_number' ] =  array(
+					'type'			=> 'text',
+					'label'			=> __( 'Verksamhetsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'billing_activity_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Aktivitetsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'billing_project_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Projektnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'billing_object_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Objektnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+			break;
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Changes the fields on my account.
+	 * @param  array $fields
+	 * @return array
+	 */
+	public function change_my_account_shipping_fields( $fields ) {
+		// Change labels.
+		$fields[ 'shipping_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
+
+		/**
+		 * Add / remove fields depending on which organization the
+		 * user belongs to.
+		 *
+		 * case 1: Sundsvalls Kommun
+		 * case 2: Servicecenter IT
+		 */
+
+		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
+			// Sundsvalls Kommun.
+			case 2:
+				$fields[ 'shipping_reference_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Referensnummer', 'sk-smex' ),
+					'class'			=> '',
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
+				);
+			break;
+
+			// Servicecenter IT.
+			case 1:
+				$fields[ 'shipping_responsibility_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Ansvarsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'shipping_occupation_number' ] =  array(
+					'type'			=> 'text',
+					'label'			=> __( 'Verksamhetsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> true,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'shipping_activity_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Aktivitetsnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'shipping_project_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Projektnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+				$fields[ 'shipping_object_number' ] = array(
+					'type'			=> 'text',
+					'label'			=> __( 'Objektnummer', 'sk-smex' ),
+					'class'			=> array(),
+					'required'		=> false,
+					'clear'			=> true,
+					'label_class'	=> '',
+					'default'		=> '',
+				);
+			break;
+		}
+
+		return $fields;
 	}
 
 	/**
