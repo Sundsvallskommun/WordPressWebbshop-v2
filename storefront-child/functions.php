@@ -14,19 +14,15 @@ function collapsable_categories() {
 		}
 
 		.widget_product_categories .cat-parent:before {
-			content: "- \f114"
-		}
-
-		.widget_product_categories .cat-parent:before {
-			cursor: pointer;
-		}
-
-		.widget_product_categories .cat-parent:before {
-			content: "\f115" !important;
+			content: "- \f115" !important;
 		}
 
 		.widget_product_categories .cat-parent.closed:before {
-			content: "\f114" !important;
+			content: "+ \f114" !important;
+		}		
+
+		.widget_product_categories .cat-parent:before {
+			cursor: pointer;
 		}
 	</style>
 
