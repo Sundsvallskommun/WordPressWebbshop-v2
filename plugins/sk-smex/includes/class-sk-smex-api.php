@@ -95,6 +95,47 @@ class SK_SMEX_API {
 	}
 
 	/**
+	 * Checks if user is required to enter additional fields.
+	 * @return boolean
+	 */
+	public function user_requires_additional_fields() {
+		// First check company id to make sure user
+		// belongs to Sundsvalls Kommun.
+		if ( (int) $this->get_user_data( 'CompanyId' ) !== 1 ) {
+			return false;
+		} else {
+			/**
+			 * User belongs to Sundsvalls Kommun.
+			 *
+			 * Next up we need to look at the organisation tree.
+			 *
+			 * In order for the user to have to enter the additional
+			 * fields they need to be under parent OrgId 13 and also
+			 * to be part of either child OrgId 7 or 32.
+			 *
+			 * So we'll loop through the organisation tree to
+			 * look for them.
+			 */
+			
+			$found_parent = false;
+			$found_child  = false;
+			
+			foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
+				list( $level, $org_id, $name ) = explode( '|', $level );
+				if ( (int) $org_id === 13 ) {
+					$found_parent = true;
+				} else if ( in_array( (int) $org_id, array(
+					7, 32
+				) ) ) {
+					$found_child = true;
+				}
+			}
+
+			return ( $found_parent && $found_child );
+		}
+	}
+
+	/**
 	 * Returns the current SoapClient instance.
 	 * @return SoapClient
 	 */
