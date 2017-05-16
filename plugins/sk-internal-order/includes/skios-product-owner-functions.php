@@ -253,65 +253,72 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message = '';
 
-	$message .= "Ny order på produkter du äger \n\n";
+	$message .= "<h1>Ny order på produkter du äger</h1>";
 
 	$message .= skios_email_customer_details($order);
 
-	$message .= "Produkter\n-----------------------\n";
+	$message .= "<h2>Produkter<br>-----------------------</h2>";
 
 	$message .= skios_email_items($order, $items);
 
 	$subject = __( 'Ny order på era produkter', 'skios' );
 
-	wp_mail( $to = $email_address, $subject, $message );
+	wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
 }
 
 function skios_email_customer_details($order) {
 
-	$text  = "Faktureringsinformation\n-----------------------\n";
+	$text  = "<h2>Faktureringsinformation<br>-----------------------</h2>";
 
-	$text .= "$order->billing_first_name $order->billing_last_name \n";
-	$text .= "$order->billing_email \n";
-	$text .= "$order->billing_phone \n";
+	$text .= $order->get_formatted_billing_address();
 
-	$text .= "\n";
+	$text .= "<br>";
 
-	$text .= "Leveransinformation\n-----------------------\n";
+	$text .= "<h2>Leveransinformation<br>-----------------------</h2>";
 
-	$text .= "$order->shipping_first_name $order->shipping_last_name \n";
-	$text .= "$order->shipping_email \n";
-	$text .= "$order->shipping_phone \n";
+	$text .= $order->get_formatted_shipping_address();
 
 	return $text;
 
 }
 
-function skios_email_items($order, $items) {
+/**
+ * Returns a string containing order item information.
+ *
+ * This includes all metadata such as variation data or gravityforms.
+ * @param  WC_Order $order
+ * @param  array    $items
+ * @return string
+ */
+function skios_email_items( $order, $items ) {
+	$string = '<table>';
+		// Add the table headers
+		$string .= '<thead>';
+			$string .= '<th>Antal</th>';
+			$string .= '<th>Artikelnr</th>';
+			$string .= '<th>Artikel</th>';
+		$string .= '</thead>';
 
-	ob_start();
+		// Add the products.
+		$string .= '<tbody>';
+			// Loop through all items.
+			foreach ( $items as $item ) {
+				$string .= '<tr>';
+					$string .= '<td>' . $item[ 'qty' ] . '</td>';
+					$string .= '<td>' . get_post_meta( $item[ 'product_id' ], '_sku', true ) . '</td>';
 
-	$args = array(
-			'show_sku'      => false,
-			'show_image'    => false,
-			'image_size'    => array( 32, 32 ),
-			'plain_text'    => true,
-			'sent_to_admin' => false,
-		);
+					// Add the name.
+					$string .= '<td>';
+						$string .= $item[ 'name' ];
+						// Add all meta data at the end of the line.
+						foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+							$string .= sprintf( ' %s: %s', $meta->key, $meta->value );
+						}
+					$string .= '</td>';
+				$string .= '</tr>';
+			}
+		$string .= '</tbody>';
+	$string .= '</table>';
 
-	$template = $args['plain_text'] ? 'emails/plain/email-order-items.php' : 'emails/email-order-items.php';
-
-	wc_get_template( $template, array(
-			'order'               => $order,
-			'items'               => $items,
-			'show_download_links' => $order->is_download_permitted(),
-			'show_sku'            => $args['show_sku'],
-			'show_purchase_note'  => $order->is_paid(),
-			'show_image'          => $args['show_image'],
-			'image_size'          => $args['image_size'],
-			'plain_text'          => $args['plain_text'],
-			'sent_to_admin'       => $args['sent_to_admin'],
-		) );
-
-	return $order_items = ob_get_clean();
-
+	return $string;
 }
