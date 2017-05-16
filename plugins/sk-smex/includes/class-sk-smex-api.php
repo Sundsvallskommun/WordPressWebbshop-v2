@@ -131,7 +131,7 @@ class SK_SMEX_API {
 				}
 			}
 
-			return ( $found_parent && $found_child );
+			return ! ( $found_parent && $found_child );
 		}
 	}
 
