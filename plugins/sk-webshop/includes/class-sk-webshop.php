@@ -38,6 +38,28 @@ class SK_Webshop {
 		// Filter the address titles on my account.
 		add_filter( 'woocommerce_my_account_get_addresses', array( $this, 'change_address_titles' ) );
 
+		add_action( 'woocommerce_product_options_general_product_data', array( $this, 'disable_add_to_cart_custom_product_field' ) );
+		add_action( 'woocommerce_process_product_meta', array( $this, 'disable_add_to_cart_custom_product_field_save' ) );
+
+		// Disable add to cart link in loop if setting is checked
+		add_filter('woocommerce_loop_add_to_cart_link', function($link, $product) {
+			$disabled = 'yes' == get_post_meta( $product->get_id(), '_add_to_cart_disabled', true );
+			if (!$disabled) return $link;
+			return null;
+		}, 10, 2);
+
+		// Disable add to cart link on product if setting is checked
+		add_action('wp', function() {
+			global $post;
+			$disabled = 'yes' == get_post_meta( $post->ID, '_add_to_cart_disabled', true );
+
+			if (!$disabled) return;
+
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+
+		});
+
+
 		// Include all class files.
 		$this->includes();
 
@@ -203,6 +225,36 @@ class SK_Webshop {
 			'billing'	=> __( 'Faktureringsuppgifter', 'sk-webshop' ),
 			'shipping'	=> __( 'Leveransuppgifter', 'sk-webshop' ),
 		);
+	}
+
+	/**
+	 * Add field to disable "add to cart" for product
+	 * */
+	public function disable_add_to_cart_custom_product_field() {
+		global $woocommerce, $post;
+
+		echo '<div class="options_group">';
+
+		woocommerce_wp_checkbox(
+			array(
+				'id'            => '_add_to_cart_disabled',
+				'wrapper_class' => '',
+				'label'         => __('Ej köpbar', 'skpp' ),
+				'description'   => __( 'Gör så produkten inte kan köpas, men utan att det står att den är slut i lager.', 'skpp' )
+			)
+		);
+
+		echo '</div>';
+
+	}
+
+
+	/**
+	 * Save field
+	 */
+	public function disable_add_to_cart_custom_product_field_save($post_id) {
+		$woocommerce_checkbox = isset( $_POST['_add_to_cart_disabled'] ) ? 'yes' : 'no';
+		update_post_meta( $post_id, '_add_to_cart_disabled', $woocommerce_checkbox );
 	}
 
 }
