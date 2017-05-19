@@ -93,3 +93,8 @@ form[role="search"]:before {
 	top: .5em !important;
 
 }
+
+/* Place Gravity Forms description closer to the field */
+.gform_wrapper .field_description_below .gfield_description {
+    padding-top: 6px;
+}
