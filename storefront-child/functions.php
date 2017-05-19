@@ -48,3 +48,44 @@ function collapsable_categories() {
 	<?php
 }
 add_action( 'wp_footer', 'collapsable_categories' );
+
+function separate_cat_and_products() {
+	?>
+	<script type="text/javascript">
+		jQuery( document ).ready( function($) {
+
+
+			var $cats = $('.products > .product-category');
+
+			if ( $cats.length > 0 ) {
+
+				var $catUl = $('<ul class="products"></ul>');
+				var $productUl = $('ul.products');
+
+				$cats.detach();
+				$cats.appendTo($catUl);
+				$catUl.insertBefore($productUl);
+
+				$('<h2>Kategorier</h2>').insertBefore($catUl);
+				$('<h2>Produkter</h2>').insertBefore($productUl);
+
+				$catUl.find('.product').each(fixFirstLast);
+				$productUl.find('.product').each(fixFirstLast);
+
+				function fixFirstLast(i) {
+					$(this).removeClass('first');
+					$(this).removeClass('last');
+
+					if (i%3 == 0) { $(this).addClass('first'); }
+					if (i%3 == 2) { $(this).addClass('last'); }
+
+				}
+
+			}
+
+		});
+	</script>
+	<?php
+}
+
+add_action( 'wp_footer', 'separate_cat_and_products' );
