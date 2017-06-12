@@ -43,8 +43,10 @@ class SK_SMEX {
 	 * Inits hooks and class.
 	 */
 	public function __construct() {
+		// Setup billing fields.
 		$this->setup_billing_fields();
 
+		// Include all files.
 		$this->includes();
 		
 		// Check if we can successfully connect to SMEX.
@@ -79,6 +81,10 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function includes() {
+		// Make sure pluggable is loaded.
+		include_once ABSPATH . 'wp-includes/pluggable.php';
+
+		// Include SMEX_API class file.
 		include __DIR__ . '/class-sk-smex-api.php';
 	}
 
