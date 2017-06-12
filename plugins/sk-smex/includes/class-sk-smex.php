@@ -49,7 +49,7 @@ class SK_SMEX {
 		
 		// Check if we can successfully connect to SMEX.
 		$this->is_smex_active = $this->init_smex();
-		if ( $this->is_smex_active ) {
+		if ( $this->is_smex_active && is_user_logged_in() ) {
 			$this->init_hooks();
 		}
 
