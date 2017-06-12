@@ -226,33 +226,39 @@ class SK_SMEX {
 	public function populate_checkout_fields( $value, $input ) {
 		// Only modify checkout fields.
 		if ( is_checkout() ) {
+			$new_value = '';
 			switch ( $input ) {
 				case 'billing_first_name':
 				case 'shipping_first_name':
-					$value = $this->smex_api->get_user_data( 'Givenname' );
+					$new_value = $this->smex_api->get_user_data( 'Givenname' );
 				break;
 				
 				case 'billing_last_name':
 				case 'shipping_last_name':
-					$value = $this->smex_api->get_user_data( 'Lastname' );
+					$new_value = $this->smex_api->get_user_data( 'Lastname' );
 				break;
 
 				case 'billing_company':
 				case 'shipping_company':
-					$value = $this->smex_api->get_user_data( 'Company' );
+					$new_value = $this->smex_api->get_user_data( 'Company' );
 				break;
 
 				case 'billing_email':
-					$value = $this->smex_api->get_user_data( 'Email' );
+					$new_value = $this->smex_api->get_user_data( 'Email' );
 				break;
 
 				case 'billing_phone':
-					$value = $this->smex_api->get_user_data( 'WorkPhone' );
+					$new_value = $this->smex_api->get_user_data( 'WorkPhone' );
 				break;
 
 				case 'billing_reference_number':
-					$value = $this->smex_api->get_user_data( 'ReferenceNumber' );
+					$new_value = $this->smex_api->get_user_data( 'ReferenceNumber' );
 				break;
+			}
+
+			// Make sure that we have a new value.
+			if ( ! is_wp_error( $new_value ) ) {
+				$value = $new_value;
 			}
 		}
 		return $value;
@@ -266,11 +272,15 @@ class SK_SMEX {
 	 * @return array
 	 */
 	public function change_my_account_formatted_address( $values, $customer_id, $name ) {
+		// Try to get the reference number from SMEX.
+		$reference_number = ( ! is_wp_error( $this->smex_api->get_user_data( 'ReferenceNumber' ) ) ) ?
+			$this->smex_api->get_user_data( 'ReferenceNumber' ) : '';
+
 		$values = array(
 			'first_name'		=> get_user_meta( $customer_id, $name . '_first_name', true ),
 			'last_name'			=> get_user_meta( $customer_id, $name . '_last_name', true ),
 			'company'			=> get_user_meta( $customer_id, $name . '_company', true ),
-			'reference_number'	=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
+			'reference_number'	=> $reference_number,
 		);
 
 		/**
@@ -280,19 +290,21 @@ class SK_SMEX {
 		 * case 1: Sundsvalls Kommun
 		 * case 2: Servicecenter IT
 		 */
-		switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
-			// Sundsvalls Kommun.
-			case 2:
-			break;
+		if ( ! is_wp_error( $this->smex_api->get_user_data( 'CompanyId' ) ) ) {
+			switch ( (int) $this->smex_api->get_user_data( 'CompanyId' ) ) {
+				// Sundsvalls Kommun.
+				case 2:
+				break;
 
-			// Servicecenter IT.
-			case 1:
-				$values[ 'responsibility_number' ] = get_user_meta( $customer_id, $name . '_responsibility_number', true );
-				$values[ 'occupation_number' ] =  get_user_meta( $customer_id, $name . '_occupation_number', true );
-				$values[ 'activity_number' ] = get_user_meta( $customer_id, $name . '_activity_number', true );
-				$values[ 'project_number' ] = get_user_meta( $customer_id, $name . '_project_number', true );
-				$values[ 'object_number' ] = get_user_meta( $customer_id, $name . '_object_number', true );
-			break;
+				// Servicecenter IT.
+				case 1:
+					$values[ 'responsibility_number' ] = get_user_meta( $customer_id, $name . '_responsibility_number', true );
+					$values[ 'occupation_number' ] =  get_user_meta( $customer_id, $name . '_occupation_number', true );
+					$values[ 'activity_number' ] = get_user_meta( $customer_id, $name . '_activity_number', true );
+					$values[ 'project_number' ] = get_user_meta( $customer_id, $name . '_project_number', true );
+					$values[ 'object_number' ] = get_user_meta( $customer_id, $name . '_object_number', true );
+				break;
+			}
 		}
 
 		return $values;
@@ -394,6 +406,10 @@ class SK_SMEX {
 		// Change labels.
 		$fields[ 'billing_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
 
+		// Try to get the reference number from SMEX.
+		$reference_number = ( ! is_wp_error( $this->smex_api->get_user_data( 'ReferenceNumber' ) ) ) ?
+			$this->smex_api->get_user_data( 'ReferenceNumber' ) : '';
+
 		// Always add reference number.
 		$fields[ 'billing_reference_number' ] = array(
 			'type'			=> 'text',
@@ -402,7 +418,7 @@ class SK_SMEX {
 			'required'		=> true,
 			'clear'			=> true,
 			'label_class'	=> '',
-			'default'		=> $this->smex_api->get_user_data( 'ReferenceNumber' ),
+			'default'		=> $reference_number,
 		);
 
 		return $fields;
