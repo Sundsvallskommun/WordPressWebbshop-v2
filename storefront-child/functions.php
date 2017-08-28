@@ -8,7 +8,13 @@
 function collapsable_categories() {
 	?>
 
-	<style>
+  <style>
+
+		.widget_product_categories ul li:before {
+      min-width: 1.74em;
+      text-align: right;
+		}
+
 		.widget_product_categories .current-cat > a {
 			font-weight: 600 !important;
 		}
