@@ -23,7 +23,7 @@ function collapsable_categories() {
 
 		.widget_product_categories .cat-parent.closed:before {
 			content: "+ \f114" !important;
-		}		
+		}
 
 		.widget_product_categories .cat-parent:before {
 			cursor: pointer;

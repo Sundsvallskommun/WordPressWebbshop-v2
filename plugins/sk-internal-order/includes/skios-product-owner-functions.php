@@ -253,28 +253,26 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message = '';
 
-	$message .= "<h1>Ny order på produkter du äger</h1>";
+	$message .= "<h1 style='font-size: 1.5em;'>Beställning</h1>";
 
 	$message .= skios_email_customer_details($order);
 
-	$message .= "<h2>Produkter<br>-----------------------</h2>";
+	$message .= "<h2 style='font-size: 1.2em;'>Produkter</h2>";
 
 	$message .= skios_email_items($order, $items);
 
 	$subject = __( 'Ny order på era produkter', 'skios' );
 
-	wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
+  wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
 }
 
 function skios_email_customer_details($order) {
 
-	$text  = "<h2>Faktureringsinformation<br>-----------------------</h2>";
+	$text  = "<h2 style='font-size: 1.2em;'>Beställningsuppgifter</h2>";
 
 	$text .= $order->get_formatted_billing_address();
 
-	$text .= "<br>";
-
-	$text .= "<h2>Leveransinformation<br>-----------------------</h2>";
+	$text .= "<h2 style='font-size: 1.2em;'>Leveransadress</h2>";
 
 	$text .= $order->get_formatted_shipping_address();
 
@@ -294,9 +292,9 @@ function skios_email_items( $order, $items ) {
 	$string = '<table>';
 		// Add the table headers
 		$string .= '<thead>';
-			$string .= '<th>Antal</th>';
-			$string .= '<th>Artikelnr</th>';
-			$string .= '<th>Artikel</th>';
+			$string .= '<th style="text-align: left;">Antal</th>';
+			$string .= '<th style="text-align: left;">Artikelnr</th>';
+			$string .= '<th style="text-align: left;">Artikel</th>';
 		$string .= '</thead>';
 
 		// Add the products.
@@ -304,16 +302,19 @@ function skios_email_items( $order, $items ) {
 			// Loop through all items.
 			foreach ( $items as $item ) {
 				$string .= '<tr>';
-					$string .= '<td>' . $item[ 'qty' ] . '</td>';
-					$string .= '<td>' . get_post_meta( $item[ 'product_id' ], '_sku', true ) . '</td>';
+					$string .= '<td style="min-width: 50px; vertical-align: top;">' . $item[ 'qty' ] . '</td>';
+					$string .= '<td style="min-width: 100px; vertical-align: top;">' . get_post_meta( $item[ 'product_id' ], '_sku', true ) . '</td>';
 
 					// Add the name.
-					$string .= '<td>';
-						$string .= $item[ 'name' ];
-						// Add all meta data at the end of the line.
+					$string .= '<td style="vertical-align: top; padding-bottom: 0.5em;">';
+            $string .= $item[ 'name' ];
+            $string .= '<br>';
+            // Add all meta data at the end of the line.
 						foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-							$string .= sprintf( ' %s: %s', $meta->key, $meta->value );
+							$string .= sprintf( '<br><strong>%s</strong>: %s', $meta->key, $meta->value );
 						}
+            $string .= '<br>';
+
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
