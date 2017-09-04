@@ -53,8 +53,12 @@ function collapsable_categories() {
 	</script>
 	<?php
 }
+
 add_action( 'wp_footer', 'collapsable_categories' );
 
+/**
+ * Adds "Categories" and "products" headings in product archive.
+ */
 function separate_cat_and_products() {
 	?>
 	<script type="text/javascript">
@@ -96,9 +100,31 @@ function separate_cat_and_products() {
 
 add_action( 'wp_footer', 'separate_cat_and_products' );
 
+/**
+ * Adds a tooltip for products in product archive if the product has a short
+ * description.
+ */
+add_action( 'woocommerce_before_shop_loop_item', function() {
+	global $product;
 
+	$short_description = $product->get_short_description();
 
-add_action( 'wp_footer', 'sk_product_tooltip_script' );
+	$has_description = mb_strlen( $short_description ) > 0;
+
+	if ( $has_description ) {
+?>
+
+<div class="product-tooltip">
+	<div>
+		<h2><?php echo $product->get_title(); ?></h2>
+		<?php echo $short_description; ?>
+	</div>
+</div>
+
+	<?php
+	}
+
+});
 
 function sk_product_tooltip_script() {
 ?>
@@ -136,24 +162,4 @@ jQuery(document).ready(function($) {
 <?php
 }
 
-add_action( 'woocommerce_before_shop_loop_item', function() {
-	global $product;
-
-	$short_description = $product->get_short_description();
-
-	$has_description = mb_strlen( $short_description ) > 0;
-
-	if ( $has_description ) {
-?>
-
-<div class="product-tooltip">
-	<div>
-		<h2><?php echo $product->get_title(); ?></h2>
-		<?php echo $short_description; ?>
-	</div>
-</div>
-
-	<?php
-	}
-
-});
+add_action( 'wp_footer', 'sk_product_tooltip_script' );
