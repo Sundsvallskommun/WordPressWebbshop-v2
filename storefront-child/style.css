@@ -105,3 +105,37 @@ form[role="search"]:before {
 	    font-size: .9em;
 	}
 }
+
+.product:hover .product-tooltip {
+	opacity: 1;
+}
+
+.product-tooltip {
+	transition: opacity .25s;
+
+	opacity: 0;
+	background: rgba(250, 250, 250, 0.95);
+
+	overflow: hidden;
+
+	z-index: 999;
+	position: absolute;
+	padding: 2.5em;
+	color: #000;
+	font-weight: 400;
+
+	margin: auto;
+	font-size: .875em;
+}
+
+.product-tooltip:after {
+	content: "";
+	display: block;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 4em;
+	width: 100%;
+	background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+	z-index: 1000;
+}
