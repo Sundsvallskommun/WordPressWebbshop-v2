@@ -31,6 +31,7 @@ class SK_Webshop {
     add_filter( 'woocommerce_variation_free_price_html', array( $this, 'hide_free_price_notice' ) );
 
 		add_action( 'wp_footer', array( $this, 'hide_gravityforms_diff' ) );
+		add_action( 'wp_footer', array( $this, 'gravity_form_description_linebreaks' ) );
 
 		add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_settings'));
 
@@ -185,7 +186,18 @@ class SK_Webshop {
 			}
 		</style>
 	<?php 
+  }
+
+	function gravity_form_description_linebreaks() {
+	?>
+		<style>
+			.gfield_description {
+        white-space: pre;
+			}
+		</style>
+	<?php 
 	}
+
 
 
 	private function get_tinymce_toolbar_items($toolbar = 1) {
