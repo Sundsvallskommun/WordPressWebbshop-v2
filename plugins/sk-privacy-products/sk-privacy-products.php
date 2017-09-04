@@ -1,5 +1,7 @@
 <?php
 /**
+ * SK Sekretessprodukter
+ * 
  * @link     http://www.fmca.se/
  * @package  SK_SMEX
  *

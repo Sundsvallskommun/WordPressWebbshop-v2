@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce > FDT Avance integration
+ * SK CSV Importer
  *
  * @link     http://www.fmca.se/
  * @package  SK_SMEX

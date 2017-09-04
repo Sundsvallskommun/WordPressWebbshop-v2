@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce > FDT Avance integration
+ * DeDU for SK Internal Order System
  *
  * @link     http://www.fmca.se/
  * @package  SK_DeDU
