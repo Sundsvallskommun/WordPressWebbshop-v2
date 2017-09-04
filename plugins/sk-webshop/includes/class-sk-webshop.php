@@ -28,7 +28,9 @@ class SK_Webshop {
 
 		add_filter( 'woocommerce_variable_free_price_html',  array( $this, 'hide_free_price_notice' ) );
 		add_filter( 'woocommerce_free_price_html',           array( $this, 'hide_free_price_notice' ) );
-		add_filter( 'woocommerce_variation_free_price_html', array( $this, 'hide_free_price_notice' ) );
+    add_filter( 'woocommerce_variation_free_price_html', array( $this, 'hide_free_price_notice' ) );
+
+		add_action( 'wp_footer', array( $this, 'hide_gravityforms_diff' ) );
 
 		add_filter('tiny_mce_before_init', array(&$this, 'tiny_mce_settings'));
 
@@ -170,7 +172,21 @@ class SK_Webshop {
 	*/
 	function hide_free_price_notice( $price ) {
 		return wc_price(0);
+  }
+
+	/**
+	 * Hide "+10,00 Kr" and similar next to GF-option
+	 */
+	function hide_gravityforms_diff() {
+	?>
+		<style>
+			.ginput_price {
+				display: none;
+			}
+		</style>
+	<?php 
 	}
+
 
 	private function get_tinymce_toolbar_items($toolbar = 1) {
 		if ( 1 === intval($toolbar) ) return 'formatselect, bold, link, unlink, blockquote, bullist, numlist, table, spellchecker, eservice_button, youtube_button, sk_collapse, rml_folder';
