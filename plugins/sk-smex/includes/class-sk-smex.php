@@ -351,10 +351,16 @@ class SK_SMEX {
 			// Add the format for reference number only.
 			$formats[ $key . '_REF_ONLY' ] = $formats[ $key ] . "Referensnummer: {reference_number}\n";
 
-			// Add the format for all additionals.
+			// Get the string that we'll build on.
+			$format_string = $format;
+
+			// Add each field to the format string.
 			foreach ( $this->ADDITIONAL_BILLING_FIELDS as $billing_field => $label ) {
-				$formats[ $key . '_ALL_ADDITIONAL' ] = $formats[ $key ] . "{$label}: {" .substr( $billing_field, 8 ) . "}\n";
+				$format_string .= "\n{$label}: {" . substr( $billing_field, 8 ) . "}";
 			}
+
+			// Add the string to the array.
+			$formats[ $key . '_ALL_ADDITIONAL' ] = $format_string;
 		}
 		return $formats;
 	}
