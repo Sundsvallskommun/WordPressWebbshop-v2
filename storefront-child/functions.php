@@ -105,6 +105,11 @@ add_action( 'wp_footer', 'separate_cat_and_products' );
  * description.
  */
 add_action( 'woocommerce_before_shop_loop_item', function() {
+
+	if (is_cart()) {
+		return false;
+	}
+
 	global $product;
 
 	$short_description = $product->get_short_description();

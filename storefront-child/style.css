@@ -106,7 +106,7 @@ form[role="search"]:before {
 	}
 }
 
-.product:hover .product-tooltip {
+.products .product:hover .product-tooltip {
 	opacity: 1;
 }
 
