@@ -40,6 +40,24 @@ class SK_SMEX {
 	);
 
 	/**
+	 * Field names pairing between gravity forms dynamic field population and
+	 * SMEX api field.
+	 *
+	 * Key = Gravity Forms parameter value
+	 * Value = SMEX field name
+	 *
+	 * @var array
+	 */
+	private $GF_DYNAMIC_FIELDS = array(
+		'smex_firstname' => 'Givenname',
+		'smex_lastname' => 'Lastname',
+		'smex_company' => 'Company',
+		'smex_email' => 'Email',
+		'smex_phone' => 'WorkPhone',
+		'smex_reference_number' => 'ReferenceNumber'
+	);
+
+	/**
 	 * Inits hooks and class.
 	 */
 	public function __construct() {
@@ -125,6 +143,11 @@ class SK_SMEX {
 
 		// Add an action that deletes our billing fields for privacy orders.
 		add_action( 'sk_privacy_after_data_clear', array( $this, 'delete_data_on_privacy_orders' ) );
+
+		// Add a filter for each dynamic field to populate them.
+		foreach ( $this->GF_DYNAMIC_FIELDS as $field => $smexvalue ) {
+			add_filter( "gform_field_value_$field", array( $this, 'auto_populate_gravity_forms' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -489,6 +512,17 @@ class SK_SMEX {
 			wp_redirect( wc_get_cart_url() );
 			exit;
 		}
+	}
+
+	public function auto_populate_gravity_forms( $value, $field, $name ) {
+		$smexvalue = $this->GF_DYNAMIC_FIELDS[$name];
+		$dyn_value = $this->smex_api->get_user_data( $smexvalue );
+
+		if ( is_wp_error( $dyn_value ) ) {
+			return $value;
+		}
+
+		return $dyn_value;
 	}
 
 }
