@@ -227,6 +227,14 @@ class SK_Privacy_Products {
 
 		// Remove all item data from order
 		$order->remove_order_items();
+
+		/**
+		 * Allows other plugins and / or themes to modify
+		 * the order.
+		 *
+		 * @param WC_Order $order
+		 */
+		do_action( 'sk_privacy_after_data_clear', $order );
 	}
 
 
