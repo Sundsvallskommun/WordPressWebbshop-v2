@@ -40,6 +40,24 @@ class SK_SMEX {
 	);
 
 	/**
+	 * Field names pairing between gravity forms dynamic field population and
+	 * SMEX api field.
+	 *
+	 * Key = Gravity Forms parameter value
+	 * Value = SMEX field name
+	 *
+	 * @var array
+	 */
+	private $GF_DYNAMIC_FIELDS = array(
+		'smex_firstname' => 'Givenname',
+		'smex_lastname' => 'Lastname',
+		'smex_company' => 'Company',
+		'smex_email' => 'Email',
+		'smex_phone' => 'WorkPhone',
+		'smex_reference_number' => 'ReferenceNumber'
+	);
+
+	/**
 	 * Inits hooks and class.
 	 */
 	public function __construct() {
@@ -122,6 +140,10 @@ class SK_SMEX {
 		// Filters that will make sure that some fields aren't altered.
 		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'check_billing_first_name' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'check_billing_last_name' ) );
+
+		foreach ( $this->GF_DYNAMIC_FIELDS as $field => $smexvalue ) {
+			add_filter( "gform_field_value_$field", array( $this, 'auto_populate_gravity_forms' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -469,6 +491,17 @@ class SK_SMEX {
 			wp_redirect( wc_get_cart_url() );
 			exit;
 		}
+	}
+
+	public function auto_populate_gravity_forms( $value, $field, $name ) {
+		$smexvalue = $this->GF_DYNAMIC_FIELDS[$name];
+		$dyn_value = $this->smex_api->get_user_data( $smexvalue );
+
+		if ( is_wp_error( $dyn_value ) ) {
+			return $value;
+		}
+
+		return $dyn_value;
 	}
 
 }
