@@ -122,6 +122,9 @@ class SK_SMEX {
 		// Filters that will make sure that some fields aren't altered.
 		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'check_billing_first_name' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'check_billing_last_name' ) );
+
+		// Add an action that deletes our billing fields for privacy orders.
+		add_action( 'sk_privacy_after_data_clear', array( $this, 'delete_data_on_privacy_orders' ) );
 	}
 
 	/**
@@ -461,6 +464,17 @@ class SK_SMEX {
 	 */
 	public function check_billing_last_name( $value ) {
 		return $this->smex_api->get_user_data( 'Lastname' );
+	}
+
+	/**
+	 * Deletes our custom billing fields on privacy orders.
+	 * @param  WC_Order $order
+	 * @return void
+	 */
+	public function delete_data_on_privacy_orders( $order ) {
+		foreach ( $this->ADDITIONAL_BILLING_FIELDS as $key => $label ) {
+			delete_post_meta( $order->get_id(), substr( $key, 1 ) );
+		}
 	}
 
 	/**
