@@ -54,6 +54,12 @@ class SK_Webshop_Unittype {
 		 */
 		add_action( 'wp_footer', function() {
 			global $product;
+
+			// Return if $product doesn't exist.
+			if ( ! $product ) {
+				return;
+			}
+
 			$unittype = $this->display_unittype(null, $product);
 			?>
 				<style>
