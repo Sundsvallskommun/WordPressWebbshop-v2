@@ -47,7 +47,25 @@ class SK_Webshop_Unittype {
 		add_action( 'save_post', array( $this, 'save_unit_type_field' ) );
 
 		add_filter( 'woocommerce_get_price_html', array( $this, 'display_unittype'), 15, 2 );
-	}
+		add_filter( 'woocommerce_gform_total_price', array( $this, 'display_unittype_2'), 15, 2 );
+
+		/**
+		 * Display unittype after gravity form total
+		 */
+		add_action( 'wp_footer', function() {
+			global $product;
+			$unittype = $this->display_unittype(null, $product);
+			?>
+				<style>
+					.formattedTotalPrice:after {
+						content: " <?php echo $unittype ?>";
+					}
+				</style>
+			<?php
+		});
+
+  }
+
 
 	/**
 	 * Function that returns a singleton instance
