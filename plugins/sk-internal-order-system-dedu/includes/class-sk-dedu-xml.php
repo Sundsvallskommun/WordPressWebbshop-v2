@@ -110,12 +110,21 @@ class Sk_DeDU_XML {
 	 */
 	private function generate_anmarkning_xml( $items ) {
 		// Add header.
-		$string = sprintf( __( "Beställningsnummer: %d\n\n", 'sk-dedu' ), $this->order->id );
-		$string .= __( "Antal\t\t\t\tAnrtikel nr\t\t\t\t\tArtikel\n\n", 'sk-dedu' );
+		$string = sprintf( __( "Beställningsnummer: %d\n\n", 'sk-dedu' ), $this->order->get_id() );
+		$string .= __( "Antal\t\t\t\tArtikel nr\t\t\t\t\tArtikel\n\n", 'sk-dedu' );
 
 		// Loop through all items.
 		foreach ( $items as $item ) {
-			$string .= $item[ 'qty' ] . "\t\t\t\t" . get_post_meta( $item[ 'product_id' ], '_sku', true ) . "\t\t\t\t\t" . $item[ 'name' ];
+			$product = wc_get_product( $item->get_product() );
+
+			$string .= sprintf( "%1\$s\t\t\t\t\t%2\$s\t\t\t\t\t%3\$s (%4\$s %6\$s / %5\$s %6\$s)",
+				$item->get_quantity(),
+				$product->get_sku(),
+				$product->get_name(),
+				wc_get_price_to_display( $product ),
+				$item->get_total(),
+				html_entity_decode( get_woocommerce_currency_symbol() )
+			);
 
 			// Add all meta data at the end of the line.
 			foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
