@@ -209,7 +209,7 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 				 * @param string   $owner[ 'type' ] The type of product owner.
 				 * @param array    $owner           The product owner.
 				 * @param WC_Order $order         The WC_Order object.
-				 * @param items    $items           The order items that belongs to this product owner.
+				 * @param array    $items           The order items that belongs to this product owner.
 				 */
 				if ( ! is_wp_error( $result = apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $items ) ) ) {
 					$successful_filters[ $owner_id ] = $items;
