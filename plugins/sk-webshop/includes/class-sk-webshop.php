@@ -62,6 +62,7 @@ class SK_Webshop {
 
 		});
 
+		add_action('init', array( $this, 'forcelogin' ));
 
 		// Include all class files.
 		$this->includes();
@@ -285,6 +286,25 @@ class SK_Webshop {
 	public function disable_add_to_cart_custom_product_field_save($post_id) {
 		$woocommerce_checkbox = isset( $_POST['_add_to_cart_disabled'] ) ? 'yes' : 'no';
 		update_post_meta( $post_id, '_add_to_cart_disabled', $woocommerce_checkbox );
+  }
+
+	function getUrl() {
+		$url  = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
+		$url .= '://' . $_SERVER['SERVER_NAME'];
+		$url .= in_array( $_SERVER['SERVER_PORT'], array('80', '443') ) ? '' : ':' . $_SERVER['SERVER_PORT'];
+		$url .= $_SERVER['REQUEST_URI'];
+		return $url;
+	}
+
+	function forcelogin() {
+		if( !is_user_logged_in() ) {
+			$url = $this->getUrl();
+			$whitelist = apply_filters('forcelogin_whitelist', array());
+			$redirect_url = apply_filters('forcelogin_redirect', $url);
+			if( preg_replace('/\?.*/', '', $url) != preg_replace('/\?.*/', '', wp_login_url()) && !in_array($url, $whitelist) ) {
+				wp_safe_redirect( wp_login_url( $redirect_url ), 302 ); exit();
+			}
+		}
 	}
 
 }
