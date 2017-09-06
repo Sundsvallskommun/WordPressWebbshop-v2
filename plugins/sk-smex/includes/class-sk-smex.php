@@ -440,8 +440,14 @@ class SK_SMEX {
 	 * @return array
 	 */
 	public function change_my_account_billing_fields( $fields ) {
-		// Change labels.
-		$fields[ 'billing_company' ][ 'label' ] = __( 'Organisation', 'sk-smex' );
+		// Label for company is either "bolag" or "förvaltning".
+		// Only change if we have access to SMEX.
+		if  ( $this->is_smex_active ) {
+			$label = ( $this->smex_api->user_requires_additional_fields() ) ? __( 'Förvaltning', 'sk-smex' ) : __( 'Bolag', 'sk-smex' );
+
+			// Change labels.
+			$fields[ 'billing_company' ][ 'label' ] = $label;
+		}
 
 		// Try to get the reference number from SMEX.
 		$reference_number = ( ! is_wp_error( $this->smex_api->get_user_data( 'ReferenceNumber' ) ) ) ?
