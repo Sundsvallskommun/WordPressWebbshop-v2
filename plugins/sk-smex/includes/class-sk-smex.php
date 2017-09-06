@@ -271,7 +271,7 @@ class SK_SMEX {
 
 				case 'billing_company':
 				case 'shipping_company':
-					$new_value = $this->smex_api->get_user_data( 'Company' );
+					$new_value = $this->smex_api->get_user_organisation();
 				break;
 
 				case 'billing_email':

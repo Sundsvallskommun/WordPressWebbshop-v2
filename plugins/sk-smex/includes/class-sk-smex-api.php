@@ -136,6 +136,22 @@ class SK_SMEX_API {
 	}
 
 	/**
+	 * Returns the lowest level of the organisation tree
+	 * or an empty string if we failed to get the
+	 * organisation.
+	 * @return string
+	 */
+	public function get_user_organisation() {
+		$levels = explode( '¤', $this->get_user_data( 'OrgTree' ) );
+		if ( is_array( $levels ) ) {
+			list( $level, $org_id, $name ) = explode( '|', reset( $levels ) );
+			return $name;
+		} else {
+			'';
+		}
+	}
+
+	/**
 	 * Returns the current SoapClient instance.
 	 * @return SoapClient
 	 */
