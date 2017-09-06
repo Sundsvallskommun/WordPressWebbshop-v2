@@ -187,6 +187,7 @@ class SK_SMEX {
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
+					'priority'		=> 140,
 				);
 				$fields[ 'billing' ][ 'billing_occupation_number' ] =  array(
 					'type'			=> 'text',
@@ -196,6 +197,7 @@ class SK_SMEX {
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
+					'priority'		=> 140,
 				);
 				$fields[ 'billing' ][ 'billing_activity_number' ] = array(
 					'type'			=> 'text',
@@ -205,6 +207,7 @@ class SK_SMEX {
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
+					'priority'		=> 140,
 				);
 				$fields[ 'billing' ][ 'billing_project_number' ] = array(
 					'type'			=> 'text',
@@ -214,6 +217,7 @@ class SK_SMEX {
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
+					'priority'		=> 140,
 				);
 				$fields[ 'billing' ][ 'billing_object_number' ] = array(
 					'type'			=> 'text',
@@ -223,6 +227,7 @@ class SK_SMEX {
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
+					'priority'		=> 140,
 				);
 		}
 
@@ -451,6 +456,7 @@ class SK_SMEX {
 			'clear'			=> true,
 			'label_class'	=> '',
 			'default'		=> $reference_number,
+			'priority'		=> 135,
 		);
 
 		return $fields;
