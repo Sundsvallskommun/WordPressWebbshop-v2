@@ -38,6 +38,9 @@ class SKIOS {
 
 		// Hook in to the order notification action for the default email type.
 		add_filter( 'skios_order_notification', array( $this, 'handle_order_notification' ), 10, 5 );
+
+		// Fix for free orders that otherwise never go through the gateway.
+		add_filter( 'woocommerce_cart_needs_payment', '__return_true', 747 );
 	}
 
 	/**
