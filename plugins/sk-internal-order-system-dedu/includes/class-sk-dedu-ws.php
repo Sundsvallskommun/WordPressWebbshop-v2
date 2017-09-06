@@ -88,7 +88,7 @@ class Sk_DeDU_WS {
 				$headers = SKW()->get_headers_from_curl( $data );
 
 				// Make sure 'ErrorDescription' is set.
-				if ( ! empty( $error_description = $headers[ 'ErrorDescription' ] ) ) {
+				if ( isset( $headers[ 'ErrorDescription' ] ) && ! empty( $error_description = $headers[ 'ErrorDescription' ] ) ) {
 					return new WP_Error( 'webservice_error', $error_description );
 				} else {
 					return new WP_Error( 'unknown_error', __( 'Something unexpected went wrong when trying to send order to DeDU.', 'sk-dedu' ) );
