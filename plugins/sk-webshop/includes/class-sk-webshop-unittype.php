@@ -86,6 +86,15 @@ class SK_Webshop_Unittype {
 	}
 
 	/**
+	 * Returns the unit type and price for the product.
+	 * @param  WC_Product $product
+	 * @return void
+	 */
+	public static function get_product_unit_type_and_price( $product ) {
+		return strip_tags( $product->get_price_html() );
+	}
+
+	/**
 	 * Outputs the unit type for the product.
 	 * @param  integer $price
 	 * @param  WC_Product $product
@@ -103,8 +112,8 @@ class SK_Webshop_Unittype {
 			return $price . ' offert';
 		}
 
-		if(isset($unit_type[0])) {
-			$unit_type_name = $unit_type[0]->name;
+		if ( isset( $unit_type[ 0 ] ) ) {
+			$unit_type_name = $unit_type[ 0 ]->name;
 			return $price . ' ' . $unit_type_name;
 		}
 
@@ -223,4 +232,14 @@ class SK_Webshop_Unittype {
 		}
 	}
 
+}
+
+/**
+ * Returns the unit type and price for the product.
+ * @param  WC_Product $product
+ * @return void
+ */
+function get_product_unit_type_and_price( $product ) {
+	$instance = SK_Webshop_Unittype::get_instance();
+	return $instance->get_product_unit_type_and_price( $product );
 }
