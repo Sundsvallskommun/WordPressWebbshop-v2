@@ -307,14 +307,15 @@ function skios_email_items( $order, $items ) {
 
 					// Add the name.
 					$string .= '<td style="vertical-align: top; padding-bottom: 0.5em;">';
-            $string .= $item[ 'name' ];
-            $string .= '<br>';
-            // Add all meta data at the end of the line.
-						foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-							$string .= sprintf( '<br><strong>%s</strong>: %s', $meta->key, $meta->value );
-						}
-            $string .= '<br>';
-
+						$string .= $item[ 'name' ];
+						$string .= '<br<>';
+						$string .= $item->get_product()->get_price_html();
+						$string .= '<br>';
+							// Add all meta data at the end of the line.
+							foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+								$string .= sprintf( '<br><strong>%s</strong>: %s', $meta->key, $meta->value );
+							}
+							$string .= '<br>';
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
