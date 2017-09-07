@@ -297,6 +297,19 @@ class SK_Webshop {
 	}
 
 	function forcelogin() {
+
+		if (array_key_exists('use_sso', $_GET)) {
+			return;
+		}
+		// Prevent infinite loop when used with SAML-plugin.
+		if (array_key_exists('SAMLRequest', $_GET) || array_key_exists('SAMLResponse', $_GET)) {
+			return;
+		}
+		if (array_key_exists('SAMLRequest', $_POST) || array_key_exists('SAMLResponse', $_POST)) {
+			return;
+		}
+
+
 		if( !is_user_logged_in() ) {
 			$url = $this->getUrl();
 			$whitelist = apply_filters('forcelogin_whitelist', array());
