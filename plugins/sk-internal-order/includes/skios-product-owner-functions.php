@@ -235,15 +235,16 @@ function skios_no_owner_email( $email_address, $order, $items ) {
 
 	$message = '';
 
-	$message .= "Följande produkter saknar produktägare. \n\n";
+	$message .= "Beställning av produkter som saknar produktägare";
+	$message .= "<h1 style='font-size: 1.5em;'>Beställning</h1>";
 
 	$message .= skios_email_customer_details($order);
 
-	$message .= "Produkter\n-----------------------\n";
+	$message .= "<h2 style='font-size: 1.2em;'>Produkter</h2>";
 
 	$message .= skios_email_items($order, $items);
 
-	$subject = __( 'Ny order på produkter som saknar ägare', 'skios' );
+	$subject = __( 'Beställning av produkter som saknar produktägare', 'skios' );
 
 	wp_mail( $to = $email_address, $subject, $message );
 
@@ -261,7 +262,7 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message .= skios_email_items($order, $items);
 
-	$subject = __( 'Ny order på era produkter', 'skios' );
+	$subject = __( 'Beställning', 'skios' );
 
   wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
 }
@@ -308,12 +309,12 @@ function skios_email_items( $order, $items ) {
 					// Add the name.
 					$string .= '<td style="vertical-align: top; padding-bottom: 0.5em;">';
 						$string .= $item[ 'name' ];
-						$string .= '<br<>';
+						$string .= '<br>';
 						$string .= $item->get_product()->get_price_html();
 						$string .= '<br>';
 							// Add all meta data at the end of the line.
 							foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-								$string .= sprintf( '<br><strong>%s</strong>: %s', $meta->key, $meta->value );
+								$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $meta->key, $meta->value );
 							}
 							$string .= '<br>';
 					$string .= '</td>';
