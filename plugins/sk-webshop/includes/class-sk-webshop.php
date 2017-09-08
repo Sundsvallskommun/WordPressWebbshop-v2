@@ -62,6 +62,13 @@ class SK_Webshop {
 
 		});
 
+    /**
+     * Change text on thank-you page when order is completed
+     */
+    add_filter('woocommerce_thankyou_order_received_text', function($text){
+      return 'Tack för din beställning! Ett ärendenummer kommer att skickas till din e-post inom kort.';
+    }, 10, 1 );
+
 		add_action('init', array( $this, 'forcelogin' ));
 
 		// Include all class files.
