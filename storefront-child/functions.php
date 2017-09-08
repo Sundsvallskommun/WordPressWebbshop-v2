@@ -11,7 +11,7 @@ function collapsable_categories() {
   <style>
 
 		.widget_product_categories ul li:before {
-      min-width: 1.74em;
+      min-width: 2em;
       text-align: right;
 		}
 
