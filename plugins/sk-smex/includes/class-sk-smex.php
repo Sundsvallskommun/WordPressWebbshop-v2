@@ -429,7 +429,10 @@ class SK_SMEX {
 
 				// Add it's uppercase value (don't know if this is necessary).
 				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = $args[ substr( $billing_field, 8 ) ]; 
-			}
+      } else {
+				$values[ '{' . substr( $billing_field, 8 ) . '}' ] = '';
+				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = '';
+      }
 		}
 		return $values;
 	}
