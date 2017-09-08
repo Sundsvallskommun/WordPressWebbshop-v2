@@ -109,33 +109,62 @@ class Sk_DeDU_XML {
 	 * @return string
 	 */
 	private function generate_anmarkning_xml( $items ) {
-		// Add header.
-		$string = sprintf( __( "Beställningsnummer: %d\n\n", 'sk-dedu' ), $this->order->get_id() );
-		$string .= __( "Antal\t\t\t\tArtikel nr\t\t\t\t\tArtikel\n\n", 'sk-dedu' );
+		$pad_number = 20;
 
-		// Loop through all items.
-		foreach ( $items as $item ) {
+		// Keep track of the longest string for quantity and SKU.
+		$qty_str_len = strlen( 'Antal' );
+		$sku_str_len = strlen( 'Artikelnr' );
+
+		// Array for all products.
+		$products = array();
+
+		// Loop through all items to figure out string lengths
+		// and to get all products.
+		foreach ( $items as $key => $item ) {
 			$product = wc_get_product( $item->get_product() );
 
-			$string .= sprintf( "%1\$s\t\t\t\t\t%2\$s\t\t\t\t\t%3\$s (%4\$s %6\$s / %5\$s %6\$s)",
-				$item->get_quantity(),
-				$product->get_sku(),
-				$product->get_name(),
+			// Change longest string for quantity or sku?
+			$qty_str_len = ( strlen( $item->get_quantity() ) > $qty_str_len ) ? strlen( $item->get_quantity() ) : $qty_str_len;
+			$sku_str_len = ( strlen( $product->get_sku() ) > $sku_str_len ) ? strlen( $product->get_sku() ) : $sku_str_len;
+
+			// Add the product to the array with the same key.
+			$products[ $key ] = $product;
+		}
+
+		$str  = "\nBeställningsnummer: {$this->order->get_id()}\n";
+		$str .= sprintf( "%s%sArtikel\n",
+			str_pad( 'Antal', ( $qty_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
+			str_pad( 'Artikel', ( $sku_str_len + $pad_number ), " ", STR_PAD_RIGHT )
+		);
+
+		// Loop through all products to create a new string.
+		foreach ( $items as $key => $item ) {
+			// Get product from the array.
+			$product = $products[ $key ];
+			
+			// Build the string.
+			$str .= sprintf( "%1\$s%2\$s%3\$s (%4\$s %6\$s / %5\$s %6\$s)\n",
+				str_pad( $item->get_quantity(), ( $qty_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
+				str_pad( $product->get_sku(), ( $sku_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
+				str_pad( $product->get_name(), 0, " ", STR_PAD_LEFT ),
 				wc_get_price_to_display( $product ),
 				$item->get_total(),
 				html_entity_decode( get_woocommerce_currency_symbol() )
 			);
 
-			// Add all meta data at the end of the line.
-			foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-				$string .= sprintf( ' %s: %s', $meta->key, $meta->value );
+			if( ! empty( $item->get_formatted_meta_data() ) ) {
+				// Add all meta data at the end of the line.
+				// sprintf( "\n%s: %s", $meta->key, $meta->value )
+				foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+					$meta_string = sprintf( "%s: %s\n", $meta->key, $meta->value );
+					$str .= str_pad( $meta_string, $qty_str_len + $sku_str_len + ( $pad_number * 2 ) + strlen( $meta_string ), " ", STR_PAD_LEFT );
+				}
 			}
 
-			// Add the new line.
-			$string .= "\n";
+			$str .= "\n";
 		}
 
-		return $string;
+		return $str;
 	}
 
 	/**
