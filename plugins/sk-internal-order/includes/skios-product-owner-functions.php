@@ -262,9 +262,20 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message .= skios_email_items($order, $items);
 
-	$subject = __( 'Beställning', 'skios' );
+  $subject = __( 'Beställning', 'skios' );
+
+  global $customer_email;
+  $customer_email = $order->get_billing_email();
+
+  add_filter( 'wp_mail_from', 'skios_customer_from_address', 10, 1);
 
   wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
+}
+
+function skios_customer_from_address($from_email) {
+  global $customer_email;
+  remove_filter( 'wp_mail_from', 'skios_customer_from_address', 10, 1);
+  return $customer_email;
 }
 
 function skios_email_customer_details($order) {
