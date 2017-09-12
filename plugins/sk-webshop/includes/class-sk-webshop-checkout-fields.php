@@ -37,7 +37,7 @@ class SK_Webshop_Checkout_Fields {
 	public function change_address2( $fields ) {
 		// Remove the placeholder on address 2 and set a new label.
 		$fields[ 'billing' ][ 'billing_address_2' ][ 'placeholder' ] = '';
-		$fields[ 'billing' ][ 'billing_address_2' ][ 'label' ] = __( 'Förvaltning, avdelning, rum', 'sk-smex' );
+		$fields[ 'billing' ][ 'billing_address_2' ][ 'label' ] = __( 'Förvaltning/bolag, avdelning, rum', 'sk-smex' );
 
 		// Return fields.
 		return $fields;
