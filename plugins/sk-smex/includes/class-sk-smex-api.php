@@ -84,7 +84,12 @@ class SK_SMEX_API {
 		}
 
 		// Return the property by looping through the data.
-		foreach ( $this->user_data as $data ) {
+    foreach ( $this->user_data as $data ) {
+
+      if ( $property == 'Organization' && strtolower( $data->Name ) === 'OrgTree' ) {
+        return $this->get_user_organization($data->Value);
+      }
+
 			if ( strtolower( $data->Name ) === strtolower( $property ) ) {
 				return $data->Value;
 			}
@@ -141,8 +146,8 @@ class SK_SMEX_API {
 	 * organisation.
 	 * @return string
 	 */
-	public function get_user_organisation() {
-		$levels = explode( '¤', $this->get_user_data( 'OrgTree' ) );
+	public function get_user_organization($orgtree) {
+		$levels = explode( '¤', $orgtree );
 		if ( is_array( $levels ) ) {
 			list( $level, $org_id, $name ) = explode( '|', reset( $levels ) );
 			return $name;

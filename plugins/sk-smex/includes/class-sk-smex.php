@@ -52,6 +52,7 @@ class SK_SMEX {
 		'smex_firstname' => 'Givenname',
 		'smex_lastname' => 'Lastname',
 		'smex_company' => 'Company',
+    'smex_org' => 'Organization',
 		'smex_email' => 'Email',
 		'smex_phone' => 'WorkPhone',
 		'smex_reference_number' => 'ReferenceNumber'
@@ -271,7 +272,7 @@ class SK_SMEX {
 
 				case 'billing_company':
 				case 'shipping_company':
-					$new_value = $this->smex_api->get_user_organisation();
+					$new_value = $this->smex_api->get_user_data( 'Organization' );
 				break;
 
 				case 'billing_email':
