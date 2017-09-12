@@ -84,11 +84,10 @@ class SK_SMEX_API {
 		}
 
 		// Return the property by looping through the data.
-    foreach ( $this->user_data as $data ) {
-
-      if ( $property == 'Organization' && strtolower( $data->Name ) === 'OrgTree' ) {
-        return $this->get_user_organization($data->Value);
-      }
+		foreach ( $this->user_data as $data ) {
+			if ( $property == 'Organization' && $data->Name === 'OrgTree' ) {
+				return $this->get_user_organization($data->Value);
+			}
 
 			if ( strtolower( $data->Name ) === strtolower( $property ) ) {
 				return $data->Value;
