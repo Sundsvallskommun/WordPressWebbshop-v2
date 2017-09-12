@@ -29,7 +29,7 @@ class SK_SMEX {
 	 * All billing fields additional fields.
 	 * @var array
 	 */
-	private $ADDITIONAL_BILLING_FIELDS = array();
+	public $ADDITIONAL_BILLING_FIELDS = array();
 
 	/**
 	 * Product owners that require additional fields.

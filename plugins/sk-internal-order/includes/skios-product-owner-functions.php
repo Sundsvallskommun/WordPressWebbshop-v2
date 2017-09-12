@@ -246,7 +246,7 @@ function skios_no_owner_email( $email_address, $order, $items ) {
 
 	$subject = __( 'Beställning av produkter som saknar produktägare', 'skios' );
 
-	wp_mail( $to = $email_address, $subject, $message );
+	wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
 
 }
 
@@ -271,11 +271,53 @@ function skios_email_customer_details($order) {
 
 	$text  = "<h2 style='font-size: 1.2em;'>Beställningsuppgifter</h2>";
 
-	$text .= $order->get_formatted_billing_address();
+	$text .= $order->get_billing_first_name() . ' ' .  $order->get_billing_last_name();
+  $text .= '<br>';
+	$text .= $order->get_billing_phone();
+  $text .= '<br>';
+	$text .= $order->get_billing_email();
+  $text .= '<br>';
+  $text .= $order->get_billing_company();
 
-	$text .= "<h2 style='font-size: 1.2em;'>Leveransadress</h2>";
+  $text .= "<h2 style='font-size: 1.2em;'>Leveransadress</h2>";
 
-	$text .= $order->get_formatted_shipping_address();
+	$text .= $order->get_billing_address_1();
+  $text .= '<br>';
+	$text .= $order->get_billing_address_2();
+  $text .= '<br>';
+  $text .= $order->get_billing_postcode();
+  $text .= '<br>';
+  $text .= $order->get_billing_city();
+
+  $text .= "<h2 style='font-size: 1.2em;'>Faktureringsuppgifter</h2>";
+
+  global $sk_smex;
+  $metas = $sk_smex->ADDITIONAL_BILLING_FIELDS;
+
+  foreach ( $metas as $key => $value ) {
+    $meta = get_post_meta($order->get_id(), "_$key", true);
+
+    if ($meta) {
+      $text .= "<strong>$value</strong>: ";
+      $text .= $meta;
+      $text .= '<br>';
+    }
+
+  }
+
+  $notes = $order->get_customer_note();
+
+  if ($notes) {
+    $text .= "<h2 style='font-size: 1.2em;'>Mer information</h2>";
+    $text .= "<strong>Ordernoteringar</strong>: ";
+    $text .= '<br>';
+    $text .= $notes;
+    $text .= '<br>';
+  }
+
+  //$text .= $order->get_formatted_shipping_address();
+
+  //Ordernoteringar
 
 	return $text;
 
