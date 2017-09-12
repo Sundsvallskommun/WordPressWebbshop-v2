@@ -153,10 +153,12 @@ class Sk_DeDU_XML {
 			);
 
 			if( ! empty( $item->get_formatted_meta_data() ) ) {
+				// Add an empty line.
+				$str .= "\n";
+
 				// Add all meta data at the end of the line.
-				// sprintf( "\n%s: %s", $meta->key, $meta->value )
 				foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-					$meta_string = sprintf( "%s: %s\n", $meta->key, $meta->value );
+					$meta_string = sprintf( "%s: %s\n\n", $meta->key, $meta->value );
 					$str .= str_pad( $meta_string, $qty_str_len + $sku_str_len + ( $pad_number * 2 ) + strlen( $meta_string ), " ", STR_PAD_LEFT );
 				}
 			}
