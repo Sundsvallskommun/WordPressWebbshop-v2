@@ -262,9 +262,16 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message .= skios_email_items($order, $items);
 
-	$subject = __( 'Beställning', 'skios' );
+  $subject = __( 'Beställning', 'skios' );
 
-  wp_mail( $to = $email_address, $subject, $message, array('Content-Type: text/html; charset=UTF-8') );
+  /**
+   * Set customer email as "from"-address.
+   */
+  $headers[] = "From: {$order->get_billing_first_name()} {$order->get_billing_last_name()} <{$order->get_billing_email()}>";
+  $headers[] = 'Content-Type: text/html; charset=UTF-8';
+
+  wp_mail( $to = $email_address, $subject, $message, $headers );
+
 }
 
 function skios_email_customer_details($order) {
@@ -294,13 +301,17 @@ function skios_email_customer_details($order) {
   global $sk_smex;
   $metas = $sk_smex->ADDITIONAL_BILLING_FIELDS;
 
-  foreach ( $metas as $key => $value ) {
-    $meta = get_post_meta($order->get_id(), "_$key", true);
+  if (is_array($metas)) {
 
-    if ($meta) {
-      $text .= "<strong>$value</strong>: ";
-      $text .= $meta;
-      $text .= '<br>';
+    foreach ( $metas as $key => $value ) {
+      $meta = get_post_meta($order->get_id(), "_$key", true);
+
+      if ($meta) {
+        $text .= "<strong>$value</strong>: ";
+        $text .= $meta;
+        $text .= '<br>';
+      }
+
     }
 
   }
