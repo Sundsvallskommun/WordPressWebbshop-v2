@@ -149,6 +149,9 @@ class SK_SMEX {
 		foreach ( $this->GF_DYNAMIC_FIELDS as $field => $smexvalue ) {
 			add_filter( "gform_field_value_$field", array( $this, 'auto_populate_gravity_forms' ), 10, 3 );
 		}
+
+		// Add a filter for gravityforms.
+		add_filter( 'gform_pre_send_email', array( $this, 'change_gravityforms_email_headers' ), 10, 4 );
 	}
 
 	/**
@@ -539,6 +542,26 @@ class SK_SMEX {
 		}
 
 		return $dyn_value;
+	}
+
+	/**
+	 * Changes the 'From:' header for all gravityforms.
+	 * @param  array $email
+	 * @param  string $message_format
+	 * @param  array $notification
+	 * @param  array $entry
+	 * @return array
+	 */
+	public function change_gravityforms_email_headers( $email, $message_format, $notification, $entry ) {
+		if ( is_user_logged_in() ) {
+			// User is logged in, set the "From" header to
+			// the logged in users email address.
+			$current_user = wp_get_current_user();
+			$email[ 'headers' ][ 'From' ] = "From: \"{$current_user->user_email}\" <{$current_user->user_email}>";
+		}
+
+		// Return.
+		return $email;
 	}
 
 }
