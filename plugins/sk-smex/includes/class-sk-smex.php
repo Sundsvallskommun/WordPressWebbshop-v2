@@ -91,6 +91,7 @@ class SK_SMEX {
 			'billing_responsibility_number'	=> __( 'Ansvarsnummer', 'sk-smex' ),
 			'billing_occupation_number'		=> __( 'Verksamhetsnummer', 'sk-smex' ),
 			'billing_activity_number'		=> __( 'Aktivitetsnummer', 'sk-smex' ),
+			'billing_project_number'		=> __( 'Projektnummer', 'sk-smex' ),
 			'billing_object_number'			=> __( 'Objektnummer', 'sk-smex' ),
 		);
 	}
@@ -394,6 +395,7 @@ class SK_SMEX {
 			// Add the string to the array.
 			$formats[ $key . '_ALL_ADDITIONAL' ] = $format_string;
 		}
+
 		return $formats;
 	}
 
