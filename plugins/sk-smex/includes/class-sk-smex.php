@@ -52,7 +52,7 @@ class SK_SMEX {
 		'smex_firstname' => 'Givenname',
 		'smex_lastname' => 'Lastname',
 		'smex_company' => 'Company',
-    'smex_org' => 'Organization',
+		'smex_org' => 'Organization',
 		'smex_email' => 'Email',
 		'smex_phone' => 'WorkPhone',
 		'smex_reference_number' => 'ReferenceNumber'
