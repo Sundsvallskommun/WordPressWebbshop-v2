@@ -202,7 +202,7 @@ class SK_Webshop {
 	?>
 		<style>
 			.gfield_description {
-        white-space: pre;
+        white-space: pre-line;
 			}
 		</style>
 	<?php 
