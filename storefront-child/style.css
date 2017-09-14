@@ -106,9 +106,14 @@ form[role="search"]:before {
 	}
 }
 
+h1.product_title {
+  font-size: 2.25em;
+}
+
 .products .product:hover .product-tooltip {
 	opacity: 1;
 }
+
 
 .product-tooltip {
 	transition: opacity .25s;
