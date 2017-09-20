@@ -60,6 +60,23 @@ class SK_SMEX_API {
 		return self::$instance;
 	}
 
+	public function get_username() {
+		$username = wp_get_current_user()->user_login;
+
+		if (empty($username)) {
+			return false;
+		}
+
+		$domain = get_user_meta( get_current_user_id(), '_user_domain', true );
+
+		if ( $domain ) {
+			$username = $domain . '\\' . $username;
+		}
+
+		return $username;
+
+	}
+
 	/**
 	 * Returns the value from a given property.
 	 * @param  string $property
@@ -68,7 +85,7 @@ class SK_SMEX_API {
 	public function get_user_data( $property ) {
 		// Make sure we have retrieved user data.
 		if ( is_null( $this->user_data ) ) {
-			if ( wp_get_current_user() !== 0 && ! empty( $username = wp_get_current_user()->user_login ) ) {
+			if ( wp_get_current_user() !== 0 && ! empty( $username = $this->get_username() ) ) {
 				$soap = $this->get_soap_client();
 				$result = $soap->GetPortalPersonData( array (
 					'loginname'	=> $username,
