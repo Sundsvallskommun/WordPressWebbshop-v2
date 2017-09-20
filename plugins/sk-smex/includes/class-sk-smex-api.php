@@ -60,10 +60,14 @@ class SK_SMEX_API {
 		return self::$instance;
 	}
 
+    /**
+     * Returns the username used for SMEX calls.
+     * @return string
+     */
 	public function get_username() {
 		$username = wp_get_current_user()->user_login;
 
-		if (empty($username)) {
+		if ( empty( $username ) ) {
 			return false;
 		}
 
@@ -74,7 +78,6 @@ class SK_SMEX_API {
 		}
 
 		return $username;
-
 	}
 
 	/**
