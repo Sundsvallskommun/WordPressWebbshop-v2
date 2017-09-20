@@ -452,7 +452,7 @@ class SK_SMEX {
 		// Label for company is either "bolag" or "förvaltning".
 		// Only change if we have access to SMEX.
 		if  ( $this->is_smex_active ) {
-			$label = ( $this->smex_api->user_requires_additional_fields() ) ? __( 'Förvaltning/Bolag', 'sk-smex' ) : __( 'Bolag', 'sk-smex' );
+			$label = ( $this->smex_api->user_requires_additional_fields() ) ? __( 'Förvaltning', 'sk-smex' ) : __( 'Bolag', 'sk-smex' );
 
 			// Change labels.
 			$fields[ 'billing_company' ][ 'label' ] = $label;
