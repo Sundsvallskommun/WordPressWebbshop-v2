@@ -47,7 +47,6 @@ class SK_Webshop_Unittype {
 		add_action( 'save_post', array( $this, 'save_unit_type_field' ) );
 
 		add_filter( 'woocommerce_get_price_html', array( $this, 'display_unittype'), 15, 2 );
-		add_filter( 'woocommerce_gform_total_price', array( $this, 'display_unittype_2'), 15, 2 );
 
 		/**
 		 * Display unittype after gravity form total
@@ -60,7 +59,7 @@ class SK_Webshop_Unittype {
 				return;
 			}
 
-			$unittype = $this->display_unittype(null, $product);
+			$unittype = $this->display_unittype(null, $product, true);
 			?>
 				<style>
 					.formattedTotalPrice:after {
@@ -100,7 +99,12 @@ class SK_Webshop_Unittype {
 	 * @param  WC_Product $product
 	 * @return string
 	 */
-	public function display_unittype( $price, $product ) {
+	public function display_unittype( $price, $product, $if_empty = false ) {
+
+		if (!$if_empty && empty($price)) {
+			return $price;
+		}
+
 		$unit_type = wp_get_post_terms( $product->get_id(), self::$UNIT_TYPE_TAX );
 		$is_quotation = 'yes' === get_post_meta( $product->get_id(), '_quotation_price', true );
 
