@@ -163,7 +163,6 @@ class Sk_DeDU_XML {
 				}
 			}
 
-			$str .= "\n";
 		}
 
 		return $str;
