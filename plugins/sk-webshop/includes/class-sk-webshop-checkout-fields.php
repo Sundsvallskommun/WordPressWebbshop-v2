@@ -18,7 +18,7 @@ class SK_Webshop_Checkout_Fields {
 	 */
 	public function __construct() {
 		// Change fields.
-		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_address2' ), 10 );
+		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_fields' ), 10 );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_order_of_fields' ), 15 );
 		add_filter( 'woocommerce_default_address_fields', array( $this, 'change_required' ) );
 
@@ -30,18 +30,29 @@ class SK_Webshop_Checkout_Fields {
 	}
 
 	/**
-	 * Changes the address2 to better fit SK.
+	 * Add billing department and organization
 	 * @param  array $fields
 	 * @return array
 	 */
-	public function change_address2( $fields ) {
+	public function add_fields( $fields ) {
 		// Remove the placeholder on address 2 and set a new label.
-		$fields[ 'billing' ][ 'billing_address_2' ][ 'placeholder' ] = '';
-		$fields[ 'billing' ][ 'billing_address_2' ][ 'label' ] = __( 'Förvaltning/Bolag, avdelning, rum', 'sk-smex' );
+		$fields[ 'billing' ][ 'billing_organization' ] = $fields[ 'billing' ][ 'billing_address_2' ];
+		$fields[ 'billing' ][ 'billing_organization' ][ 'label' ] = __( 'Förvaltning/bolag', 'sk-smex' );
+    $fields[ 'billing' ][ 'billing_organization' ][ 'autocomplete' ] = '';
+    $fields[ 'billing' ][ 'billing_organization' ][ 'placeholder' ] = '';
+    $fields[ 'billing' ][ 'billing_organization' ][ 'required' ] = true;
+
+		$fields[ 'billing' ][ 'billing_department' ] = $fields[ 'billing' ][ 'billing_address_2' ];
+		$fields[ 'billing' ][ 'billing_department' ][ 'label' ] = __( 'Arbetsplats, avdelning, rum' );
+		$fields[ 'billing' ][ 'billing_department' ][ 'autocomplete' ] = '';
+    $fields[ 'billing' ][ 'billing_department' ][ 'placeholder' ] = '';
+    $fields[ 'billing' ][ 'billing_department' ][ 'required' ] = true;
+
+		unset($fields[ 'billing' ][ 'billing_address_2' ]);
 
 		// Return fields.
 		return $fields;
-	}
+  }
 
 	/**
 	 * Changes the order.
@@ -52,7 +63,10 @@ class SK_Webshop_Checkout_Fields {
 		$fields[ 'billing' ][ 'billing_first_name' ][ 'priority' ] = 5;
 		$fields[ 'billing' ][ 'billing_last_name' ][ 'priority' ] = 5;
 		$fields[ 'billing' ][ 'billing_phone' ][ 'priority' ] = 15;
-		$fields[ 'billing' ][ 'billing_email' ][ 'priority' ] = 16;
+    $fields[ 'billing' ][ 'billing_email' ][ 'priority' ] = 16;
+
+		$fields[ 'billing' ][ 'billing_organization' ][ 'priority' ] = 45;
+		$fields[ 'billing' ][ 'billing_department' ][ 'priority' ] = 46;
 
 		return $fields;
 	}

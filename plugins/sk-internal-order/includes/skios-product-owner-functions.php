@@ -288,9 +288,11 @@ function skios_email_customer_details($order) {
 
   $text .= "<h2 style='font-size: 1.2em;'>Leveransadress</h2>";
 
-	$text .= $order->get_billing_address_1();
+	$text .= $order->get_meta('_billing_organization', true);
   $text .= '<br>';
-	$text .= $order->get_billing_address_2();
+	$text .= $order->get_meta('_billing_department', true);
+  $text .= '<br>';
+	$text .= $order->get_billing_address_1();
   $text .= '<br>';
   $text .= $order->get_billing_postcode();
   $text .= '<br>';
