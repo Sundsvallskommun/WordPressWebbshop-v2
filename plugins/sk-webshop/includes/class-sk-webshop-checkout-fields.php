@@ -21,6 +21,7 @@ class SK_Webshop_Checkout_Fields {
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_fields' ), 10 );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_order_of_fields' ), 15 );
 		add_filter( 'woocommerce_default_address_fields', array( $this, 'change_required' ) );
+		add_filter( 'woocommerce_billing_fields', array( $this, 'change_billing_fields' ), 90 );
 
 		// Add some css for the footer.
 		add_action( 'wp_footer', array( $this, 'inject_styles' ) );
@@ -80,6 +81,39 @@ class SK_Webshop_Checkout_Fields {
 		// Remove required from postcode and city.
 		$fields[ 'postcode' ][ 'required' ]	= false;
 		$fields[ 'city' ][ 'required' ]		= false;
+
+		// Return new fields.
+		return $fields;
+	}
+
+	/**
+	 * Changes the address fields to match the checkout fields.
+	 * For more info, see method add_fields().
+	 *
+	 * Note: this is mostly used for the my-account/addresses.
+	 * @param  array $fields
+	 * @return array
+	 */
+	public function change_billing_fields( $fields ) {
+		// Add organization.
+		$fields['billing_organization'] = $fields['billing_address_2'];
+		$fields['billing_organization'][ 'label' ] = __( 'Förvaltning/bolag', 'sk-smex' );
+		$fields['billing_organization'][ 'autocomplete' ] = '';
+		$fields['billing_organization'][ 'placeholder' ] = '';
+		$fields['billing_organization'][ 'required' ] = true;
+
+		// Add department.
+		$fields['billing_department'] = $fields[ 'billing_address_2' ];
+		$fields['billing_department']['label'] = __( 'Arbetsplats, avdelning, rum' );
+		$fields['billing_department']['autocomplete'] = '';
+		$fields['billing_department']['placeholder'] = '';
+		$fields['billing_department']['required'] = true;
+
+		// Change priority of address_1.
+		$fields['billing_address_1']['priority'] = 55;
+
+		// Remove address_2.
+		unset( $fields['billing_address_2'] );
 
 		// Return new fields.
 		return $fields;
