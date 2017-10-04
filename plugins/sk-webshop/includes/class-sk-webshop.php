@@ -97,6 +97,7 @@ class SK_Webshop {
 	private function includes() {
 		include __DIR__ . '/class-sk-webshop-unittype.php';
 		include __DIR__ . '/class-sk-webshop-checkout-fields.php';
+		include __DIR__ . '/class-sk-gf-privacy.php';
 	}
 
 	/**
@@ -106,6 +107,7 @@ class SK_Webshop {
 	private function init_classes() {
 		$this->taxonomies = new SK_Webshop_Unittype();
 		$this->checkout_fields = new SK_Webshop_Checkout_Fields();
+		$this->gf_privacy = new SK_GF_Privacy();
 	}
 
 	/**
