@@ -199,7 +199,7 @@ class Sk_DeDU_XML {
 			$order->billing_city );
 
 		// Add billing address.
-		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s", 'sk-dedu' ), '' );
+		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n", 'sk-dedu' ), '' );
 		return $string;
 	}
 
