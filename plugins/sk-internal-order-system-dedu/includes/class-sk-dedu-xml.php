@@ -184,22 +184,22 @@ class Sk_DeDU_XML {
 		// Add phone.
 		$string .= sprintf( __( "Telefon: %s\n", 'sk-dedu' ), $order->billing_phone );
 
+		// Add company
+		$string .= sprintf( __( "Förvaltning: %s\n", 'sk-dedu' ), $order->billing_company );
+
 		// Add customer message (order comment).
 		$string .= sprintf( __( "Kommentar: %s\n", 'sk-dedu' ), $order->customer_message );
 
 		// Add shipping address.
-		$string .= sprintf( __( "Leveransadress: %s\n%s\n%s %s\n", 'sk-dedu' ),
-			$order->billing_company,
+		$string .= sprintf( __( "Leveransadress:\n%s\n%s\n%s\n%s %s\n", 'sk-dedu' ),
+			$order->get_meta('_billing_organization', true),
+			$order->get_meta('_billing_department', true),
 			$order->billing_address_1,
 			$order->billing_postcode,
 			$order->billing_city );
 
 		// Add billing address.
-		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n%s\n%s %s\n", 'sk-dedu' ),
-			$order->shipping_company,
-			$order->shipping_address_1,
-			$order->shipping_postcode,
-			$order->shipping_city );
+		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s", 'sk-dedu' ), '' );
 		return $string;
 	}
 
