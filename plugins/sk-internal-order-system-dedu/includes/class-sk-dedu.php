@@ -95,9 +95,9 @@ class SK_DeDU {
 	public function handle_dedu_order_notification( $result, $type, $owner, $order, $items ) {
 		// Only handle DeDU orders.
 		// Also make sure we have credentials in $_SERVER.
-		if ( $type === 'dedu' && ! empty( $credentials = $_SERVER[ 'dedu_credentials' ] ) ) {
+		if ( 'dedu' === $type && ! empty( $credentials = $_SERVER['dedu_credentials'] ) ) {
 			// Init WS class.
-			$dedu_ws = new SK_DeDU_WS( $credentials[ 'username' ], $credentials[ 'password' ] );
+			$dedu_ws = new SK_DeDU_WS( $credentials['username'], $credentials['password'] );
 
 			// Send order.
 			return $dedu_ws->send_order( $order, $items );

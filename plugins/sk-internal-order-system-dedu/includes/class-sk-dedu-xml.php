@@ -61,31 +61,31 @@ class Sk_DeDU_XML {
 	 * @return string
 	 */
 	private function generate_order_items_xml( WC_Order $order, $items ) {
-			// Loop through $items and get the values.
-			foreach ( $items as $item ) {
-				// Get the fields first and check that they're not empty.
-				$item[ 'dedu_fields' ] = get_post_meta( $item[ 'product_id' ], 'sk_dedu_fields', true );
-				if ( empty( $item[ 'dedu_fields' ] ) ) {
-					return new WP_Error( 'missing_dedu_fields', __( 'Produkten saknar DeDU fält fastän DeDU är satt som produktägare.', 'sk-dedu' ) );
-				}
-
-				// Opening tag.
-				$xml = '<Sundsvall_CreateWebShopTask>';
-
-					$xml .= "<ADName>{$this->get_adname()}</ADName>";
-					$xml .= '<YrkeId>' . $item[ 'dedu_fields' ][ 'YrkeId' ] . '</YrkeId>';
-					$xml .= '<ArendetypId>' . $item[ 'dedu_fields' ][ 'ArendetypId' ] . '</ArendetypId>';
-					$xml .= '<KategoriId>' . $item[ 'dedu_fields' ][ 'KategoriId' ] . '</KategoriId>';
-					$xml .= '<UnderkategoriId>' . $item[ 'dedu_fields' ][ 'UnderkategoriId' ] . '</UnderkategoriId>';
-					$xml .= "<Anmarkning>{$this->generate_anmarkning_xml( $items )}</Anmarkning>";
-					$xml .= '<PrioritetId>' . $item[ 'dedu_fields' ][ 'PrioritetId' ] . '</PrioritetId>';
-					$xml .= "<InternKommentar>{$this->generate_internkommentar_xml( $order, $items )}</InternKommentar>";
-
-				// Closing tag.
-				$xml .= '</Sundsvall_CreateWebShopTask>';
+		// Loop through $items and get the values.
+		foreach ( $items as $item ) {
+			// Get the fields first and check that they're not empty.
+			$item['dedu_fields'] = get_post_meta( $item['product_id'], 'sk_dedu_fields', true );
+			if ( empty( $item['dedu_fields'] ) ) {
+				return new WP_Error( 'missing_dedu_fields', __( 'Produkten saknar DeDU fält fastän DeDU är satt som produktägare.', 'sk-dedu' ) );
 			}
 
+			// Opening tag.
+			$xml = '<Sundsvall_CreateWebShopTask>';
+
+				$xml .= "<ADName>{$this->get_adname()}</ADName>";
+				$xml .= '<YrkeId>' . $item['dedu_fields']['YrkeId'] . '</YrkeId>';
+				$xml .= '<ArendetypId>' . $item['dedu_fields']['ArendetypId'] . '</ArendetypId>';
+				$xml .= '<KategoriId>' . $item['dedu_fields']['KategoriId'] . '</KategoriId>';
+				$xml .= '<UnderkategoriId>' . $item['dedu_fields']['UnderkategoriId'] . '</UnderkategoriId>';
+				$xml .= "<Anmarkning>{$this->generate_anmarkning_xml( $items )}</Anmarkning>";
+				$xml .= '<PrioritetId>' . $item['dedu_fields']['PrioritetId'] . '</PrioritetId>';
 				$xml .= "<Referensnummer>{$order->get_meta( '_billing_reference_number' )}</Referensnummer>";
+				$xml .= "<InternKommentar>{$this->generate_internkommentar_xml( $order, $items )}</InternKommentar>";
+
+			// Closing tag.
+			$xml .= '</Sundsvall_CreateWebShopTask>';
+		}
+
 		// Return XML string.
 		return $xml;
 	}
@@ -133,36 +133,35 @@ class Sk_DeDU_XML {
 
 		$str  = "\nBeställningsnummer: {$this->order->get_id()}\n";
 		$str .= sprintf( "%s%sArtikel\n",
-			str_pad( 'Antal', ( $qty_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
-			str_pad( 'Artikel', ( $sku_str_len + $pad_number ), " ", STR_PAD_RIGHT )
+			str_pad( 'Antal', ( $qty_str_len + $pad_number ), ' ', STR_PAD_RIGHT ),
+			str_pad( 'Artikel', ( $sku_str_len + $pad_number ), ' ', STR_PAD_RIGHT )
 		);
 
 		// Loop through all products to create a new string.
 		foreach ( $items as $key => $item ) {
 			// Get product from the array.
 			$product = $products[ $key ];
-			
+
 			// Build the string.
 			$str .= sprintf( "%1\$s%2\$s%3\$s (%4\$s %6\$s / %5\$s %6\$s)\n",
-				str_pad( $item->get_quantity(), ( $qty_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
-				str_pad( $product->get_sku(), ( $sku_str_len + $pad_number ), " ", STR_PAD_RIGHT ),
-				str_pad( $product->get_name(), 0, " ", STR_PAD_LEFT ),
+				str_pad( $item->get_quantity(), ( $qty_str_len + $pad_number ), ' ', STR_PAD_RIGHT ),
+				str_pad( $product->get_sku(), ( $sku_str_len + $pad_number ), ' ', STR_PAD_RIGHT ),
+				str_pad( $product->get_name(), 0, ' ', STR_PAD_LEFT ),
 				wc_get_price_to_display( $product ),
 				$item->get_total(),
 				html_entity_decode( get_woocommerce_currency_symbol() )
 			);
 
-			if( ! empty( $item->get_formatted_meta_data() ) ) {
+			if ( ! empty( $item->get_formatted_meta_data() ) ) {
 				// Add an empty line.
 				$str .= "\n";
 
 				// Add all meta data at the end of the line.
-				foreach( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+				foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
 					$meta_string = sprintf( "%s: %s\n\n", $meta->key, $meta->value );
-					$str .= str_pad( $meta_string, $qty_str_len + $sku_str_len + ( $pad_number * 2 ) + strlen( $meta_string ), " ", STR_PAD_LEFT );
+					$str .= str_pad( $meta_string, $qty_str_len + $sku_str_len + ( $pad_number * 2 ) + strlen( $meta_string ), ' ', STR_PAD_LEFT );
 				}
 			}
-
 		}
 
 		return $str;
@@ -197,6 +196,7 @@ class Sk_DeDU_XML {
 			$order->get_billing_address_1(),
 			$order->get_billing_postcode(),
 			$order->get_billing_city()
+		);
 
 		// Add billing address.
 		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n", 'sk-dedu' ), '' );
