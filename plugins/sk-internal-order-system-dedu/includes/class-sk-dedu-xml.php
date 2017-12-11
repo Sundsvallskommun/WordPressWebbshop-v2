@@ -79,13 +79,13 @@ class Sk_DeDU_XML {
 					$xml .= '<UnderkategoriId>' . $item[ 'dedu_fields' ][ 'UnderkategoriId' ] . '</UnderkategoriId>';
 					$xml .= "<Anmarkning>{$this->generate_anmarkning_xml( $items )}</Anmarkning>";
 					$xml .= '<PrioritetId>' . $item[ 'dedu_fields' ][ 'PrioritetId' ] . '</PrioritetId>';
-					$xml .= "<Referensnummer>{$order->billing_reference_number}</Referensnummer>";
 					$xml .= "<InternKommentar>{$this->generate_internkommentar_xml( $order, $items )}</InternKommentar>";
 
 				// Closing tag.
 				$xml .= '</Sundsvall_CreateWebShopTask>';
 			}
 
+				$xml .= "<Referensnummer>{$order->get_meta( '_billing_reference_number' )}</Referensnummer>";
 		// Return XML string.
 		return $xml;
 	}
@@ -179,24 +179,24 @@ class Sk_DeDU_XML {
 		$string  = sprintf( __( "Namn: %s\n", 'sk-dedu' ), $order->get_formatted_billing_full_name() );
 
 		// Add email.
-		$string .= sprintf( __( "E-post: %s\n", 'sk-dedu' ), $order->billing_email );
+		$string .= sprintf( __( "E-post: %s\n", 'sk-dedu' ), $order->get_billing_email() );
 
 		// Add phone.
-		$string .= sprintf( __( "Telefon: %s\n", 'sk-dedu' ), $order->billing_phone );
+		$string .= sprintf( __( "Telefon: %s\n", 'sk-dedu' ), $order->get_billing_phone() );
 
 		// Add company
-		$string .= sprintf( __( "Förvaltning: %s\n", 'sk-dedu' ), $order->billing_company );
+		$string .= sprintf( __( "Förvaltning: %s\n", 'sk-dedu' ), $order->get_billing_company() );
 
 		// Add customer message (order comment).
-		$string .= sprintf( __( "Kommentar: %s\n", 'sk-dedu' ), $order->customer_message );
+		$string .= sprintf( __( "Kommentar: %s\n", 'sk-dedu' ), $order->get_customer_note() );
 
 		// Add shipping address.
 		$string .= sprintf( __( "Leveransadress:\n%s\n%s\n%s\n%s %s\n", 'sk-dedu' ),
 			$order->get_meta('_billing_organization', true),
 			$order->get_meta('_billing_department', true),
-			$order->billing_address_1,
-			$order->billing_postcode,
-			$order->billing_city );
+			$order->get_billing_address_1(),
+			$order->get_billing_postcode(),
+			$order->get_billing_city()
 
 		// Add billing address.
 		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n", 'sk-dedu' ), '' );
