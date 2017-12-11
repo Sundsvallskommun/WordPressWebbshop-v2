@@ -58,6 +58,15 @@ class Sk_DeDU_WS {
 	 * @return
 	 */
 	public function send_order( WC_Order $order, $order_items ) {
+		// Get the logger.
+		$logger  = wc_get_logger();
+		$context = array(
+			'source' => 'sk-dedu',
+		);
+
+		// Translators: the order ID.
+		$logger->info( sprintf( __( 'Starting to send WC_Order #%s to DeDU..', 'sk-dedu' ), $order->get_id() ), $context );
+
 		// Init cURL.
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_create_task_url, $this->ws_session_key ) );
@@ -69,6 +78,9 @@ class Sk_DeDU_WS {
 		$dedu_xml = new SK_DeDU_XML( $order, $order_items );
 		$xml = $dedu_xml->generate_xml();
 
+		// Translators: the order XML.
+		$logger->debug( sprintf( __( "WC_Order #%s XML:\n%s", 'sk-dedu' ), $order->get_id(), $xml ), $context );
+
 		// Make sure all is fine.
 		if ( ! is_wp_error( $xml ) ) {
 			// Set data.
@@ -79,20 +91,15 @@ class Sk_DeDU_WS {
 
 			// Check if we had any errors and if the HTTP status code was 201.
 			if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 ) {
+				$logger->info( __( 'DeDU replied with status code: 201. Order successfully exported.', 'sk-dedu' ), $context );
 				return true;
 			} else {
-				// Otherwise return a WP_Error with the ErrorDescription header
-				// as the message.
+				// Otherwise, log the incident and the request.
+				// Translators: the cURL response.
+				$logger->emergency( sprintf( __( "Could not create order in DeDU. DeDU replied:\n%s", 'sk-dedu' ), $data ), $context );
 
-				// Get headers.
-				$headers = SKW()->get_headers_from_curl( $data );
-
-				// Make sure 'ErrorDescription' is set.
-				if ( isset( $headers['ErrorDescription'] ) && ! empty( $error_description = $headers['ErrorDescription'] ) ) {
-					return new WP_Error( 'webservice_error', $error_description );
-				} else {
-					return new WP_Error( 'unknown_error', __( 'Something unexpected went wrong when trying to send order to DeDU.', 'sk-dedu' ) );
-				}
+				// Return a generic error message.
+				return new WP_Error( 'dedu_error', __( 'Något gick fel vid beställningen.', 'sk-dedu' ) );
 			}
 		} else {
 			return $xml;
