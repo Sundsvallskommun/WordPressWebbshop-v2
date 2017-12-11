@@ -15,36 +15,36 @@ class Sk_DeDU_WS {
 	 * Given username.
 	 * @var string
 	 */
-	private $WS_USERNAME;
+	private $ws_username;
 
 	/**
 	 * Given password.
 	 * @var string
 	 */
-	private $WS_PASSWORD;
+	private $ws_password;
 
 	/**
 	 * The URL for the login endpoint of WebService.
 	 * @var string
 	 */
-	private static $WS_LOGIN_URL = 'https://dedu.se/DeDUservicetest/Login?%s';
+	private static $ws_login_url = 'https://dedu.se/DeDUservicetest/Login?%s';
 
 	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
-	private static $WS_CREATE_TASK_URL = 'https://dedu.se/DeDUservicetest/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
+	private static $ws_create_task_url = 'https://dedu.se/DeDUservicetest/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
 
 	/**
 	 * Authenticates with the WebService on construct.
 	 */
 	public function __construct( $username, $password ) {
-		$this->WS_USERNAME = $username;
-		$this->WS_PASSWORD = $password;
+		$this->ws_username = $username;
+		$this->ws_password = $password;
 
 		// Try to authenticate.
 		if ( $session_key = $this->authenticate() ) {
-			$this->WS_SESSION_KEY = $session_key;
+			$this->ws_session_key = $session_key;
 		} else {
 			// Throw an exception for invalid credentials.
 			throw new Exception( 'The credentials you provided seems to be wrong.' );
@@ -60,7 +60,7 @@ class Sk_DeDU_WS {
 	public function send_order( WC_Order $order, $order_items ) {
 		// Init cURL.
 		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_CREATE_TASK_URL, $this->WS_SESSION_KEY ) );
+		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_create_task_url, $this->ws_session_key ) );
 		curl_setopt( $ch, CURLOPT_POST, true );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_HEADER, true );
@@ -83,12 +83,12 @@ class Sk_DeDU_WS {
 			} else {
 				// Otherwise return a WP_Error with the ErrorDescription header
 				// as the message.
-				
+
 				// Get headers.
 				$headers = SKW()->get_headers_from_curl( $data );
 
 				// Make sure 'ErrorDescription' is set.
-				if ( isset( $headers[ 'ErrorDescription' ] ) && ! empty( $error_description = $headers[ 'ErrorDescription' ] ) ) {
+				if ( isset( $headers['ErrorDescription'] ) && ! empty( $error_description = $headers['ErrorDescription'] ) ) {
 					return new WP_Error( 'webservice_error', $error_description );
 				} else {
 					return new WP_Error( 'unknown_error', __( 'Something unexpected went wrong when trying to send order to DeDU.', 'sk-dedu' ) );
@@ -108,7 +108,7 @@ class Sk_DeDU_WS {
 		$ch = curl_init();
 
 		// Set URL.
-		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$WS_LOGIN_URL, $this->generate_login_params() ) );
+		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_login_url, $this->generate_login_params() ) );
 
 		// Return as string instead of echo.
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
@@ -135,13 +135,13 @@ class Sk_DeDU_WS {
 		$timestamp = gmdate( 'Y-m-d\TH:i:s\Z' );
 
 		// Data is $timestamp and username.
-		$data = $this->WS_USERNAME . $timestamp;
+		$data = $this->ws_username . $timestamp;
 
 		// Return signature as a Bas64 encoded string.
 		return http_build_query( array(
-			'username'	=> $this->WS_USERNAME,
-			'timestamp'	=> $timestamp,
-			'hash'		=> str_replace( '/', '~', str_replace( '=', '_', str_replace( '+', '-', base64_encode( hash_hmac( 'sha1', $data, $this->WS_PASSWORD, true ) ) ) ) ),
+			'username'  => $this->ws_username,
+			'timestamp' => $timestamp,
+			'hash'      => str_replace( '/', '~', str_replace( '=', '_', str_replace( '+', '-', base64_encode( hash_hmac( 'sha1', $data, $this->ws_password, true ) ) ) ) ),
 		) );
 	}
 
