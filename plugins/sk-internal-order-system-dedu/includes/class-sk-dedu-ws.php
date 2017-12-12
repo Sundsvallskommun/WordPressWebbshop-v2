@@ -78,9 +78,6 @@ class Sk_DeDU_WS {
 		$dedu_xml = new SK_DeDU_XML( $order, $order_items );
 		$xml = $dedu_xml->generate_xml();
 
-		// Translators: the order XML.
-		$logger->debug( sprintf( __( "WC_Order #%s XML:\n%s", 'sk-dedu' ), $order->get_id(), $xml ), $context );
-
 		// Make sure all is fine.
 		if ( ! is_wp_error( $xml ) ) {
 			// Set data.
@@ -94,9 +91,14 @@ class Sk_DeDU_WS {
 				$logger->info( __( 'DeDU replied with status code: 201. Order successfully exported.', 'sk-dedu' ), $context );
 				return true;
 			} else {
+				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
+				// Translators: the order XML.
+				$logger->debug( sprintf( __( 'WC_Order #%1$s XML: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), $context );
+
+				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $data ) );
 				// Otherwise, log the incident and the request.
 				// Translators: the cURL response.
-				$logger->emergency( sprintf( __( "Could not create order in DeDU. DeDU replied:\n%s", 'sk-dedu' ), $data ), $context );
+				$logger->emergency( sprintf( __( 'Could not create order in DeDU. DeDU replied:%s', 'sk-dedu' ), $log_entry ), $context );
 
 				// Return a generic error message.
 				return new WP_Error( 'dedu_error', __( 'Något gick fel vid beställningen.', 'sk-dedu' ) );
