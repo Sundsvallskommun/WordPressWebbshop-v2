@@ -190,18 +190,27 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 			// Reduce stock levels.
 			$order->reduce_order_stock();
 
-			// Remove cart.
-			$woocommerce->cart->empty_cart();
+			// Remove cart unless cart is null.
+			if ( isset( $woocommerce->cart ) ) {
+				$woocommerce->cart->empty_cart();
+			}
 
 			// Return thankyou redirect
 			return array(
-				'result'	=> 'success',
-				'redirect'	=> $this->get_return_url( $order )
+				'result'   => 'success',
+				'redirect' => $this->get_return_url( $order ),
 			);
 		} else {
+			// Set the status to failed.
+			$order->update_status( 'failed', $result->get_error_message() );
+
 			// WooCommerce documentation dictates that if an error occurs we should
 			// set a notice and return null.
-			wc_add_notice( $result->get_error_message(), 'error' );
+			// Note: since we allow orders to be manually sent through the gateway
+			// we need to make sure that wc_add_notice exists.
+			if ( function_exists( 'wc_add_notice' ) ) {
+				wc_add_notice( $result->get_error_message(), 'error' );
+			}
 			return;
 		}
 	}
