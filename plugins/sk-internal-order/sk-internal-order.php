@@ -16,9 +16,6 @@
  * Developer URI:	utveckling.sundsvall.se
  * Text Domain:		skio
  * Domain Path:		/languages
- * Copyright:       © 2009-2015 WooThemes.
- * License:         GNU General Public License v3.0
- * License URI:     http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
