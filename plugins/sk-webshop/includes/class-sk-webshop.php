@@ -288,6 +288,21 @@ class SK_Webshop {
 
 	}
 
+	/**
+	 * Adds an entry to error_log() if the provided
+	 * $level matches current error_reporting() level.
+	 * @param  string  $entry
+	 * @param  integer $level
+	 * @return void
+	 */
+	public function log( $entry, $level = E_WARNING ) {
+		$current_error_level = error_reporting();
+
+		if ( $level <= $current_error_level ) {
+			error_log( $entry );
+		}
+	}
+
 
 	/**
 	 * Save field
