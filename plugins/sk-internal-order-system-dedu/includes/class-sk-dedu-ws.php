@@ -27,13 +27,13 @@ class Sk_DeDU_WS {
 	 * The URL for the login endpoint of WebService.
 	 * @var string
 	 */
-	private static $ws_login_url = 'https://dedu.se/DeDUservicetest/Login?%s';
+	private static $ws_login_url = 'https://dedu.se/DeDUservice/Login?%s';
 
 	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
-	private static $ws_create_task_url = 'https://dedu.se/DeDUservicetest/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
+	private static $ws_create_task_url = 'https://dedu.se/DeDUService/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
 
 	/**
 	 * Authenticates with the WebService on construct.
