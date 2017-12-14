@@ -23,6 +23,11 @@ class SK_DeDU {
 	 * Sets up the plugin correctly regarding hooks etc.
 	 */
 	public function __construct() {
+		// Get all values from options.
+		$this->url      = get_option( 'dedu_url' );
+		$this->username = get_option( 'dedu_username' );
+		$this->password = get_option( 'dedu_password' );
+
 		spl_autoload_register( array( $this, 'register_autoload' ) );
 
 		// Init classes.
@@ -64,11 +69,25 @@ class SK_DeDU {
 	}
 
 	/**
+	 * Helper function for checking if DeDU credentials
+	 * are set.
+	 * @return boolean
+	 */
+	private function has_credentials() {
+		return ! empty( $this->url ) && ! empty( $this->username ) && ! empty( $this->password );
+	}
+
+	/**
 	 * Initiates classes.
 	 * @return void
 	 */
 	private function init_classes() {
 		$this->productfields = SK_DeDU_Product_Fields::get_instance();
+
+		if ( is_admin() ) {
+			require_once __DIR__ . '/../admin/class-sk-dedu-settings.php';
+			$this->admin_settings = new SK_DeDU_Settings();
+		}
 	}
 
 	/**
@@ -94,10 +113,10 @@ class SK_DeDU {
 	 */
 	public function handle_dedu_order_notification( $result, $type, $owner, $order, $items ) {
 		// Only handle DeDU orders.
-		// Also make sure we have credentials in $_SERVER.
-		if ( 'dedu' === $type && ! empty( $credentials = $_SERVER['dedu_credentials'] ) ) {
+		// Also make sure we have credentials.
+		if ( 'dedu' === $type && $this->has_credentials() ) {
 			// Init WS class.
-			$dedu_ws = new SK_DeDU_WS( $credentials['username'], $credentials['password'] );
+			$dedu_ws = new SK_DeDU_WS( $this->url, $this->username, $this->password );
 
 			// Send order.
 			return $dedu_ws->send_order( $order, $items );

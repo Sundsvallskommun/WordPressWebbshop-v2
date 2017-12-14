@@ -27,18 +27,28 @@ class Sk_DeDU_WS {
 	 * The URL for the login endpoint of WebService.
 	 * @var string
 	 */
-	private static $ws_login_url = 'https://dedu.se/DeDUservice/Login?%s';
+
+	private static $ws_login_url = '/Login?%s';
 
 	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
-	private static $ws_create_task_url = 'https://dedu.se/DeDUService/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
+
+	private static $ws_create_task_url = '/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
 
 	/**
 	 * Authenticates with the WebService on construct.
+	 * @param string $base_url
+	 * @param string $username
+	 * @param string $password
 	 */
-	public function __construct( $username, $password ) {
+	public function __construct( $base_url, $username, $password ) {
+		// Set URLs.
+		self::$ws_login_url = untrailingslashit( $base_url ) . self::$ws_login_url;
+		self::$ws_create_task_url = untrailingslashit( $base_url ) . self::$ws_create_task_url;
+
+		// Set credentials as class properties.
 		$this->ws_username = $username;
 		$this->ws_password = $password;
 
@@ -58,15 +68,6 @@ class Sk_DeDU_WS {
 	 * @return
 	 */
 	public function send_order( WC_Order $order, $order_items ) {
-		// Get the logger.
-		$logger  = wc_get_logger();
-		$context = array(
-			'source' => 'sk-dedu',
-		);
-
-		// Translators: the order ID.
-		$logger->info( sprintf( __( 'Starting to send WC_Order #%s to DeDU..', 'sk-dedu' ), $order->get_id() ), $context );
-
 		// Init cURL.
 		$ch = curl_init();
 		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_create_task_url, $this->ws_session_key ) );
@@ -88,17 +89,19 @@ class Sk_DeDU_WS {
 
 			// Check if we had any errors and if the HTTP status code was 201.
 			if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 ) {
-				$logger->info( __( 'DeDU replied with status code: 201. Order successfully exported.', 'sk-dedu' ), $context );
 				return true;
 			} else {
+				// Translators: WC_Order::ID.
+				SKW()->log( sprintf( __( 'Failed to export WC_Order #%1$s to DeDU.', 'sk-dedu' ), $order->get_id() ), E_WARNING );
+
 				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
 				// Translators: the order XML.
-				$logger->debug( sprintf( __( 'WC_Order #%1$s XML: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), $context );
+				SKW()->log( sprintf( __( 'WC_Order #%1$s XML: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
 
 				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $data ) );
 				// Otherwise, log the incident and the request.
 				// Translators: the cURL response.
-				$logger->emergency( sprintf( __( 'Could not create order in DeDU. DeDU replied:%s', 'sk-dedu' ), $log_entry ), $context );
+				SKW()->log( sprintf( __( 'WC_Order #%1$s cURL response: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
 
 				// Return a generic error message.
 				return new WP_Error( 'dedu_error', __( 'Något gick fel vid beställningen.', 'sk-dedu' ) );
