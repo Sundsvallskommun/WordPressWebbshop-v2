@@ -54,8 +54,12 @@ class Sk_DeDU_WS {
 		if ( $session_key = $this->authenticate() ) {
 			$this->ws_session_key = $session_key;
 		} else {
-			// Throw an exception for invalid credentials.
-			throw new Exception( 'The credentials you provided seems to be wrong.' );
+			// Log it.
+			SKW()->log( __( 'SK_DeDU: Det gick inte att autensiera med DeDU. Var vänlig kontrollera att uppgifterna stämmer.', 'sk-dedu' ), E_WARNING );
+
+			// Throw a general exception since this might
+			// end up in the front-end.
+			throw new Exception( __( 'Något gick fel vid beställningen.', 'sk-dedu' ) );
 		}
 	}
 
