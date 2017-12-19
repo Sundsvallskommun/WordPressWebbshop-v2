@@ -27,13 +27,13 @@ class Sk_DeDU_WS {
 	 * The URL for the login endpoint of WebService.
 	 * @var string
 	 */
-	private static $ws_login_url = '/Login?%s';
+	private $ws_login_url = '/Login?%s';
 
 	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
-	private static $ws_create_task_url = '/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
+	private $ws_create_task_url = '/TemplatedXML?TemplateName=Sundsvall_CreateWebShopTaskFromList&SessionKey=%s';
 
 	/**
 	 * Authenticates with the WebService on construct.
@@ -43,8 +43,8 @@ class Sk_DeDU_WS {
 	 */
 	public function __construct( $base_url, $username, $password ) {
 		// Set URLs.
-		self::$ws_login_url = untrailingslashit( $base_url ) . self::$ws_login_url;
-		self::$ws_create_task_url = untrailingslashit( $base_url ) . self::$ws_create_task_url;
+		$this->ws_login_url = untrailingslashit( $base_url ) . $this->ws_login_url;
+		$this->ws_create_task_url = untrailingslashit( $base_url ) . $this->ws_create_task_url;
 
 		// Set credentials as class properties.
 		$this->ws_username = $username;
@@ -72,7 +72,7 @@ class Sk_DeDU_WS {
 	public function send_order( WC_Order $order, $order_items ) {
 		// Init cURL.
 		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_create_task_url, $this->ws_session_key ) );
+		curl_setopt( $ch, CURLOPT_URL, sprintf( $this->ws_create_task_url, $this->ws_session_key ) );
 		curl_setopt( $ch, CURLOPT_POST, true );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_HEADER, true );
@@ -122,7 +122,7 @@ class Sk_DeDU_WS {
 		$ch = curl_init();
 
 		// Set URL.
-		curl_setopt( $ch, CURLOPT_URL, sprintf( self::$ws_login_url, $this->generate_login_params() ) );
+		curl_setopt( $ch, CURLOPT_URL, sprintf( $this->ws_login_url, $this->generate_login_params() ) );
 
 		// Return as string instead of echo.
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
