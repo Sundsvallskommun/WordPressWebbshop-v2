@@ -211,7 +211,7 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 				 * @param array    $items           The order items that belongs to this product owner.
 				 */
 				if ( ! is_wp_error( $result = apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $item->items ) ) ) {
-					$successful_filters[ $owner_id ] = $item->items;
+					$successful_filters[ $item->owner_id ] = $item->items;
 				} else {
 					return $result;
 				}
