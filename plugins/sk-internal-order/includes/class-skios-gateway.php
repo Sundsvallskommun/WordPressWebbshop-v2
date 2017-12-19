@@ -244,7 +244,7 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 			$order->update_status( 'wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ) );
 
 			// Reduce stock levels.
-			$order->reduce_order_stock();
+			wc_reduce_stock_levels( $order->get_id() );
 
 			// Remove cart unless cart is null.
 			if ( isset( $woocommerce->cart ) ) {
