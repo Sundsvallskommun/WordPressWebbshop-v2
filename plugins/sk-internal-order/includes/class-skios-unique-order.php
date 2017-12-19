@@ -71,7 +71,6 @@ class SKIOS_Unique_Order {
 				'wrapper_class' => 'show_if_simple show_if_variable',
 				'label'   => __( 'Skicka som separat ärende', 'woocommerce' ),
 				'description'   => __( 'Skicka varan i ett eget mejl även om det finns fler varor med samma ägare.', 'woocommerce' ),
-				'options' => $options
 			)
 		);
 

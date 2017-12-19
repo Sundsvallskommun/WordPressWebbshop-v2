@@ -164,19 +164,75 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 		$items = $order->get_items();
 
+		// Will contain objects that hold
+		// owner id and it's products.
 		$sorted_items = array();
+
+		// Keymap of $sorted_items with the
+		// owner id as key.
+		$sorted_items_key_map = array();
 
 		foreach ($items as $item) {
 
 			$product_id = $item['product_id'];
 
 			$owner_id = get_post_meta( $product_id, '_product_owner', true);
+			$unique_notice = get_post_meta( $product_id, '_unique_order_email', true );
 
-			if ( !$owner_id || empty($owner_id) ||  false == skios_get_product_owner_by_id( $owner_id ) ) { 
-				// 0 means no owner id is set for product.
-				$sorted_items[0][] = $item;
+			// Make sure that we have an owner and that it exists.
+			if ( ! $owner_id || empty( $owner_id ) || false == skios_get_product_owner_by_id( $owner_id ) ) {
+				/**
+				 * Items without a product owner will be stored in a
+				 * object that has it's owner_id set to 0.
+				 *
+				 * So first, we'll check if we have added that object.
+				 */
+				if ( isset( $sorted_items_key_map[0] ) ) {
+					$key                           = $sorted_items_key_map[0];
+					$sorted_items[ $key ]->items[] = $item;
+				} else {
+					// Otherwise add it.
+					$object           = new StdClass;
+					$object->owner_id = 0;
+					$object->items    = array( $item );
+
+					$sorted_items[]          = $object;
+					$keys                    = array_keys( $sorted_items );
+					$sorted_items_key_map[0] = end( $keys );
+				}
 			} else {
-				$sorted_items[$owner_id][] = $item;
+				// If we have already added this owner and if the product
+				// isn't required to be sent as an unique order email
+				// add it to the existing.
+				if ( isset( $sorted_items_key_map[ $owner_id ] ) && empty( $unique_notice ) ) {
+					$key                           = $sorted_items_key_map[ $owner_id ];
+					$sorted_items[ $key ]->items[] = $item;
+				} else {
+					// Create an object per quantity if it's supposed to be unique.
+					if ( ! empty( $unique_notice ) ) {
+						$quantity = $item->get_quantity();
+						for ( $i = 0; $i < $quantity; $i++ ) {
+							// Change the quantity to one since
+							// we're adding one object per quantity.
+							$item->set_quantity( 1 );
+
+							// Add it as a new object.
+							$object           = new StdClass;
+							$object->owner_id = (int) $owner_id;
+							$object->items    = array( $item );
+							$sorted_items[]   = $object;
+						}
+					} else {
+						// Otherwise, we'll simply add it.
+						$object           = new StdClass;
+						$object->owner_id = (int) $owner_id;
+						$object->items    = array( $item );
+
+						$sorted_items[]                    = $object;
+						$keys                              = array_keys( $sorted_items );
+						$sorted_items_key_map[ $owner_id ] = end( $keys );
+					}
+				}
 			}
 
 		}

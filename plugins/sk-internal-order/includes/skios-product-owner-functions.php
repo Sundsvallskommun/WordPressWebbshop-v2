@@ -191,14 +191,13 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 
 		$successful_filters = array();
 
-		foreach( $sorted_items as $owner_id => $items ) {
+		foreach( $sorted_items as $item ) {
 
-			if ( 0 == $owner_id ) {
+			if ( 0 === $item->owner_id ) {
 				// No owner associated with the id, send to admin.
-				skios_no_owner_email( get_bloginfo('admin_email'), $order, $items );
+				skios_no_owner_email( get_bloginfo( 'admin_email' ), $order, $$item->items );
 			} else {
-
-				$owner = skios_get_product_owner_by_id( $owner_id );
+				$owner = skios_get_product_owner_by_id( $item->owner_id );
 
 				/**
 				 * Lets other plugin / themes hook in to order notification.
@@ -208,16 +207,15 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 				 * @param boolean  true
 				 * @param string   $owner[ 'type' ] The type of product owner.
 				 * @param array    $owner           The product owner.
-				 * @param WC_Order $order         The WC_Order object.
+				 * @param WC_Order $order           The WC_Order object.
 				 * @param array    $items           The order items that belongs to this product owner.
 				 */
-				if ( ! is_wp_error( $result = apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $items ) ) ) {
-					$successful_filters[ $owner_id ] = $items;
+				if ( ! is_wp_error( $result = apply_filters( 'skios_order_notification', true, $owner[ 'type' ], $owner, $order, $item->items ) ) ) {
+					$successful_filters[ $owner_id ] = $item->items;
 				} else {
 					return $result;
 				}
 			}
-
 		}
 
 		return ( count( $successful_filters ) === count( $sorted_items ) );
