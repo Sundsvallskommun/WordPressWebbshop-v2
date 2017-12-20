@@ -34,9 +34,6 @@ class SK_Webshop_Required_Fields {
 		'billing_city' => array(
 			'label' => 'Ort',
 		),
-		'billing_reference_number' => array(
-			'label' => 'Referensnummer',
-		),
 		'billing_responsibility_number' => array(
 			'label' => 'Ansvarsnummer',
 		),
