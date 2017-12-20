@@ -156,8 +156,6 @@ class SK_Webshop_Checkout_Fields {
 					}
 				}
 
-				console.log( $( 'h3[data-added=true]' ).length <= numOfExpectedTitles );
-
 				// Check if we have already added the header.
 				if ( $( 'h3[data-added=true]' ).length <= numOfExpectedTitles ) {
 					clearTimeout( timer );
