@@ -164,7 +164,7 @@ class Sk_DeDU_XML {
 			}
 		}
 
-		return $str;
+		return htmlspecialchars( $str );
 	}
 
 	/**
@@ -200,7 +200,7 @@ class Sk_DeDU_XML {
 
 		// Add billing address.
 		$string .= sprintf( __( "Fakturaadress (gäller endast vid extern faktura): %s\n", 'sk-dedu' ), '' );
-		return $string;
+		return htmlspecialchars( $string );
 	}
 
 }
