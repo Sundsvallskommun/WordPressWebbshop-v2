@@ -69,6 +69,8 @@ class Sk_DeDU_XML {
 				return new WP_Error( 'missing_dedu_fields', __( 'Produkten saknar DeDU fält fastän DeDU är satt som produktägare.', 'sk-dedu' ) );
 			}
 
+			$reference_number = htmlspecialchars( $order->get_meta( '_billing_reference_number' ) );
+
 			// Opening tag.
 			$xml = '<Sundsvall_CreateWebShopTask>';
 
@@ -79,7 +81,7 @@ class Sk_DeDU_XML {
 				$xml .= '<UnderkategoriId>' . $item['dedu_fields']['UnderkategoriId'] . '</UnderkategoriId>';
 				$xml .= "<Anmarkning>{$this->generate_anmarkning_xml( $items )}</Anmarkning>";
 				$xml .= '<PrioritetId>' . $item['dedu_fields']['PrioritetId'] . '</PrioritetId>';
-				$xml .= "<Referensnummer>{$order->get_meta( '_billing_reference_number' )}</Referensnummer>";
+				$xml .= "<Referensnummer>{$reference_number}</Referensnummer>";
 				$xml .= "<InternKommentar>{$this->generate_internkommentar_xml( $order, $items )}</InternKommentar>";
 
 			// Closing tag.
