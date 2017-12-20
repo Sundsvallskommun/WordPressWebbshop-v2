@@ -116,21 +116,60 @@ class SK_Webshop_Checkout_Fields {
 
 			jQuery( document.body ).on( 'country_to_state_changing', function() {
 				var $ = jQuery;
+				var numOfExpectedTitles = 0;
+
+				var $shipping_title = $( '<h3 data-added="true">Leveransadress</h3>' );
+				var shipping_fields = [
+					'billing_organization',
+					'billing_department',
+					'billing_address_1',
+					'billing_postcode',
+					'billing_city',
+				];
+				var $the_shipping_field = '';
+
+				var $billing_title = $( '<h3 data-added="true">Faktureringsuppgifter</h3>' );
+				var billing_fields = [
+					'billing_reference_number',
+					'billing_responsibility_number',
+					'billing_occupation_number',
+					'billing_activity_number',
+					'billing_project_number',
+					'billing_object_number',
+				];
+				var $the_billing_field = '';
+
+				for (var i = 0; i <= shipping_fields.length; i++) {
+					if ( $( '#' + shipping_fields[i] ).length > 0 ) {
+						numOfExpectedTitles++;
+						$the_shipping_field = $( '#' + shipping_fields[i] );
+						break;
+					}
+				}
+
+				for (var i = 0; i <= billing_fields.length; i++) {
+					if ( $( '#' + billing_fields[i] ).length > 0 ) {
+						console.log( 'dsadsds' );
+						numOfExpectedTitles++;
+						$the_billing_field = $( '#' + billing_fields[i] );
+						break;
+					}
+				}
+
+				console.log( $( 'h3[data-added=true]' ).length <= numOfExpectedTitles );
 
 				// Check if we have already added the header.
-				if ( $( 'h3[data-added=true]' ).length === 2 ) {
+				if ( $( 'h3[data-added=true]' ).length <= numOfExpectedTitles ) {
 					clearTimeout( timer );
 				}
 
 				timer = setTimeout( function() {
-					var $country = $( '#billing_country_field' ),
-						$reference_number = $( '#billing_reference_number_field' ),
-						$shippingTitle = $( '<h3 data-added="true">Leveransadress</h3>' ),
-						$billingTitle = $( '<h3 data-added="true">Faktureringsuppgifter</h3>' );
+					if ( $the_shipping_field.length > 0 ) {
+						$the_shipping_field.parent().before( $shipping_title );
+					}
 
-					if ( $( 'h3[data-added=true]' ).length < 2 ) {
-						$country.before( $shippingTitle );
-						$reference_number.before( $billingTitle );
+					if ( $the_billing_field.length > 0 ) {
+						$the_billing_field.parent().before( $billing_title );
 					}
 				}, 100 );
 			} );
