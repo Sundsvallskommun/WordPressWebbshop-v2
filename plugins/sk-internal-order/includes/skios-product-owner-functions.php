@@ -195,7 +195,7 @@ function skios_handle_order_notifications( $order, $sorted_items ) {
 
 			if ( 0 === $item->owner_id ) {
 				// No owner associated with the id, send to admin.
-				skios_no_owner_email( get_bloginfo( 'admin_email' ), $order, $$item->items );
+				skios_no_owner_email( get_bloginfo( 'admin_email' ), $order, $item->items );
 			} else {
 				$owner = skios_get_product_owner_by_id( $item->owner_id );
 

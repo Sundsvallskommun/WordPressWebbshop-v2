@@ -185,7 +185,6 @@ class SK_Webshop_Required_Fields {
 			foreach ( $fields['billing'] as $field => $value ) {
 				if ( isset( $_fields[ $field ] ) ) {
 					$required = $_fields[ $field ]['required'];
-					$fields['billing'][ $field ]['required'] = $required;
 
 					if ( ! $required ) {
 						unset( $fields['billing'][ $field ] );
@@ -200,7 +199,6 @@ class SK_Webshop_Required_Fields {
 					$required = $_fields[ $_field ]['required'];
 
 					if ( ! $required ) {
-						$fields[ $field ]['required'] = $required;
 
 						if ( ! $required ) {
 							unset( $fields[ $field ] );
