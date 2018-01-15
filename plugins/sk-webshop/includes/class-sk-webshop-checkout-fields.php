@@ -18,7 +18,6 @@ class SK_Webshop_Checkout_Fields {
 	 */
 	public function __construct() {
 		// Change fields.
-		add_filter( 'woocommerce_checkout_fields', array( $this, 'add_fields' ), 10 );
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_order_of_fields' ), 15 );
 		add_filter( 'woocommerce_default_address_fields', array( $this, 'change_required' ) );
 		add_filter( 'woocommerce_billing_fields', array( $this, 'change_billing_fields' ), 90 );
@@ -29,31 +28,6 @@ class SK_Webshop_Checkout_Fields {
 		// Add some script for the footer.
 		add_action( 'wp_footer', array( $this, 'inject_scripts' ) );
 	}
-
-	/**
-	 * Add billing department and organization
-	 * @param  array $fields
-	 * @return array
-	 */
-	public function add_fields( $fields ) {
-		// Remove the placeholder on address 2 and set a new label.
-		$fields[ 'billing' ][ 'billing_organization' ] = $fields[ 'billing' ][ 'billing_address_2' ];
-		$fields[ 'billing' ][ 'billing_organization' ][ 'label' ] = __( 'Förvaltning/bolag', 'sk-smex' );
-    $fields[ 'billing' ][ 'billing_organization' ][ 'autocomplete' ] = '';
-    $fields[ 'billing' ][ 'billing_organization' ][ 'placeholder' ] = '';
-    $fields[ 'billing' ][ 'billing_organization' ][ 'required' ] = true;
-
-		$fields[ 'billing' ][ 'billing_department' ] = $fields[ 'billing' ][ 'billing_address_2' ];
-		$fields[ 'billing' ][ 'billing_department' ][ 'label' ] = __( 'Arbetsplats, avdelning, rum' );
-		$fields[ 'billing' ][ 'billing_department' ][ 'autocomplete' ] = '';
-    $fields[ 'billing' ][ 'billing_department' ][ 'placeholder' ] = '';
-    $fields[ 'billing' ][ 'billing_department' ][ 'required' ] = true;
-
-		unset($fields[ 'billing' ][ 'billing_address_2' ]);
-
-		// Return fields.
-		return $fields;
-  }
 
 	/**
 	 * Changes the order.
@@ -142,21 +116,58 @@ class SK_Webshop_Checkout_Fields {
 
 			jQuery( document.body ).on( 'country_to_state_changing', function() {
 				var $ = jQuery;
+				var numOfExpectedTitles = 0;
+
+				var $shipping_title = $( '<h3 data-added="true">Leveransadress</h3>' );
+				var shipping_fields = [
+					'billing_organization',
+					'billing_department',
+					'billing_address_1',
+					'billing_postcode',
+					'billing_city',
+				];
+				var $the_shipping_field = '';
+
+				var $billing_title = $( '<h3 data-added="true">Faktureringsuppgifter</h3>' );
+				var billing_fields = [
+					'billing_reference_number',
+					'billing_responsibility_number',
+					'billing_occupation_number',
+					'billing_activity_number',
+					'billing_project_number',
+					'billing_object_number',
+				];
+				var $the_billing_field = '';
+
+				for (var i = 0; i <= shipping_fields.length; i++) {
+					if ( $( '#' + shipping_fields[i] ).length > 0 ) {
+						numOfExpectedTitles++;
+						$the_shipping_field = $( '#' + shipping_fields[i] );
+						break;
+					}
+				}
+
+				for (var i = 0; i <= billing_fields.length; i++) {
+					if ( $( '#' + billing_fields[i] ).length > 0 ) {
+						console.log( 'dsadsds' );
+						numOfExpectedTitles++;
+						$the_billing_field = $( '#' + billing_fields[i] );
+						break;
+					}
+				}
 
 				// Check if we have already added the header.
-				if ( $( 'h3[data-added=true]' ).length === 2 ) {
+				if ( $( 'h3[data-added=true]' ).length <= numOfExpectedTitles ) {
 					clearTimeout( timer );
 				}
 
 				timer = setTimeout( function() {
-					var $country = $( '#billing_country_field' ),
-						$reference_number = $( '#billing_reference_number_field' ),
-						$shippingTitle = $( '<h3 data-added="true">Leveransadress</h3>' ),
-						$billingTitle = $( '<h3 data-added="true">Faktureringsuppgifter</h3>' );
+					if ( $the_shipping_field.length > 0 ) {
+						$the_shipping_field.parent().before( $shipping_title );
+					}
 
-					if ( $( 'h3[data-added=true]' ).length < 2 ) {
-						$country.before( $shippingTitle );
-						$reference_number.before( $billingTitle );
+					if ( $the_billing_field.length > 0 ) {
+						$the_billing_field.parent().before( $billing_title );
 					}
 				}, 100 );
 			} );

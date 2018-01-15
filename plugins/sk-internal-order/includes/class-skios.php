@@ -52,6 +52,7 @@ class SKIOS {
 		include __DIR__ . '/skios-product-owner-functions.php';
 		include __DIR__ . '/class-skios-admin-columns.php';
 		include __DIR__ . '/class-skios-product-owner.php';
+		include __DIR__ . '/class-skios-unique-order.php';
 	}
 
 	/**
@@ -60,6 +61,7 @@ class SKIOS {
 	public function init_classes() {
 		$skios_admin_columns = new SKIOS_Admin_Columns();
 		$skios_product_owner = new SKIOS_Product_Owner();
+		$skios_unique_order = new SKIOS_Unique_Order();
 	}
 
 	/**

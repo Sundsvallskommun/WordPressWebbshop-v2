@@ -23,6 +23,12 @@ class SK_Webshop {
 	 * Inits the class.
 	 */
 	public function __construct() {
+		// Add the order action item for re-trying our gateway.
+		add_filter( 'woocommerce_order_actions', array( $this, 'add_order_meta_box_action' ) );
+
+		// Add the action for re-trying our gateway.
+		add_action( 'woocommerce_order_action_skios_retry_gateway', array( $this, 'retry_order_through_skios' ) );
+
 		// Add SKU to products if it's missing when saving.
 		add_action( 'save_post', array( $this, 'add_sku_if_missing' ), 10, 3 );
 
@@ -79,6 +85,31 @@ class SK_Webshop {
 	}
 
 	/**
+	 * Adds our action for re-trying the order
+	 * through the gateway.
+	 * @param array $actions
+	 */
+	public function add_order_meta_box_action( $actions ) {
+		$actions['skios_retry_gateway'] = __( 'Skicka order igen', 'skios' );
+		return $actions;
+	}
+
+	/**
+	 * Re-tries the order through SKIOS gateway.
+	 * @param  WC_Order $order
+	 * @return void
+	 */
+	public function retry_order_through_skios( $order ) {
+		if ( 'skios' === $order->get_payment_method() && class_exists( 'SKIOS_Gateway' ) ) {
+			// Get an instance of the gateway.
+			$gateway = new SKIOS_Gateway();
+
+			// Send the order through the gateway manually.
+			$result = $gateway->process_payment( $order->get_id() );
+		}
+	}
+
+	/**
 	 * Function that returns a singleton instance
 	 * of the class.
 	 * @return SK_Webshop
@@ -97,6 +128,7 @@ class SK_Webshop {
 	private function includes() {
 		include __DIR__ . '/class-sk-webshop-unittype.php';
 		include __DIR__ . '/class-sk-webshop-checkout-fields.php';
+		include __DIR__ . '/class-sk-webshop-required-fields.php';
 		include __DIR__ . '/class-sk-gf-privacy.php';
 	}
 
@@ -107,6 +139,7 @@ class SK_Webshop {
 	private function init_classes() {
 		$this->taxonomies = new SK_Webshop_Unittype();
 		$this->checkout_fields = new SK_Webshop_Checkout_Fields();
+		$this->required_fields = new SK_Webshop_Required_Fields();
 		$this->gf_privacy = new SK_GF_Privacy();
 	}
 

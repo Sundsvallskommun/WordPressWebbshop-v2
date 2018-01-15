@@ -168,3 +168,9 @@ jQuery(document).ready(function($) {
 }
 
 add_action( 'wp_footer', 'sk_product_tooltip_script' );
+
+/**
+ * Override inline styles from theme customization to prevent it from
+ * being changed.
+ */
+include_once __DIR__.'/inline-styles.php';
