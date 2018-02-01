@@ -117,7 +117,7 @@ class SK_Webshop_Required_Fields {
 				// Create field.
 				woocommerce_wp_checkbox( array(
 					'id'            => self::$fields_meta_key . '[' . $field . ']',
-					'wrapper_class' => 'show_if_simple',
+					'wrapper_class' => '',
 					'label'         => $field_data['label'],
 					'description'   => 'Inaktivera fältet ' . $field_data['label'],
 					'default'       => 'no',
