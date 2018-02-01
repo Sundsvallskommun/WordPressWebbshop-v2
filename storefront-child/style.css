@@ -150,3 +150,6 @@ h1.product_title {
   padding: .7em;
 }
 
+.widget-area .widget a:not(.button) {
+	font-weight: unset;
+}
