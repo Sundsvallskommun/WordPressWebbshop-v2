@@ -55,7 +55,13 @@ class Sk_DeDU_WS {
 			$this->ws_session_key = $session_key;
 		} else {
 			// Log it.
-			SKW()->log( __( 'SK_DeDU: Det gick inte att autensiera med DeDU. Var vänlig kontrollera att uppgifterna stämmer.', 'sk-dedu' ), E_WARNING );
+			SKW()->log(
+				sprintf( 'PHP Error: Unable to connect to %s in %s on line 141.',
+					$base_url,
+					__FILE__
+				),
+				E_WARNING
+			);
 
 			// Throw a general exception since this might
 			// end up in the front-end.
@@ -94,16 +100,20 @@ class Sk_DeDU_WS {
 				return true;
 			} else {
 				// Translators: WC_Order::ID.
-				SKW()->log( sprintf( __( 'Failed to export WC_Order #%1$s to DeDU.', 'sk-dedu' ), $order->get_id() ), E_WARNING );
+				SKW()->log( sprintf(
+					'PHP Notice: Failed to export WC_Order #%1$s to DeDU in %2$s on line 96.',
+					$order->get_id(),
+					__FILE__
+				), E_WARNING );
 
 				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
 				// Translators: the order XML.
-				SKW()->log( sprintf( __( 'WC_Order #%1$s XML: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
+				SKW()->log( sprintf( 'PHP Debug: WC_Order #%1$s XML: %2$s', 'sk-dedu', $order->get_id(), $log_entry ), E_WARNING );
 
 				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $data ) );
 				// Otherwise, log the incident and the request.
 				// Translators: the cURL response.
-				SKW()->log( sprintf( __( 'WC_Order #%1$s cURL response: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
+				SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
 
 				// Return a generic error message.
 				return new WP_Error( 'dedu_error', __( 'Något gick fel vid beställningen.', 'sk-dedu' ) );
