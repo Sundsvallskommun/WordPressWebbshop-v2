@@ -237,8 +237,19 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 
 		}
 
+		// Remove the product add-on filter for price html.
+		if( class_exists( 'WC_GFPA_Main' ) ) {
+			remove_filter( 'woocommerce_get_price_html', array( WC_GFPA_Main::instance(), 'get_price_html' ), 999, 2 )
+		}
+
 		// Check if all order notifications were successful.
 		$result = skios_handle_order_notifications( $order, $sorted_items );
+
+		// Add the product add-on filter for price html.
+		if( class_exists( 'WC_GFPA_Main' ) ) {
+			add_filter( 'woocommerce_get_price_html', array( WC_GFPA_Main::instance(), 'get_price_html' ), 999, 2 )
+		}
+
 		if ( ! is_wp_error( $result ) ) {
 			// Mark as on-hold (we're awaiting the cheque).
 			$order->update_status( 'wc-internal-order', __( 'Orderinfo skickat till produkternas ägare.', 'skios' ) );

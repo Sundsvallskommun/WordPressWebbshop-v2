@@ -363,7 +363,7 @@ function skios_email_items( $order, $items ) {
 					$string .= '<td style="vertical-align: top; padding-bottom: 0.5em;">';
 						$string .= $item[ 'name' ];
 						$string .= '<br>';
-						$string .= $item->get_product()->get_price_html();
+						$string .= wc_price( $item->get_total() ) . $item->get_product()->get_price_suffix();
 						$string .= '<br>';
 							// Add all meta data at the end of the line.
 							foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
