@@ -115,11 +115,16 @@ class SK_DeDU {
 		// Only handle DeDU orders.
 		// Also make sure we have credentials.
 		if ( 'dedu' === $type && $this->has_credentials() ) {
-			// Init WS class.
-			$dedu_ws = new SK_DeDU_WS( $this->url, $this->username, $this->password );
+			try {
+				// Init WS class.
+				$dedu_ws = new SK_DeDU_WS( $this->url, $this->username, $this->password );
 
-			// Send order.
-			return $dedu_ws->send_order( $order, $items );
+				// Send order.
+				return $dedu_ws->send_order( $order, $items );
+			} catch ( Exception $e ) {
+				// Couldn't connect to DeDU. Return a WP_Error.
+				return new WP_Error( 'dedu_connection_failed', 'Något gick fel vid beställningen.' );
+			}
 		}
 
 		return $result;
