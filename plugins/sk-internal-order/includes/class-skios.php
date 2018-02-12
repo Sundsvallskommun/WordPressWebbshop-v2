@@ -150,8 +150,13 @@ class SKIOS {
 	 */
 	public function handle_order_notification( $result, $type, $owner, $order, $items ) {
 		if ( $type === 'email' ) {
-			$email = $owner[ 'identifier' ];
-			skios_owner_order_email( $email, $order, $items );
+			try {
+				$email = $owner[ 'identifier' ];
+				skios_owner_order_email( $email, $order, $items );
+			} catch ( Exception $e ) {
+				// Couldn't connect to DeDU. Return a WP_Error.
+				return new WP_Error( 'dedu_connection_failed', 'Något gick fel vid beställningen.' );
+			}
 		}
 
 		return $result;
