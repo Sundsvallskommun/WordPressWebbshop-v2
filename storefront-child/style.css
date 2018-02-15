@@ -151,5 +151,5 @@ h1.product_title {
 }
 
 .widget-area .widget a:not(.button) {
-	font-weight: unset;
+	font-weight: 400;
 }
