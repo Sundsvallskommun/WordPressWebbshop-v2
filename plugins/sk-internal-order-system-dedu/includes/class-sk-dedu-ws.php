@@ -51,14 +51,18 @@ class Sk_DeDU_WS {
 		$this->ws_password = $password;
 
 		// Try to authenticate.
-		if ( $session_key = $this->authenticate() ) {
+		$session_key = $this->authenticate();
+
+		// Try to authenticate.
+		if ( ! is_wp_error( $session_key ) ) {
 			$this->ws_session_key = $session_key;
 		} else {
 			// Log it.
 			SKW()->log(
-				sprintf( 'PHP Error: Unable to connect to %s in %s on line 141.',
+				sprintf( 'PHP Error: Unable to connect to %s in %s. Message from DeDU: %s',
 					$base_url,
-					__FILE__
+					__FILE__,
+					$session_key->get_error_message()
 				),
 				E_WARNING
 			);
@@ -99,11 +103,16 @@ class Sk_DeDU_WS {
 			if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201 ) {
 				return true;
 			} else {
+				// Try to get the error from headers.
+				$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
+					SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+
 				// Translators: WC_Order::ID.
 				SKW()->log( sprintf(
-					'PHP Notice: Failed to export WC_Order #%1$s to DeDU in %2$s on line 96.',
+					'PHP Notice: Failed to export WC_Order #%1$s to DeDU in %2$s. Message from DeDU: %3$s',
 					$order->get_id(),
-					__FILE__
+					__FILE__,
+					$error
 				), E_WARNING );
 
 				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
@@ -136,6 +145,7 @@ class Sk_DeDU_WS {
 
 		// Return as string instead of echo.
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $ch, CURLOPT_HEADER, true );
 
 		// Execute request.
 		$data = curl_exec( $ch );
@@ -145,8 +155,12 @@ class Sk_DeDU_WS {
 			$xml = simplexml_load_string( $data );
 			return (string) $xml->Value;
 		} else {
+			// Try to get the error from headers.
+			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
+				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+
 			// Return false if we failed to authenticate.
-			return false;
+			return new WP_Error( 'dedu_connection_failed', $error );
 		}
 	}
 
