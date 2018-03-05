@@ -115,11 +115,7 @@ class Sk_DeDU_WS {
 					$error
 				), E_WARNING );
 
-				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
-				// Translators: the order XML.
-				SKW()->log( sprintf( 'PHP Debug: WC_Order #%1$s XML: %2$s', 'sk-dedu', $order->get_id(), $log_entry ), E_WARNING );
-
-				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $data ) );
+				$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
 				// Otherwise, log the incident and the request.
 				// Translators: the cURL response.
 				SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
