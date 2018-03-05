@@ -74,7 +74,7 @@ class Sk_DeDU_XML {
 			// Opening tag.
 			$xml = '<Sundsvall_CreateWebShopTask>';
 
-				$xml .= "<ADName>{$this->get_adname()}</ADName>";
+				$xml .= "<ADName>{$this->get_adname( $order->get_customer_id() )}</ADName>";
 				$xml .= '<YrkeId>' . $item['dedu_fields']['YrkeId'] . '</YrkeId>';
 				$xml .= '<ArendetypId>' . $item['dedu_fields']['ArendetypId'] . '</ArendetypId>';
 				$xml .= '<KategoriId>' . $item['dedu_fields']['KategoriId'] . '</KategoriId>';
@@ -94,12 +94,14 @@ class Sk_DeDU_XML {
 
 	/**
 	 * Returns ADName for DeDU.
+	 * @param  integer $user_id
 	 * @return string
 	 */
-	private function get_adname() {
-		$current_user = wp_get_current_user();
-		if ( $current_user->ID > 0 ) {
-			return $current_user->user_login;
+	private function get_adname( $user_id ) {
+		$user = new WP_User( $user_id );
+
+		if ( $user->ID > 0 ) {
+			return $user->user_login;
 		} else {
 			throw new WP_Error( __( 'User is not logged in!', 'sk-dedu' ) );
 		}
