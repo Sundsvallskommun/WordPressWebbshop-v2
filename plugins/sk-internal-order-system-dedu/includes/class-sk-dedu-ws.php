@@ -115,11 +115,7 @@ class Sk_DeDU_WS {
 					$error
 				), E_WARNING );
 
-				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $xml ) );
-				// Translators: the order XML.
-				SKW()->log( sprintf( 'PHP Debug: WC_Order #%1$s XML: %2$s', 'sk-dedu', $order->get_id(), $log_entry ), E_WARNING );
-
-				$log_entry = str_replace( "\r", '', str_replace( "\n", '', $data ) );
+				$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
 				// Otherwise, log the incident and the request.
 				// Translators: the cURL response.
 				SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-dedu' ), $order->get_id(), $log_entry ), E_WARNING );
@@ -145,19 +141,39 @@ class Sk_DeDU_WS {
 
 		// Return as string instead of echo.
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
-		curl_setopt( $ch, CURLOPT_HEADER, true );
+
+		// Keep headers in an array.
+		$headers = array();
+		curl_setopt( $ch, CURLOPT_HEADERFUNCTION, function( $curl, $header ) use ( &$headers ) {
+			$len    = strlen( $header );
+			$header = explode( ':', $header, 2 );
+
+			// ignore invalid headers
+			if ( 2 > count( $header ) ) {
+				return $len;
+			}
+
+			$name = strtolower( trim( $header[0] ) );
+			if ( ! array_key_exists( $name, $headers ) ) {
+				$headers[ $name ] = [ trim( $header[1] ) ];
+			} else {
+				$headers[ $name ][] = trim( $header[1] );
+			}
+
+			return $len;
+		} );
 
 		// Execute request.
-		$data = curl_exec( $ch );
+		$body = curl_exec( $ch );
 
 		// Check if all is good.
 		if ( ! curl_errno( $ch ) && curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 200 ) {
-			$xml = simplexml_load_string( $data );
+			$xml = simplexml_load_string( $body );
 			return (string) $xml->Value;
 		} else {
 			// Try to get the error from headers.
-			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
-				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+			$error = ( isset( $headers['errordescription'] ) ) ?
+				reset( $headers['errordescription'] ) : '';
 
 			// Return false if we failed to authenticate.
 			return new WP_Error( 'dedu_connection_failed', $error );
