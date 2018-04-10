@@ -169,15 +169,16 @@ class SK_Webshop_Required_Fields {
 		foreach ( $items as $item => $values ) {
 			$product_id = $values['product_id'];
 			$opt_fields = (array) get_post_meta( $product_id, self::$fields_meta_key, true );
-
+			
 			$opt_fields = array_filter( $opt_fields, function( $v ) {
 				return 'yes' === $v;
 			});
 
 			foreach ( $_fields as $field => $field_data ) {
 				$shouldbe_required = array_key_exists( $field, $opt_fields ) ? false : true;
-
-				$_fields[ $field ]['required'] = $shouldbe_required;
+				
+				// Only set it to false if it has not been set to true already
+				$_fields[ $field ]['required'] = $_fields[ $field ]['required'] === true ? true : $shouldbe_required;
 			}
 		}
 
