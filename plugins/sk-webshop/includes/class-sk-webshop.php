@@ -75,7 +75,7 @@ class SK_Webshop {
       return 'Tack för din beställning! Ett ärendenummer kommer att skickas till din e-post inom kort.';
     }, 10, 1 );
 
-		add_action('init', array( $this, 'forcelogin' ));
+		add_action('parse_request', array( $this, 'forcelogin' ), 10);
 
 		// Include all class files.
 		$this->includes();
