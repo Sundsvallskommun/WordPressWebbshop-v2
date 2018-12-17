@@ -9,9 +9,15 @@
  * @package 
  */
 
+require_once __dir__ . '/../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 class SK_CSV_Export {
+
 
 	private $csv = null;
 
@@ -21,7 +27,7 @@ class SK_CSV_Export {
 	 * Constructor.
 	 */
 	function __construct() {
-		add_action( 'wp', [ $this, 'listener' ] );
+		add_action( 'parse_request', [ $this, 'listener' ], 5 );
 	}
 
 	/**
@@ -48,14 +54,30 @@ class SK_CSV_Export {
 
 		$owners = skios_get_product_owners();
 
+		$files_to_generate = array();
+
 		foreach( $owners as $owner ) {
-			$filename =  $owner['label'].'.csv';
-			$posts = $this->get_products( $owner['id'] );
-			$this->generate_csv( $posts, $filename );
+			if ( ! isset( $files_to_generate[$owner['label']] ) ) {
+				$files_to_generate[$owner['label']] = array();
+			}
+
+			$files_to_generate[$owner['label']][] = $owner['id'];
+		}
+
+		foreach( $files_to_generate as $label => $ids ) {
+			$filename =  $label.'.csv';
+			$posts = $this->get_products( $ids );
+
+			if ( count($posts) >= 1) {
+				$this->generate_csv( $posts, $filename );
+			}
+			
 		}
 
 		$posts = $this->get_products();
-		$this->generate_csv( $posts, 'no_owner.csv' );
+		if ( count($posts) >= 1) {
+			$this->generate_csv( $posts, 'no_owner.csv' );	
+		}
 
 		die();
 	}
@@ -67,17 +89,28 @@ class SK_CSV_Export {
 	*
 	* @return array Returns the posts
 	*/
-	private function get_products( $owner = null ) {
+	private function get_products( $ids = null ) {
 
 
 		$args = array(
-        	'post_type' => 'product',
-        	'posts_per_page' => -1
-        );
+			'post_type' => 'product',
+			'posts_per_page' => -1
+		);
 
-        if ( $owner ) {
-			$args['meta_key'] = '_product_owner';
-			$args['meta_value'] = $owner;
+		if ( $ids ) {
+			if ( is_array( $ids ) ) {
+				$args['meta_query'] = [
+					[
+						'key'     => '_product_owner',
+						'value'   => $ids,
+						'compare' => 'IN',
+					],
+				];
+			} else {
+				$args['meta_key'] = '_product_owner';
+				$args['meta_value'] = $ids;
+			}
+
 		} else {
 			$args['meta_query'] = array(
 				'relation' => 'OR',
@@ -127,8 +160,10 @@ class SK_CSV_Export {
 			}
 
 		}
-
+		
 		$this->csv_close();
+
+		$this->generate_xlsx_from_csv( $filename );
 	}
 
 	/**
@@ -298,6 +333,26 @@ class SK_CSV_Export {
 		}
 
 		return implode( $attr_list, '. ' );
+	}
+
+	/**
+	* Convert csv to xlsx
+	*
+	* @param string $filename Filename of the csv
+	*
+	* @return void
+	*/
+	private function generate_xlsx_from_csv( $filename ) {
+
+		$reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+		$reader->setDelimiter(',');
+		$reader->setEnclosure('"');
+		$reader->setSheetIndex(0);
+
+		$spreadsheet = $reader->load( self::CSV_PATH . '/' . $filename );
+		$writer = new Xlsx( $spreadsheet );
+		$writer->save(self::CSV_PATH . '/' . str_replace( 'csv', 'xlsx', $filename ));
+
 	}
 
 }
