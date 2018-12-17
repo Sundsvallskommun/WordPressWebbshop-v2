@@ -90,7 +90,6 @@ class SK_Remove_Inactive_Users {
 	private function check_user_against_smex( $user ) {
 
 		$username = $user->user_login;
-		printf( "Checking user against smex: %s <br>", $username );
 
 		$smex_user_exists = SK_SMEX_API::get_instance()->user_exists( $username );
 
@@ -98,7 +97,6 @@ class SK_Remove_Inactive_Users {
 			$this->maybe_set_deletion_meta( $user );
 			$this->num_queued_users += 1;
 		} else {
-			printf( "User exists.<br>" );
 			delete_user_meta( $user->ID, '_user_deletion_queue');
 		}
 	}
@@ -118,8 +116,6 @@ class SK_Remove_Inactive_Users {
 		if ( empty( $deletion_meta ) ) {
 			$user->get( '_user_deletion_queue' );
 			add_user_meta( $user->ID, '_user_deletion_queue', time(), true);
-		} else {
-	
 		}
 	}
 
