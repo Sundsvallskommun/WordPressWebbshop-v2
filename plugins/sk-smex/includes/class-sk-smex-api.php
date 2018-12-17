@@ -119,6 +119,29 @@ class SK_SMEX_API {
 	}
 
 	/**
+	 * Check if user exists in SMEX
+	 * @param  string $username
+	 * @return bool | WP_Error
+	 */
+	public function user_exists( $username ) {
+		
+		// Make sure we have retrieved user data.
+		if ( $username ) {
+			$soap = $this->get_soap_client();
+			$result = $soap->GetPortalPersonData( array (
+				'loginname'	=> $username,
+			) );
+			if ( empty( $result->GetPortalPersonDataResult ) ) {
+				return false; // User does not exist
+			} else {
+				return true;
+			}
+		} else {
+			return new WP_Error( 'username_not_specified', __( 'Username is not specified.', 'sk-smex' ) );
+		}
+	}
+
+	/**
 	 * Checks if user is required to enter additional fields.
 	 * @return boolean
 	 */
