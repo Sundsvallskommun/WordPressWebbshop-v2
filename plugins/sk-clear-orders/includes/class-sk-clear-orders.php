@@ -24,7 +24,7 @@ class SK_Clear_Orders {
 	 * Constructor.
 	 */
 	function __construct() {
-		add_action( 'wp', [ $this, 'listener' ] );
+		add_action( 'parse_request', [ $this, 'listener' ], 5 );
 	}
 
 	/**
