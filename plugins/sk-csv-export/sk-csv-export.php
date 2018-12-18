@@ -22,6 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if acccessed directly.
 }
 
+if ( !defined( 'SK_CSV_EXPORT_PLUGIN_DIR' ) ) {
+	define( 'SK_CSV_EXPORT_PLUGIN_DIR', __DIR__ );
+}
+
 // Include main plugin class.
 require_once __DIR__ . '/includes/class-sk-csv-export.php';
 $skios = new SK_CSV_Export();

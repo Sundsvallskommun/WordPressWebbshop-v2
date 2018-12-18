@@ -20,14 +20,21 @@ class SK_CSV_Export {
 
 
 	private $csv = null;
-
-	const CSV_PATH = __dir__;
+	private static $orderXlsxDir = null;
 
 	/**
 	 * Constructor.
 	 */
 	function __construct() {
+
+		if ( defined( 'ORDER_XLSX_DIR' ) ) {
+			self::$orderXlsxDir = ORDER_XLSX_DIR;
+		} else {
+			self::$orderXlsxDir = SK_CSV_EXPORT_PLUGIN_DIR;
+		}
+
 		add_action( 'parse_request', [ $this, 'listener' ], 5 );
+
 	}
 
 	/**
@@ -216,7 +223,7 @@ class SK_CSV_Export {
 	*/
 	private function csv_init($filename) {
 
-		$this->csv = fopen( self::CSV_PATH . '/' . $filename, 'w');
+		$this->csv = fopen( self::$orderXlsxDir . '/' . $filename, 'w');
 
 		$columns = [
 			'Artikelnummer',
@@ -349,9 +356,9 @@ class SK_CSV_Export {
 		$reader->setEnclosure('"');
 		$reader->setSheetIndex(0);
 
-		$spreadsheet = $reader->load( self::CSV_PATH . '/' . $filename );
+		$spreadsheet = $reader->load( self::$orderXlsxDir . '/' . $filename );
 		$writer = new Xlsx( $spreadsheet );
-		$writer->save(self::CSV_PATH . '/' . str_replace( 'csv', 'xlsx', $filename ));
+		$writer->save(self::$orderXlsxDir . '/' . str_replace( 'csv', 'xlsx', $filename ));
 
 	}
 
