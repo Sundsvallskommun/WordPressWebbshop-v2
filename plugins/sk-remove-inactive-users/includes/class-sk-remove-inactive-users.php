@@ -46,8 +46,10 @@ class SK_Remove_Inactive_Users {
 	 *
 	 * @return array
 	 */
-	private function get_all_users() {
-		$args = array();
+	private function get_all_subscribers() {
+		$args = array(
+			'role' => 'subscriber',
+		);
 		return get_users( $args );
 	}
 
@@ -72,7 +74,7 @@ class SK_Remove_Inactive_Users {
 	 * @return void
 	 */
 	private function queue_inactive_users() {
-		$users = $this->get_all_users();
+		$users = $this->get_all_subscribers();
 		foreach ( $users as $user ) {
 			$this->check_user_against_smex( $user );
 		}
@@ -144,6 +146,14 @@ class SK_Remove_Inactive_Users {
 	 */
 	private function delete_user( $user ) {
 		require_once(ABSPATH.'wp-admin/includes/user.php');
-		return wp_delete_user( $user->ID );
+
+		// Reassign content to wpadmin
+		$reasign = null;
+		$wpadmin = get_user_by( 'login', 'wpadmin' );
+		if ( $wpadmin ) {
+			$reassign = $wpadmin->ID;
+		}
+
+		return wp_delete_user( $user->ID, $reassign );
 	}
 }
