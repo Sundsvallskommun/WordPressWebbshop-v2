@@ -43,16 +43,19 @@ h6 {
 .site-title a {
 	color: #000;
 }
+
 .storefront-primary-navigation .nav-menu a {
 	font-weight: 400;
 	color: black !important;
 }
 
-
+.storefront-breadcrumb {
+background-color: #f8f8f8;
+}
 
 @media (min-width: 768px) {
 
-	.site-header .site-branding {
+	.woocommerce-active .site-header .site-branding {
 		width: 30%;
 		margin: 0;
 		padding-right: 1em;
@@ -152,4 +155,16 @@ h1.product_title {
 
 .widget-area .widget a:not(.button) {
 	font-weight: 400;
+	text-decoration: none;
+}
+
+.gform_confirmation_wrapper {
+	background-color: #f8f8f8;
+    padding: 20px;
+    font-weight: 600;
+}
+.gform_confirmation_message::before {
+    content: "\f058";
+    font-family: "Font Awesome 5 Free" !important;
+    margin-right: 8px;
 }

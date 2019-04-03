@@ -11,8 +11,8 @@ function collapsable_categories() {
   <style>
 
 		.widget_product_categories ul li:before {
-      min-width: 2em;
-      text-align: right;
+            min-width: 2em;
+            text-align: right;
 		}
 
 		.widget_product_categories .current-cat > a {
@@ -24,11 +24,11 @@ function collapsable_categories() {
 		}
 
 		.widget_product_categories .cat-parent:before {
-			content: "- \f115" !important;
+			content: "- \f07c" !important;
 		}
 
 		.widget_product_categories .cat-parent.closed:before {
-			content: "+ \f114" !important;
+			content: "+ \f07b" !important;
 		}
 
 		.widget_product_categories .cat-parent:before {
