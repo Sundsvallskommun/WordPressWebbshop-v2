@@ -75,6 +75,7 @@ class SK_Webshop_Checkout_Fields {
 		$fields['billing_organization'][ 'autocomplete' ] = '';
 		$fields['billing_organization'][ 'placeholder' ] = '';
 		$fields['billing_organization'][ 'required' ] = true;
+		$fields['billing_organization'][ 'label_class' ] = array();
 
 		// Add department.
 		$fields['billing_department'] = $fields[ 'billing_address_2' ];
@@ -82,6 +83,7 @@ class SK_Webshop_Checkout_Fields {
 		$fields['billing_department']['autocomplete'] = '';
 		$fields['billing_department']['placeholder'] = '';
 		$fields['billing_department']['required'] = true;
+		$fields['billing_department']['label_class'] = array();
 
 		// Change priority of address_1.
 		$fields['billing_address_1']['priority'] = 55;
