@@ -108,7 +108,7 @@ class SK_DeDU_Product_Fields {
 				// Create field.
 				woocommerce_wp_text_input( array(
 					'id'			=> self::$FIELDS_META_KEY . '[' . $field . ']',
-					'wrapper_class'	=> 'show_if_simple',
+					'wrapper_class'	=> '',
 					'label'			=> $field,
 					'description'	=> sprintf( __( 'Fyll i %s.', 'sk-dedu' ), $field ),
 					'default'		=> '0',
