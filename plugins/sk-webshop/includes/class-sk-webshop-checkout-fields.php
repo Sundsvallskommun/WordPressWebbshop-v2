@@ -75,6 +75,7 @@ class SK_Webshop_Checkout_Fields {
 		$fields['billing_organization'][ 'autocomplete' ] = '';
 		$fields['billing_organization'][ 'placeholder' ] = '';
 		$fields['billing_organization'][ 'required' ] = true;
+		$fields['billing_organization'][ 'label_class' ] = array();
 
 		// Add department.
 		$fields['billing_department'] = $fields[ 'billing_address_2' ];
@@ -82,6 +83,7 @@ class SK_Webshop_Checkout_Fields {
 		$fields['billing_department']['autocomplete'] = '';
 		$fields['billing_department']['placeholder'] = '';
 		$fields['billing_department']['required'] = true;
+		$fields['billing_department']['label_class'] = array();
 
 		// Change priority of address_1.
 		$fields['billing_address_1']['priority'] = 55;
@@ -163,11 +165,11 @@ class SK_Webshop_Checkout_Fields {
 
 				timer = setTimeout( function() {
 					if ( $the_shipping_field.length > 0 ) {
-						$the_shipping_field.parent().before( $shipping_title );
+						$the_shipping_field.closest('.form-row').before( $shipping_title );
 					}
 
 					if ( $the_billing_field.length > 0 ) {
-						$the_billing_field.parent().before( $billing_title );
+						$the_billing_field.closest('.form-row').before( $billing_title );
 					}
 				}, 100 );
 			} );
