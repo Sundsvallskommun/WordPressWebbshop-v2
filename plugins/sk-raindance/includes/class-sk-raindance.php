@@ -80,6 +80,9 @@ class SK_Raindance {
 	 * @return void
 	 */
 	private function init_hooks() {
+		// Register the listener.
+		add_filter( 'fmca_listener_actions', array( $this, 'add_listener_action' ) );
+
 		// Add our custom checkout field validation.
 		add_action( 'woocommerce_checkout_process', array( $this, 'validate_additional_fields' ) );
 	}
