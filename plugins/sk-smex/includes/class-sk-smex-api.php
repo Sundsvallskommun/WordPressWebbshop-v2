@@ -60,6 +60,37 @@ class SK_SMEX_API {
 		return self::$instance;
 	}
 
+	/**
+	 * Returns an array of autocomplete result.
+	 * @param  string $search
+	 * @return array
+	 */
+	public function get_enduser_autocomplete( $search ) {
+		$soap = $this->get_soap_client();
+		if ( ! is_wp_error( $soap ) ) {
+			$result = $soap->PortalSearchAsYouType( array(
+				'searchString' => $search,
+			) );
+			if ( empty( $result->PortalSearchAsYouTypeResult ) ) { // phpcs:ignore
+				return array();
+			} else {
+				$return = array();
+				foreach ( $result->PortalSearchAsYouTypeResult->string as $person ) { // phpcs:ignore
+					if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
+						$key  = $matches[1];
+						$return[] = array(
+							'id'   => $key,
+							'text' => $person,
+						);
+					}
+				}
+			}
+			return $return;
+		} else {
+			return $soap;
+		}
+	}
+
     /**
      * Returns the username used for SMEX calls.
      * @return string
@@ -163,16 +194,17 @@ class SK_SMEX_API {
 			 * So we'll loop through the organisation tree to
 			 * look for them.
 			 */
-			
+
 			$found_parent = false;
 			$found_child  = false;
-			
+
 			foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
 				list( $level, $org_id, $name ) = explode( '|', $level );
-				if ( (int) $org_id === 13 ) {
+				if ( 13 === (int) $org_id ) {
 					$found_parent = true;
-				} else if ( in_array( (int) $org_id, array(
-					7, 32
+				} elseif ( in_array( (int) $org_id, array(
+					7,
+					32,
 				) ) ) {
 					$found_child = true;
 				}
@@ -196,6 +228,22 @@ class SK_SMEX_API {
 		} else {
 			'';
 		}
+	}
+
+	/**
+	 * Checks if activity number should be a required field.
+	 * @return boolean
+	 */
+	public function is_activity_number_required() {
+		$found = false;
+		foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
+			list( $level, $org_id, $name ) = explode( '|', $level );
+			if ( strpos( $name, 'BoU' ) !== false ) {
+				$found = true;
+			}
+		}
+
+		return $found;
 	}
 
 	/**

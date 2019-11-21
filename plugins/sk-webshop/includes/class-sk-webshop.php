@@ -23,6 +23,9 @@ class SK_Webshop {
 	 * Inits the class.
 	 */
 	public function __construct() {
+		// Init Timber.
+		$this->init_timber();
+
 		// Add the order action item for re-trying our gateway.
 		add_filter( 'woocommerce_order_actions', array( $this, 'add_order_meta_box_action' ) );
 
@@ -82,6 +85,16 @@ class SK_Webshop {
 
 		// Init classes.
 		$this->init_classes();
+	}
+
+	/**
+	 * Inits Timber.
+	 * @return void
+	 */
+	private function init_timber() {
+		$timber = new \Timber\Timber();
+		Timber::$dirname = [ 'views' ];
+		Timber::$cache = true;
 	}
 
 	/**

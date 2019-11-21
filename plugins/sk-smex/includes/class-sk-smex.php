@@ -86,13 +86,37 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function setup_billing_fields() {
-		$this->ADDITIONAL_BILLING_FIELDS = array(	
-			'billing_reference_number'		=> __( 'Referensnummer', 'sk-smex' ),
-			'billing_responsibility_number'	=> __( 'Ansvarsnummer', 'sk-smex' ),
-			'billing_occupation_number'		=> __( 'Verksamhetsnummer', 'sk-smex' ),
-			'billing_activity_number'		=> __( 'Aktivitetsnummer', 'sk-smex' ),
-			'billing_project_number'		=> __( 'Projektnummer', 'sk-smex' ),
-			'billing_object_number'			=> __( 'Objektnummer', 'sk-smex' ),
+		$this->ADDITIONAL_BILLING_FIELDS = array(
+			'billing_responsibility_number' => array(
+				'id'     => 'billing_responsibility_number',
+				'label'  => __( 'Ansvarsnummer', 'sk-smex' ),
+				'length' => 8,
+			),
+			'billing_occupation_number' => array(
+				'id'     => 'billing_occupation_number',
+				'label'  => __( 'Verksamhetsnummer', 'sk-smex' ),
+				'length' => 6,
+			),
+			'billing_activity_number' => array(
+				'id'     => 'billing_activity_number',
+				'label'  => __( 'Aktivitetsnummer', 'sk-smex' ),
+				'length' => 4,
+			),
+			'billing_project_number' => array(
+				'id'     => 'billing_project_number',
+				'label'  => __( 'Projektnummer', 'sk-smex' ),
+				'length' => 5,
+			),
+			'billing_object_number' => array(
+				'id'     => 'billing_object_number',
+				'label'  => __( 'Objektnummer', 'sk-smex' ),
+				'length' => 7,
+			),
+			'billing_reference_number' => array(
+				'id'     => 'billing_reference_number',
+				'label'  => __( 'Referensnummer', 'sk-smex' ),
+				'length' => -1,
+			),
 		);
 	}
 
@@ -208,7 +232,7 @@ class SK_SMEX {
 					'type'			=> 'text',
 					'label'			=> __( 'Aktivitetsnummer', 'sk-smex' ),
 					'class'			=> array(),
-					'required'		=> false,
+					'required'		=> $this->smex_api->is_activity_number_required(),
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
@@ -395,8 +419,8 @@ class SK_SMEX {
 			$format_string = $format;
 
 			// Add each field to the format string.
-			foreach ( $this->ADDITIONAL_BILLING_FIELDS as $billing_field => $label ) {
-				$format_string .= "\n{$label}: {" . substr( $billing_field, 8 ) . "}";
+			foreach ( $this->ADDITIONAL_BILLING_FIELDS as $id => $field ) {
+				$format_string .= "\n{$field['label']}: {" . substr( $id, 8 ) . "}";
 			}
 
 			// Add the string to the array.
@@ -431,17 +455,17 @@ class SK_SMEX {
 		}
 
 		// Loop through all our custom billing fields.
-		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $billing_field ) {
+		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $id => $field ) {
 			// Check if this billing field exists.
-			if ( ! empty( $args[ substr( $billing_field, 8 ) ] ) ) {
+			if ( ! empty( $args[ substr( $id, 8 ) ] ) ) {
 				// Add it's value.
-				$values[ '{' . substr( $billing_field, 8 ) . '}' ] = $args[ substr( $billing_field, 8 ) ]; 
+				$values[ '{' . substr( $id, 8 ) . '}' ] = $args[ substr( $id, 8 ) ]; 
 
 				// Add it's uppercase value (don't know if this is necessary).
-				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = $args[ substr( $billing_field, 8 ) ]; 
+				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = $args[ substr( $id, 8 ) ]; 
       } else {
-				$values[ '{' . substr( $billing_field, 8 ) . '}' ] = '';
-				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = '';
+				$values[ '{' . substr( $id, 8 ) . '}' ] = '';
+				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = '';
       }
 		}
 		return $values;
@@ -520,7 +544,7 @@ class SK_SMEX {
 	 * @return void
 	 */
 	public function delete_data_on_privacy_orders( $order ) {
-		foreach ( $this->ADDITIONAL_BILLING_FIELDS as $key => $label ) {
+		foreach ( $this->ADDITIONAL_BILLING_FIELDS as $key => $field ) {
 			delete_post_meta( $order->get_id(), substr( $key, 1 ) );
 		}
 	}

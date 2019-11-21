@@ -1,0 +1,16 @@
+<form action="" method="post" id="gform_privacy_settings">
+	<h2>Sekretess</h2>
+
+	<div>
+		<input type="checkbox" id="form_is_privacy" name="form_is_privacy" {{ ( selected ) ? 'checked=checked' : '' }} />
+		<label for="form_is_privacy"> Rensa data när mejl har skickats</label>
+	</div>
+
+	<p class="submit">
+		<input type="submit" name="save" value="{{ __( 'Save', 'gravityforms' ) }}" class="button-primary">
+	</p>
+
+	{{ function( 'wp_nonce_field', nonce_action, nonce_name ) }}
+
+	<input type="hidden" id="gform_meta" name="gform_meta" />
+</form>

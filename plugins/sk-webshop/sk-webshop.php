@@ -14,7 +14,7 @@
  * Author URI:		http://www.fmca.se/
  * Developer:		FMCA
  * Developer URI:	http://www.fmca.se/
- * Text Domain:		sk-smex
+ * Text Domain:		sk-webshop
  * Domain Path:		/languages
  */
 

@@ -303,11 +303,11 @@ function skios_email_customer_details($order) {
 
   if (is_array($metas)) {
 
-    foreach ( $metas as $key => $value ) {
+    foreach ( $metas as $key => $field ) {
       $meta = get_post_meta($order->get_id(), "_$key", true);
 
       if ($meta) {
-        $text .= "<strong>$value</strong>: ";
+        $text .= "<strong>{$field['label']}</strong>: ";
         $text .= $meta;
         $text .= '<br>';
       }
@@ -370,6 +370,7 @@ function skios_email_items( $order, $items ) {
 								$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $meta->key, $meta->value );
 							}
 							$string .= '<br>';
+							$string .= get_pob_string( $order, $item );
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
@@ -377,4 +378,73 @@ function skios_email_items( $order, $items ) {
 	$string .= '</table>';
 
 	return $string;
+}
+
+/**
+ * Return string formatted for POB.
+ * @param  WC_Order $order
+ * @param  array    $items
+ * @return string
+ */
+function get_pob_string( $order, $item ) {
+	$pob_string_data = get_pob_string_data( $order, $item );
+
+	$string  = "<span id='pobString'>";
+
+	$pob_string = [];
+	foreach ( $pob_string_data as $key => $data ) {
+		// POB expect all fields to be outputted with same ammount of
+		// spaces as expected data length if data is missing.
+		$pob_string[] = str_pad( $data['meta_val'], $data['length'], ' ' );
+	}
+
+	// Add a space between every data field.
+	$string .= implode( ' ', $pob_string );
+	$string .= '</span>';
+
+	return $string;
+
+}
+
+/**
+ * Setup array with the expected POB fields and their lengths.
+ * @param  WC_Order $order
+ * @param  array    $items
+ * @return array
+ */
+function get_pob_string_data( $order, $item ) {
+	global $sk_smex;
+
+	$metas     = $sk_smex->ADDITIONAL_BILLING_FIELDS; // phpcs:ignore
+	$new_metas = [];
+
+	// Get order meta values.
+	foreach ( $metas as $key => $arr ) {
+		$meta_val = get_post_meta( $order->get_id(), "_{$key}", true );
+		$new_metas[ $key ]             = $arr;
+		$new_metas[ $key ]['meta_val'] = $meta_val;
+
+		if ( 'billing_responsibility_number' === $key ) {
+			$subaccount_field = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+			$new_metas['subaccount'] = [
+				'id'       => 'Underkonto',
+				'label'    => 'Underkonto',
+				'length'   => 6,
+				'meta_val' => isset( $subaccount_field['Underkonto'] ) ? $subaccount_field['Underkonto'] : '',
+			];
+		}
+
+		if ( 'billing_reference_number' === $key ) {
+			unset( $new_metas[ $key ] );
+		}
+	}
+
+	$new_metas['motpart'] = [
+		'id'       => 'motpart',
+		'label'    => 'Motpart',
+		'length'   => 3,
+		'meta_val' => '',
+	];
+
+	return $new_metas;
 }
