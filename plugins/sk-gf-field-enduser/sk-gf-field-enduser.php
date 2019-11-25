@@ -8,8 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if acccessed directly.
 }
 
+$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+
 // Make sure all dependencies are active.
-if ( ! in_array( 'sk-webshop/sk-webshop.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+if ( ! in_array( 'sk-webshop/sk-webshop.php', $active_plugins ) || ! in_array( 'fmca-base/fmca-base.php', $active_plugins ) ) {
 	return;
 }
 
