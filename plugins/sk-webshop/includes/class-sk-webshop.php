@@ -94,7 +94,6 @@ class SK_Webshop {
 	private function init_timber() {
 		$timber = new \Timber\Timber();
 		Timber::$dirname = [ 'views' ];
-		Timber::$cache = true;
 	}
 
 	/**
