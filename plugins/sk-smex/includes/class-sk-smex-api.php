@@ -253,14 +253,24 @@ class SK_SMEX_API {
 	private function get_soap_client() {
 		if ( is_null( $this->soap ) ) {
 			try {
-				@$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
+				$smex_url = SMEX_URL . '?singleWsdl';
+				libxml_use_internal_errors( true );
+				$sxe = @simplexml_load_string( file_get_contents( $smex_url ) );
+				if ( ! $sxe ) {
+					libxml_use_internal_errors( false );
+					throw new InvalidArgumentException();
+				}
+
+				@$this->soap = new SoapClient( $smex_url, array(
 					'trace'			=> true,
 					'cache_wsdl'	=> WSDL_CACHE_NONE,
 					'soap_version'	=> SOAP_1_1,
 				) );
 				$this->soap->__setLocation( SMEX_URL . '/basic' );
+			} catch ( InvalidArgumentException $e ) {
+				return new WP_Error( 'smex_unreachable', __( 'Couldn\'t connect to SMEX. SMEX_URL is not valid XML.', 'sk-smex' ) );
 			} catch ( Exception $e ) {
-				return new WP_Error( 'smex_unreachable', __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
+				return new WP_Error( 'smex_unknown_error', __( 'Couldn\'t connect to SMEX. Unknown error.', 'sk-smex' ) );
 			}
 		}
 		return $this->soap;

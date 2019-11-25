@@ -141,7 +141,7 @@ class SK_SMEX {
 			$this->smex_api = SK_SMEX_API::get_instance();
 			
 			return true;
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			error_log( __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
 			return false;
 		}
