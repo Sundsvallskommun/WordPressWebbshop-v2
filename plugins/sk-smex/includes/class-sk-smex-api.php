@@ -75,13 +75,26 @@ class SK_SMEX_API {
 				return array();
 			} else {
 				$return = array();
-				foreach ( $result->PortalSearchAsYouTypeResult->string as $person ) { // phpcs:ignore
-					if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
+				$result = $result->PortalSearchAsYouTypeResult->string;
+
+				// If only one result is returned it is not in an array
+				if ( is_string( $result ) ) {
+					if ( preg_match( '/\((.*)\)/', $result, $matches ) ) {
 						$key  = $matches[1];
 						$return[] = array(
 							'id'   => $key,
-							'text' => $person,
+							'text' => $result,
 						);
+					}
+				} else {
+					foreach ( $result as $person ) { // phpcs:ignore
+						if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
+							$key  = $matches[1];
+							$return[] = array(
+								'id'   => $key,
+								'text' => $person,
+							);
+						}
 					}
 				}
 			}
