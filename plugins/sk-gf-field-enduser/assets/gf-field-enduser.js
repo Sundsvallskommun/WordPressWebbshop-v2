@@ -6,6 +6,7 @@ jQuery(document).ready(function($) {
         delay: 250,
         minimumInputLength: 3,
         language: "sv",
+        width: '100%',
         ajax: {
             type: 'POST',
             url: ajax.url,
