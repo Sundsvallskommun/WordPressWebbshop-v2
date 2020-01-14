@@ -1,6 +1,6 @@
 <?php
 /**
- * WooCommerce > FDT Avance integration
+ * Sundsvall Kommun SMEX.
  *
  * @link     http://www.fmca.se/
  * @package  SK_SMEX
@@ -27,6 +27,11 @@ $active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' 
 // Make sure all dependencies are active.
 if ( ! in_array( 'sk-webshop/sk-webshop.php', $active_plugins ) || ! in_array( 'fmca-base/fmca-base.php', $active_plugins ) ) {
 	return;
+}
+
+// Define SK_SMEX_FILE.
+if ( ! defined( 'SK_SMEX_FILE' ) ) {
+	define( 'SK_SMEX_FILE', __FILE__ );
 }
 
 // Include main plugin class.

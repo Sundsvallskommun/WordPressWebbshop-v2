@@ -67,12 +67,17 @@ class SK_SMEX {
 
 		// Include all files.
 		$this->includes();
+
+		register_activation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'install' ] );
+		register_deactivation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'uninstall' ] );
 		
 		// Check if we can successfully connect to SMEX.
 		$this->is_smex_active = $this->init_smex();
 		if ( $this->is_smex_active && is_user_logged_in() ) {
 			$this->init_hooks();
 		}
+
+		add_filter( 'fmca_listener_actions', array( $this, 'add_listener_action' ) );
 
 		// Add action to make sure that SMEX is accessible before allowing users to checkout.
 		// Note: since we want to disable checkout if SMEX isn't active this hook is added
@@ -128,8 +133,69 @@ class SK_SMEX {
 		// Make sure pluggable is loaded.
 		include_once ABSPATH . 'wp-includes/pluggable.php';
 
+		// Get the install file.
+		include_once __DIR__ . '/class-sk-smex-install.php';
+
 		// Include SMEX_API class file.
 		include __DIR__ . '/class-sk-smex-api.php';
+	}
+
+	/**
+	 * Adds a listener action for updating searchable persons.
+	 * @param  array $actions
+	 * @return array
+	 */
+	public function add_listener_action( $actions ) {
+		if ( ! isset( $actions['update_searchable_persons'] ) ) {
+			$actions['update_searchable_persons'] = array(
+				'callable' => array(
+					$this,
+					'update_searchable_persons',
+				),
+				'args' => array(),
+			);
+		}
+
+		return $actions;
+	}
+
+	/**
+	 * Updates the local storage of searchable persons
+	 * with persons from SMEX.
+	 * @since  20200113
+	 * @return integer
+	 */
+	public function update_searchable_persons() {
+		$return = 0;
+
+		if ( $this->smex_api ) { 
+			// Get the remote persons.
+			$persons = $this->smex_api->get_all_endusers();
+
+			if ( ! empty( $persons ) ) {
+				global $wpdb;
+
+				// Truncate the table since that's easier
+				// than to keep track of which to insert/delete.
+				$table_name = "{$wpdb->prefix}sk_smex_searchable_persons";
+				$wpdb->query( "TRUNCATE TABLE {$table_name}" ); // phpcs:ignore
+
+				// Insert each number.
+				foreach ( $persons as $person ) {
+					$inserted = $wpdb->insert(
+						$table_name,
+						array(
+							'person' => $person,
+						)
+					);
+					if ( $inserted ) {
+						$return++;
+					}
+				}
+			}
+		}
+
+		return $return;
 	}
 
 	/**
@@ -152,6 +218,8 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function init_hooks() {
+		add_filter( 'fmca_listener_actions', array( $this, 'add_listener_action' ) );
+
 		// Filters needed to change fields on checkout, thank you and my account.
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_checkout_fields' ), 10 );
 		add_filter( 'woocommerce_form_field_args', array( $this, 'set_readonly_checkout_fields' ), 10, 3 );

@@ -66,26 +66,37 @@ class SK_SMEX_API {
 	 * @return array
 	 */
 	public function get_enduser_autocomplete( $search ) {
+		global $wpdb;
+		$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s", '%' . $search . '%' );
+		$rows  = $wpdb->get_results( $query );
+
+		$results = [];
+		foreach ( $rows as $row ) {
+			$results[] = [
+				'id'   => $row->person_id,
+				'text' => $row->person,
+			];
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Returns an array of all endunsers.
+	 * @since  20200113
+	 * @return array
+	 */
+	public function get_all_endusers() {
 		$soap = $this->get_soap_client();
 		if ( ! is_wp_error( $soap ) ) {
 			$result = $soap->PortalSearchAsYouType( array(
-				'searchString' => $search,
+				'searchString' => '',
 			) );
 			if ( empty( $result->PortalSearchAsYouTypeResult ) ) { // phpcs:ignore
 				return array();
-			} else {
-				$return = array();
-				foreach ( $result->PortalSearchAsYouTypeResult->string as $person ) { // phpcs:ignore
-					if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
-						$key  = $matches[1];
-						$return[] = array(
-							'id'   => $key,
-							'text' => $person,
-						);
-					}
-				}
 			}
-			return $return;
+
+			return $result->PortalSearchAsYouTypeResult->string;
 		} else {
 			return $soap;
 		}
