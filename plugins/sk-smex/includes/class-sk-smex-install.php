@@ -60,10 +60,11 @@ class SK_SMEX_Install {
 		}
 
 		$tables = "
-CREATE TABLE {$wpdb->prefix}sk_smex_searchable_persons (
-	person_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	person varchar(100) NOT NULL,
-	PRIMARY KEY (person_id)
+CREATE TABLE `{$wpdb->prefix}sk_smex_searchable_persons` (
+	`person_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`person` varchar(100) NOT NULL,
+	PRIMARY KEY (person_id),
+	KEY `person` (`person`)
 ) $collate;
 
 		";
