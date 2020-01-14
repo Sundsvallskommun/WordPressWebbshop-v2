@@ -33,8 +33,8 @@ class GF_Field_Enduser extends GF_Field {
 	public function get_form_editor_field_settings() {
 		return array(
 			'label_setting',
-			'size_setting',
 			'placeholder_setting',
+			'conditional_logic_field_setting',
 		);
 	}
 
