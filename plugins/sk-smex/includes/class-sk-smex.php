@@ -531,11 +531,12 @@ class SK_SMEX {
 
 				// Add it's uppercase value (don't know if this is necessary).
 				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = $args[ substr( $id, 8 ) ]; 
-      } else {
+			} else {
 				$values[ '{' . substr( $id, 8 ) . '}' ] = '';
 				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = '';
-      }
+			}
 		}
+
 		return $values;
 	}
 
