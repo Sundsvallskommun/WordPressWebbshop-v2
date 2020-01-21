@@ -523,7 +523,7 @@ class SK_SMEX {
 		}
 
 		// Loop through all our custom billing fields.
-		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $id => $field ) {
+		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $id ) {
 			// Check if this billing field exists.
 			if ( ! empty( $args[ substr( $id, 8 ) ] ) ) {
 				// Add it's value.
