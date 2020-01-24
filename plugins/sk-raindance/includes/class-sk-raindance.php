@@ -119,12 +119,18 @@ class SK_Raindance {
 		$return = array(
 			'responsibility_number' => 0,
 			'occupation_number'     => 0,
+			'activity_number'       => 0,
+			'project_number'        => 0,
+			'object_number'         => 0,
 		);
 
 		if ( $this->rd_api ) {
 			$types = array(
 				'responsibility_number' => $this->rd_api->get_remote_entities( 'responsibility_number' ),
 				'occupation_number'     => $this->rd_api->get_remote_entities( 'occupation_number' ),
+				'activity_number'       => $this->rd_api->get_remote_entities( 'activity_number' ),
+				'project_number'        => $this->rd_api->get_remote_entities( 'project_number' ),
+				'object_number'         => $this->rd_api->get_remote_entities( 'object_number' ),
 			);
 			foreach ( $types as $type => $numbers ) {
 				if ( ! empty( $numbers ) ) {
@@ -174,6 +180,30 @@ class SK_Raindance {
 		if ( is_wp_error( $validate ) ) {
 			throw new Exception( $validate->get_error_message(), 410 );
 		}
+
+		if ( ! empty( $posted['billing_activity_number'] ) ) {
+			$activity_number = $posted['billing_activity_number'];
+			$validate = $this->validate( 'activity_number', $activity_number );
+			if ( is_wp_error( $validate ) ) {
+				throw new Exception( $validate->get_error_message(), 410 );
+			}
+		}
+
+		if ( ! empty( $posted['billing_project_number'] ) ) {
+			$project_number = $posted['billing_project_number'];
+			$validate = $this->validate( 'project_number', $project_number );
+			if ( is_wp_error( $validate ) ) {
+				throw new Exception( $validate->get_error_message(), 410 );
+			}
+		}
+
+		if ( ! empty( $posted['billing_object_number'] ) ) {
+			$object_number = $posted['billing_object_number'];
+			$validate = $this->validate( 'object_number', $object_number );
+			if ( is_wp_error( $validate ) ) {
+				throw new Exception( $validate->get_error_message(), 410 );
+			}
+		}
 	}
 
 	/**
@@ -188,6 +218,9 @@ class SK_Raindance {
 		$valid_fields = array(
 			'responsibility_number',
 			'occupation_number',
+			'activity_number',
+			'project_number',
+			'object_number',
 		);
 
 		// False if the field doesn't exist.
@@ -205,6 +238,15 @@ class SK_Raindance {
 					break;
 				case 'occupation_number':
 					$label = __( 'Verksamhetsnummer', 'skw' );
+					break;
+				case 'activity_number':
+					$label = __( 'Aktivitetsnummer', 'skw' );
+					break;
+				case 'project_number':
+					$label = __( 'Projektnummer', 'skw' );
+					break;
+				case 'object_number':
+					$label = __( 'Objektnummer', 'skw' );
 					break;
 			}
 

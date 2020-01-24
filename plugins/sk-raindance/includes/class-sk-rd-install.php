@@ -73,6 +73,24 @@ CREATE TABLE {$wpdb->prefix}sk_rd_occupation_numbers (
 	PRIMARY KEY (occupation_number_id)
 ) $collate;
 
+CREATE TABLE {$wpdb->prefix}sk_rd_activity_numbers (
+	activity_number_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	activity_number BIGINT UNSIGNED NOT NULL,
+	PRIMARY KEY (activity_number_id)
+) $collate;
+
+CREATE TABLE {$wpdb->prefix}sk_rd_project_numbers (
+	project_number_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	project_number BIGINT UNSIGNED NOT NULL,
+	PRIMARY KEY (project_number_id)
+) $collate;
+
+CREATE TABLE {$wpdb->prefix}sk_rd_object_numbers (
+	object_number_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	object_number BIGINT UNSIGNED NOT NULL,
+	PRIMARY KEY (object_number_id)
+) $collate;
+
 		";
 
 		return $tables;

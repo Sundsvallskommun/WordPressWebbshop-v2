@@ -67,6 +67,9 @@ class SK_RD_API {
 		$valid_fields = array(
 			'responsibility_number',
 			'occupation_number',
+			'activity_number',
+			'project_number',
+			'object_number',
 		);
 
 		// False if the field doesn't exist.
@@ -82,6 +85,15 @@ class SK_RD_API {
 			case 'occupation_number':
 				$remote_type = 'RD_VERKSAMHET';
 				break;
+			case 'activity_number':
+				$remote_type = 'AKTIVITET';
+				break;
+			case 'project_number':
+				$remote_type = 'PROJEKT';
+				break;
+			case 'object_number':
+				$remote_type = 'OBJEKT';
+				break;
 		}
 
 		try {
@@ -96,6 +108,15 @@ class SK_RD_API {
 					break;
 				case 'occupation_number':
 					$data = wp_list_pluck( $data, 'VHTId' );
+					break;
+				case 'activity_number':
+					$data = wp_list_pluck( $data, 'AKT_ID' );
+					break;
+				case 'project_number':
+					$data = wp_list_pluck( $data, 'PROJ_ID' );
+					break;
+				case 'object_number':
+					$data = wp_list_pluck( $data, 'OBJEKT_ID' );
 					break;
 			}
 
