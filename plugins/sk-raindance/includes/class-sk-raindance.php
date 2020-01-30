@@ -168,24 +168,25 @@ class SK_Raindance {
 	 */
 	public function validate_additional_fields() {
 		$posted = wc_clean( $_POST );
+		$errors = new WP_Error;
 
 		$responsibility_number = $posted['billing_responsibility_number'];
 		$validate = $this->validate( 'responsibility_number', $responsibility_number );
 		if ( is_wp_error( $validate ) ) {
-			throw new Exception( $validate->get_error_message(), 410 );
+			wc_add_notice( $validate->get_error_message(), 'error' );
 		}
 
 		$occupation_number = $posted['billing_occupation_number'];
 		$validate = $this->validate( 'occupation_number', $occupation_number );
 		if ( is_wp_error( $validate ) ) {
-			throw new Exception( $validate->get_error_message(), 410 );
+			wc_add_notice( $validate->get_error_message(), 'error' );
 		}
 
 		if ( ! empty( $posted['billing_activity_number'] ) ) {
 			$activity_number = $posted['billing_activity_number'];
 			$validate = $this->validate( 'activity_number', $activity_number );
 			if ( is_wp_error( $validate ) ) {
-				throw new Exception( $validate->get_error_message(), 410 );
+				wc_add_notice( $validate->get_error_message(), 'error' );
 			}
 		}
 
@@ -193,7 +194,7 @@ class SK_Raindance {
 			$project_number = $posted['billing_project_number'];
 			$validate = $this->validate( 'project_number', $project_number );
 			if ( is_wp_error( $validate ) ) {
-				throw new Exception( $validate->get_error_message(), 410 );
+				wc_add_notice( $validate->get_error_message(), 'error' );
 			}
 		}
 
@@ -201,7 +202,7 @@ class SK_Raindance {
 			$object_number = $posted['billing_object_number'];
 			$validate = $this->validate( 'object_number', $object_number );
 			if ( is_wp_error( $validate ) ) {
-				throw new Exception( $validate->get_error_message(), 410 );
+				wc_add_notice( $validate->get_error_message(), 'error' );
 			}
 		}
 	}
@@ -228,32 +229,37 @@ class SK_Raindance {
 			return new WP_Error( 'invalid_field', sprintf( __( 'Fältet %s är inte giltigt för validering via SMEX.', 'skw' ), $field ) );
 		}
 
+		$label = '';
+		switch ( $field ) {
+			case 'responsibility_number':
+				$label = __( 'Ansvarsnummer', 'skw' );
+				break;
+			case 'occupation_number':
+				$label = __( 'Verksamhetsnummer', 'skw' );
+				break;
+			case 'activity_number':
+				$label = __( 'Aktivitetsnummer', 'skw' );
+				break;
+			case 'project_number':
+				$label = __( 'Projektnummer', 'skw' );
+				break;
+			case 'object_number':
+				$label = __( 'Objektnummer', 'skw' );
+				break;
+		}
+
+		if ( empty( $value ) ) {
+			return new WP_Error( 'empty_field', sprintf( __( '<strong>%s</strong> måste fyllas i.', 'skw' ), ucfirst( $label ) ) );
+		}
+
 		global $wpdb;
 		$exists = ( $wpdb->get_row( "SELECT * FROM {$wpdb->prefix}sk_rd_{$field}s WHERE {$field} = {$value}" ) );
 		if ( ! $exists ) {
-			$label = '';
-			switch ( $field ) {
-				case 'responsibility_number':
-					$label = __( 'Ansvarsnummer', 'skw' );
-					break;
-				case 'occupation_number':
-					$label = __( 'Verksamhetsnummer', 'skw' );
-					break;
-				case 'activity_number':
-					$label = __( 'Aktivitetsnummer', 'skw' );
-					break;
-				case 'project_number':
-					$label = __( 'Projektnummer', 'skw' );
-					break;
-				case 'object_number':
-					$label = __( 'Objektnummer', 'skw' );
-					break;
-			}
 
 			return new WP_Error(
 				'value_does_not_exist',
 				sprintf(
-					__( '"%s" är inte ett giltigt %s.', 'skw' ), // phpcs:ignore
+					__( '<strong>"%s"</strong> är inte ett giltigt <strong>%s</strong>.', 'skw' ), // phpcs:ignore
 					$value,
 					mb_strtolower( $label )
 				)
