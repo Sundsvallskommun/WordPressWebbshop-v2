@@ -248,8 +248,10 @@ class SK_Raindance {
 				break;
 		}
 
+		// If empty, let the default actions
+		// run through.
 		if ( empty( $value ) ) {
-			return new WP_Error( 'empty_field', sprintf( __( '<strong>%s</strong> måste fyllas i.', 'skw' ), ucfirst( $label ) ) );
+			return true;
 		}
 
 		global $wpdb;
