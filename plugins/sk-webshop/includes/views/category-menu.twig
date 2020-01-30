@@ -1,0 +1,11 @@
+{% for category in categories %}
+	<h1>{{ category.name }}</h1>
+
+	{% if category.children %}
+		<ul>
+			{% for child in category.children %}
+				<li>{{ child.name }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endfor %}
