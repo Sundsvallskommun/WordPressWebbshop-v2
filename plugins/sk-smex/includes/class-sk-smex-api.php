@@ -60,6 +60,59 @@ class SK_SMEX_API {
 		return self::$instance;
 	}
 
+	/**
+	 * Returns an array of autocomplete result.
+	 * @param  string $search
+	 * @return array
+	 */
+	public function get_enduser_autocomplete( $search ) {
+		if ( defined( 'ENDUSER_AUTOCOMPLETE_USE_SOAP' ) && ENDUSER_AUTOCOMPLETE_USE_SOAP ) {
+			$results = (array) $this->get_all_endusers( $search );
+		} else {
+			global $wpdb;
+			$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s", $search . '%' );
+			$rows  = $wpdb->get_results( $query );
+			$results = [];
+			foreach ( $rows as $row ) {
+				$results[] = $row->person;
+			}
+		}
+
+		$return = [];
+		foreach ( $results as $person ) { // phpcs:ignore
+			if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
+				$key  = $matches[1];
+				$return[] = array(
+					'id'   => $key,
+					'text' => $person,
+				);
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Returns an array of all endunsers.
+	 * @since  20200113
+	 * @return array
+	 */
+	public function get_all_endusers( $search = '' ) {
+		$soap = $this->get_soap_client();
+		if ( ! is_wp_error( $soap ) ) {
+			$result = $soap->PortalSearchAsYouType( array(
+				'searchString' => $search,
+			) );
+			if ( empty( $result->PortalSearchAsYouTypeResult ) ) { // phpcs:ignore
+				return array();
+			}
+
+			return $result->PortalSearchAsYouTypeResult->string;
+		} else {
+			return $soap;
+		}
+	}
+
     /**
      * Returns the username used for SMEX calls.
      * @return string
@@ -163,16 +216,17 @@ class SK_SMEX_API {
 			 * So we'll loop through the organisation tree to
 			 * look for them.
 			 */
-			
+
 			$found_parent = false;
 			$found_child  = false;
-			
+
 			foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
 				list( $level, $org_id, $name ) = explode( '|', $level );
-				if ( (int) $org_id === 13 ) {
+				if ( 13 === (int) $org_id ) {
 					$found_parent = true;
-				} else if ( in_array( (int) $org_id, array(
-					7, 32
+				} elseif ( in_array( (int) $org_id, array(
+					7,
+					32,
 				) ) ) {
 					$found_child = true;
 				}
@@ -199,20 +253,46 @@ class SK_SMEX_API {
 	}
 
 	/**
+	 * Checks if activity number should be a required field.
+	 * @return boolean
+	 */
+	public function is_activity_number_required() {
+		$found = false;
+		foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
+			list( $level, $org_id, $name ) = explode( '|', $level );
+			if ( strpos( $name, 'BoU' ) !== false ) {
+				$found = true;
+			}
+		}
+
+		return $found;
+	}
+
+	/**
 	 * Returns the current SoapClient instance.
 	 * @return SoapClient
 	 */
 	private function get_soap_client() {
 		if ( is_null( $this->soap ) ) {
 			try {
-				@$this->soap = new SoapClient( SMEX_URL . '?singleWsdl', array(
+				$smex_url = SMEX_URL . '?singleWsdl';
+				libxml_use_internal_errors( true );
+				$sxe = @simplexml_load_string( file_get_contents( $smex_url ) );
+				if ( ! $sxe ) {
+					libxml_use_internal_errors( false );
+					throw new InvalidArgumentException();
+				}
+
+				@$this->soap = new SoapClient( $smex_url, array(
 					'trace'			=> true,
 					'cache_wsdl'	=> WSDL_CACHE_NONE,
 					'soap_version'	=> SOAP_1_1,
 				) );
 				$this->soap->__setLocation( SMEX_URL . '/basic' );
+			} catch ( InvalidArgumentException $e ) {
+				return new WP_Error( 'smex_unreachable', __( 'Couldn\'t connect to SMEX. SMEX_URL is not valid XML.', 'sk-smex' ) );
 			} catch ( Exception $e ) {
-				return new WP_Error( 'smex_unreachable', __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
+				return new WP_Error( 'smex_unknown_error', __( 'Couldn\'t connect to SMEX. Unknown error.', 'sk-smex' ) );
 			}
 		}
 		return $this->soap;

@@ -1,0 +1,27 @@
+<div class="wrap">
+	<h1>{{ __( 'FMCA Options', 'fmca' ) }}</h1>
+
+	<form method="post" action="options.php">
+		{{ function( 'settings_fields', 'fmca-options-group' ) }}
+
+		<table class="form-table">
+			<tr valign="top">
+				<th scope="row">{{ __( 'Hash', 'fmca' ) }}</th>
+				
+				<td>
+					<input type="text" name="fmca_listener_hash" value="{{ fmca_listener_hash }}" />
+					<p class="description">{{ __( 'Listener Hash', 'fmca' ) }}</p>
+				</td>
+			</tr>
+
+			{#
+			 # Fires after all default settings have been output.
+			 #
+			 # @since 1.3.2
+			 #}
+			{% do action( 'after_fmca_output_settings' ) %}
+		</table>
+
+		{{ function( 'submit_button' ) }}
+	</form>
+</div>

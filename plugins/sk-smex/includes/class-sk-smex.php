@@ -67,12 +67,17 @@ class SK_SMEX {
 
 		// Include all files.
 		$this->includes();
+
+		register_activation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'install' ] );
+		register_deactivation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'uninstall' ] );
 		
 		// Check if we can successfully connect to SMEX.
 		$this->is_smex_active = $this->init_smex();
 		if ( $this->is_smex_active && is_user_logged_in() ) {
 			$this->init_hooks();
 		}
+
+		add_filter( 'fmca_listener_actions', array( $this, 'add_listener_action' ) );
 
 		// Add action to make sure that SMEX is accessible before allowing users to checkout.
 		// Note: since we want to disable checkout if SMEX isn't active this hook is added
@@ -86,13 +91,37 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function setup_billing_fields() {
-		$this->ADDITIONAL_BILLING_FIELDS = array(	
-			'billing_reference_number'		=> __( 'Referensnummer', 'sk-smex' ),
-			'billing_responsibility_number'	=> __( 'Ansvarsnummer', 'sk-smex' ),
-			'billing_occupation_number'		=> __( 'Verksamhetsnummer', 'sk-smex' ),
-			'billing_activity_number'		=> __( 'Aktivitetsnummer', 'sk-smex' ),
-			'billing_project_number'		=> __( 'Projektnummer', 'sk-smex' ),
-			'billing_object_number'			=> __( 'Objektnummer', 'sk-smex' ),
+		$this->ADDITIONAL_BILLING_FIELDS = array(
+			'billing_responsibility_number' => array(
+				'id'     => 'billing_responsibility_number',
+				'label'  => __( 'Ansvarsnummer', 'sk-smex' ),
+				'length' => 8,
+			),
+			'billing_occupation_number' => array(
+				'id'     => 'billing_occupation_number',
+				'label'  => __( 'Verksamhetsnummer', 'sk-smex' ),
+				'length' => 6,
+			),
+			'billing_activity_number' => array(
+				'id'     => 'billing_activity_number',
+				'label'  => __( 'Aktivitetsnummer', 'sk-smex' ),
+				'length' => 4,
+			),
+			'billing_project_number' => array(
+				'id'     => 'billing_project_number',
+				'label'  => __( 'Projektnummer', 'sk-smex' ),
+				'length' => 5,
+			),
+			'billing_object_number' => array(
+				'id'     => 'billing_object_number',
+				'label'  => __( 'Objektnummer', 'sk-smex' ),
+				'length' => 7,
+			),
+			'billing_reference_number' => array(
+				'id'     => 'billing_reference_number',
+				'label'  => __( 'Referensnummer', 'sk-smex' ),
+				'length' => -1,
+			),
 		);
 	}
 
@@ -104,8 +133,69 @@ class SK_SMEX {
 		// Make sure pluggable is loaded.
 		include_once ABSPATH . 'wp-includes/pluggable.php';
 
+		// Get the install file.
+		include_once __DIR__ . '/class-sk-smex-install.php';
+
 		// Include SMEX_API class file.
 		include __DIR__ . '/class-sk-smex-api.php';
+	}
+
+	/**
+	 * Adds a listener action for updating searchable persons.
+	 * @param  array $actions
+	 * @return array
+	 */
+	public function add_listener_action( $actions ) {
+		if ( ! isset( $actions['update_searchable_persons'] ) ) {
+			$actions['update_searchable_persons'] = array(
+				'callable' => array(
+					$this,
+					'update_searchable_persons',
+				),
+				'args' => array(),
+			);
+		}
+
+		return $actions;
+	}
+
+	/**
+	 * Updates the local storage of searchable persons
+	 * with persons from SMEX.
+	 * @since  20200113
+	 * @return integer
+	 */
+	public function update_searchable_persons() {
+		$return = 0;
+
+		if ( $this->smex_api ) { 
+			// Get the remote persons.
+			$persons = $this->smex_api->get_all_endusers();
+
+			if ( ! empty( $persons ) ) {
+				global $wpdb;
+
+				// Truncate the table since that's easier
+				// than to keep track of which to insert/delete.
+				$table_name = "{$wpdb->prefix}sk_smex_searchable_persons";
+				$wpdb->query( "TRUNCATE TABLE {$table_name}" ); // phpcs:ignore
+
+				// Insert each number.
+				foreach ( $persons as $person ) {
+					$inserted = $wpdb->insert(
+						$table_name,
+						array(
+							'person' => $person,
+						)
+					);
+					if ( $inserted ) {
+						$return++;
+					}
+				}
+			}
+		}
+
+		return $return;
 	}
 
 	/**
@@ -117,7 +207,7 @@ class SK_SMEX {
 			$this->smex_api = SK_SMEX_API::get_instance();
 			
 			return true;
-		} catch ( Exception $e ) {
+		} catch ( Throwable $e ) {
 			error_log( __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
 			return false;
 		}
@@ -128,6 +218,8 @@ class SK_SMEX {
 	 * @return void
 	 */
 	private function init_hooks() {
+		add_filter( 'fmca_listener_actions', array( $this, 'add_listener_action' ) );
+
 		// Filters needed to change fields on checkout, thank you and my account.
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'change_checkout_fields' ), 10 );
 		add_filter( 'woocommerce_form_field_args', array( $this, 'set_readonly_checkout_fields' ), 10, 3 );
@@ -208,7 +300,7 @@ class SK_SMEX {
 					'type'			=> 'text',
 					'label'			=> __( 'Aktivitetsnummer', 'sk-smex' ),
 					'class'			=> array(),
-					'required'		=> false,
+					'required'		=> $this->smex_api->is_activity_number_required(),
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
@@ -395,8 +487,8 @@ class SK_SMEX {
 			$format_string = $format;
 
 			// Add each field to the format string.
-			foreach ( $this->ADDITIONAL_BILLING_FIELDS as $billing_field => $label ) {
-				$format_string .= "\n{$label}: {" . substr( $billing_field, 8 ) . "}";
+			foreach ( $this->ADDITIONAL_BILLING_FIELDS as $id => $field ) {
+				$format_string .= "\n{$field['label']}: {" . substr( $id, 8 ) . "}";
 			}
 
 			// Add the string to the array.
@@ -431,19 +523,20 @@ class SK_SMEX {
 		}
 
 		// Loop through all our custom billing fields.
-		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $billing_field ) {
+		foreach ( array_keys( $this->ADDITIONAL_BILLING_FIELDS ) as $id ) {
 			// Check if this billing field exists.
-			if ( ! empty( $args[ substr( $billing_field, 8 ) ] ) ) {
+			if ( ! empty( $args[ substr( $id, 8 ) ] ) ) {
 				// Add it's value.
-				$values[ '{' . substr( $billing_field, 8 ) . '}' ] = $args[ substr( $billing_field, 8 ) ]; 
+				$values[ '{' . substr( $id, 8 ) . '}' ] = $args[ substr( $id, 8 ) ]; 
 
 				// Add it's uppercase value (don't know if this is necessary).
-				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = $args[ substr( $billing_field, 8 ) ]; 
-      } else {
-				$values[ '{' . substr( $billing_field, 8 ) . '}' ] = '';
-				$values[ '{' . substr( $billing_field, 8 ) . '_upper}' ] = '';
-      }
+				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = $args[ substr( $id, 8 ) ]; 
+			} else {
+				$values[ '{' . substr( $id, 8 ) . '}' ] = '';
+				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = '';
+			}
 		}
+
 		return $values;
 	}
 
@@ -520,7 +613,7 @@ class SK_SMEX {
 	 * @return void
 	 */
 	public function delete_data_on_privacy_orders( $order ) {
-		foreach ( $this->ADDITIONAL_BILLING_FIELDS as $key => $label ) {
+		foreach ( $this->ADDITIONAL_BILLING_FIELDS as $key => $field ) {
 			delete_post_meta( $order->get_id(), substr( $key, 1 ) );
 		}
 	}
