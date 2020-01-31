@@ -1,11 +1,39 @@
-{% for category in categories %}
-	<h1>{{ category.name }}</h1>
+<div class="js-menu c-tab-menu">
+	<ul class="c-tab-menu__menu c-tab-menu--split">
+		{% for category in categories %}
+			<li class="c-tab-menu__tab">
+				<a id="tab-{{ category.id }}" class="c-tab-menu__tab-btn" href="{{ category.link }}">
+					<span>{{ category.name }}</span>
+				</a>
+			</li>
+		{% endfor %}
+	</ul>
 
-	{% if category.children %}
-		<ul>
-			{% for child in category.children %}
-				<li>{{ child.name }}</li>
-			{% endfor %}
-		</ul>
-	{% endif %}
-{% endfor %}
+	<div class="c-tab-menu__content">
+		{% for category in categories %}
+			<section id="tab-pane-{{ category.id }}" class="c-tab-menu__pane">
+				<div class="row">
+					{% for cat_2 in category.children %}
+						<div class="c-header__lvl2-category">
+							<h3>
+								<a class="c-header__lvl2-category-link" href="{{ cat_2.link }}">{{ cat_2.name }}</a>
+							</h3>
+
+							{% if cat_2.children %}
+								<ul>
+									{% for cat_3 in cat_2.children %}
+										<li>
+											<a class="c-header__lvl3-category-link" href="{{ cat_3.link }}">
+												{{ cat_3.name }}
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+							{% endif %}
+						</div>
+					{% endfor %}
+				</div>
+			</section>
+		{% endfor %}
+	</div>
+</div>
