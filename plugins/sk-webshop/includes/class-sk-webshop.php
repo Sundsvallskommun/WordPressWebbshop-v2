@@ -142,6 +142,7 @@ class SK_Webshop {
 		include __DIR__ . '/class-sk-webshop-checkout-fields.php';
 		include __DIR__ . '/class-sk-webshop-required-fields.php';
 		include __DIR__ . '/class-sk-gf-privacy.php';
+		include __DIR__ . '/class-sk-related-products.php';
 	}
 
 	/**
@@ -153,6 +154,7 @@ class SK_Webshop {
 		$this->checkout_fields = new SK_Webshop_Checkout_Fields();
 		$this->required_fields = new SK_Webshop_Required_Fields();
 		$this->gf_privacy = new SK_GF_Privacy();
+		$this->related_products = new SK_Related_Products();
 	}
 
 	/**

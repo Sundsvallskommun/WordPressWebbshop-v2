@@ -1,0 +1,56 @@
+/**
+* Related products reminder modal
+*/
+.sk-modal {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s;
+}
+
+.sk-modal.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sk-modal > div {
+    width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2em;
+    background: #ffffff;
+}
+
+@media (min-width: 600px) {
+    .sk-modal > div {
+        width: 580px;
+    }
+}
+
+.sk-modal__close {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    position: absolute;
+    right: 1em;
+    top: 1em;
+}
+
+.sk-modal__close:hover {
+    background: transparent;
+    color: inherit;
+}
+
+.sk-modal h2 {
+    margin-top: 0.5em;
+}
