@@ -23,7 +23,18 @@ class SK_Webshop_Category_Menu {
 	 */
 	public function __construct() {
 		add_filter( 'nav_menu_css_class', [ $this, 'set_init_vars' ], 10, 4 );
-		add_filter( 'wp_nav_menu', [ $this, 'maybe_output_category_menu' ], 10, 2 );
+		add_action( 'storefront_header', [ $this, 'maybe_output_category_menu' ], 100 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'category_menu_assets' ] );
+	}
+
+	/**
+	 * Enqueue styles and scripts
+	 * @return void
+	 */
+	public function category_menu_assets() {
+		wp_enqueue_style( 'category-menu', plugin_dir_url(__FILE__) . '../assets/category-menu.css' );
+		wp_enqueue_script( 'vue', plugin_dir_url(__FILE__) . '../assets/vendor/vue.min.js' );
+		wp_enqueue_script( 'sk-megamenu', plugin_dir_url(__FILE__) . '../assets/sk-megamenu.js', ['jquery', 'vue'] );
 	}
 
 	/**
@@ -47,16 +58,13 @@ class SK_Webshop_Category_Menu {
 
 	/**
 	 * Outputs the category menu if applicable.
-	 * @param  string $output
-	 * @param  array  $args
-	 * @return string
+	 * @return null
 	 */
-	public function maybe_output_category_menu( $output, $args ) {
+	public function maybe_output_category_menu() {
 		if ( $this->should_output ) {
-			$output .= $this->output_category_menu( false );
+			$this->output_category_menu( true );
 		}
-
-		return $output;
+		return;
 	}
 
 	/**

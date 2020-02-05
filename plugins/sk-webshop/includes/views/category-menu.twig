@@ -1,39 +1,40 @@
-<div class="js-menu c-tab-menu">
-	<ul class="c-tab-menu__menu c-tab-menu--split">
-		{% for category in categories %}
-			<li class="c-tab-menu__tab">
-				<a id="tab-{{ category.id }}" class="c-tab-menu__tab-btn" href="{{ category.link }}">
-					<span>{{ category.name }}</span>
-				</a>
-			</li>
-		{% endfor %}
-	</ul>
 
-	<div class="c-tab-menu__content">
-		{% for category in categories %}
-			<section id="tab-pane-{{ category.id }}" class="c-tab-menu__pane">
-				<div class="row">
-					{% for cat_2 in category.children %}
-						<div class="c-header__lvl2-category">
-							<h3>
-								<a class="c-header__lvl2-category-link" href="{{ cat_2.link }}">{{ cat_2.name }}</a>
-							</h3>
+<div class="sk-category-menu || js-megamenu">
+	<div class="sk-category-menu__container || col-full">
+		<ul class="sk-category-menu__top">
+			{% for category in categories %}
+				<li>
+					<a 
+						href="{{ category.link }}"
+						:class="activeTab === {{ category.id }} ? 'active' : null" 
+						@mouseover="activeTab = {{ category.id }}">
+							{{ category.name }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
 
-							{% if cat_2.children %}
-								<ul>
-									{% for cat_3 in cat_2.children %}
-										<li>
-											<a class="c-header__lvl3-category-link" href="{{ cat_3.link }}">
-												{{ cat_3.name }}
-											</a>
-										</li>
-									{% endfor %}
-								</ul>
-							{% endif %}
-						</div>
-					{% endfor %}
-				</div>
-			</section>
+
+		{% for category in categories %}
+			<div class="sk-category-menu__sub" v-if="activeTab === {{ category.id }}">
+				{% if category.children %}
+						{% for cat in category.children %}
+							<div>
+								<h3><a href="{{ cat.link }}">{{ cat.name }}</a></h3>
+								{% if cat.children %}
+									<ul>
+										{% for cat in category.children %}
+											<li>
+												<a class="" href="{{ cat.link }}">{{ cat.name }}</a>
+											</li>
+										{% endfor %}
+									</ul>
+								{% endif %}
+							</div>
+						{% endfor %}
+
+				{% endif %}
+			</div>
 		{% endfor %}
 	</div>
 </div>
