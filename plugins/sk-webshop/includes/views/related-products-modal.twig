@@ -1,0 +1,26 @@
+<div class="sk-modal active sk-related-products-reminder">
+	<div>
+		<button class="sk-modal__close | js-close">Stäng</button>
+		<h2>{{ heading }}</h2>
+		<p>{{ text }}</p>
+	</div>
+</div>
+
+<script>
+	var $ = jQuery;
+	$('.sk-modal').each( function() {
+		var $modal = $(this);
+
+		// Close the modal with the close-button
+		$(this).on( 'click', '.js-close', function() {
+			$modal.removeClass('active');
+		});
+
+		// Close the modal with the ESC-button
+		$(document).keyup(function(e){
+			if(e.keyCode === 27) {
+				$modal.removeClass('active');
+			}
+		});
+	});
+</script>
