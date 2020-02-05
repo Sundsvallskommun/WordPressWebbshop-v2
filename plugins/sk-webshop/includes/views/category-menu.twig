@@ -18,12 +18,12 @@
 		{% for category in categories %}
 			<div class="sk-category-menu__sub" v-if="activeTab === {{ category.id }}">
 				{% if category.children %}
-						{% for cat in category.children %}
+						{% for cat in category.children if cat.id != category.id %}
 							<div>
 								<h3><a href="{{ cat.link }}">{{ cat.name }}</a></h3>
 								{% if cat.children %}
 									<ul>
-										{% for cat in category.children %}
+										{% for cat in cat.children %}
 											<li>
 												<a class="" href="{{ cat.link }}">{{ cat.name }}</a>
 											</li>
