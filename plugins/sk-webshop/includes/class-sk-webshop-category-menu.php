@@ -9,8 +9,6 @@
  * @package SK_Webshop
  */
 
-use \Timber\Term;
-
 class SK_Webshop_Category_Menu {
 
 	/**
@@ -73,7 +71,7 @@ class SK_Webshop_Category_Menu {
 	 * @return string
 	 */
 	public function output_category_menu( $echo = true ) {
-		$cats = $this->get_category_tree();
+		$cats = $this->get_category_hierarchy();
 
 		$template = __DIR__ . '/views/category-menu.twig';
 		$args     = [
@@ -91,16 +89,32 @@ class SK_Webshop_Category_Menu {
 	 * @return array
 	 */
 	public function get_category_tree() {
+		$return = $this->get_category_hierarchy();
+		var_dump( $return ); exit;
+	}
+
+	/**
+	 * Returns the direct hierarchy for a
+	 * given parent_id.
+	 * @param  integer $parent
+	 * @return array
+	 */
+	private function get_category_hierarchy( $parent = 0 ) {
 		$terms = get_terms( [
 			'taxonomy'   => 'product_cat',
+			'parent'     => $parent,
 			'hide_empty' => false,
 			'fields'     => 'ids',
-			'parent'     => 0,
-		] );
-
-		return array_map( function( $term ) {
-			return new Term( $term );
-		}, $terms );
+		] );		
+		$children = [];
+		
+		foreach ( $terms as $term_id ) {
+			$term = new SK_Term( $term_id );
+			$term->children = $this->get_category_hierarchy( $term_id );
+			$children[ $term_id ] = $term;
+		}
+		
+		return $children;
 	}
 
 }

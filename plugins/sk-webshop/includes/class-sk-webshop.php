@@ -138,6 +138,7 @@ class SK_Webshop {
 	 * @return void
 	 */
 	private function includes() {
+		include __DIR__ . '/class-sk-term.php';
 		include __DIR__ . '/class-sk-webshop-unittype.php';
 		include __DIR__ . '/class-sk-webshop-checkout-fields.php';
 		include __DIR__ . '/class-sk-webshop-required-fields.php';
