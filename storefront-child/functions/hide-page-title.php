@@ -13,6 +13,14 @@ add_action( 'wp', function() { //phpcs:ignore
 
 	if ( '1' === get_post_meta( $page_id, '_hide_page_title', true) ) {
 		remove_action( 'storefront_page', 'storefront_page_header', 10 );
+
+		?>
+		<style>
+			.storefront-breadcrumb {
+				margin-bottom: 0 !important;
+			}
+		</style>
+		<?php
 	}
 
 }, 10 ); //phpcs:ignore
