@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Adds an option to pages to hide the page title.
+ */
+include_once __DIR__ . '/functions/hide-page-title.php';
+
+/**
  * Adds the css and javascript needed in order
  * to be able to collapse categories in the widget.
  * @return void
