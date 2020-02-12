@@ -85,15 +85,6 @@ class SK_Webshop_Category_Menu {
 	}
 
 	/**
-	 * Returns the product category tree.
-	 * @return array
-	 */
-	public function get_category_tree() {
-		$return = $this->get_category_hierarchy();
-		var_dump( $return ); exit;
-	}
-
-	/**
 	 * Returns the direct hierarchy for a
 	 * given parent_id.
 	 * @param  integer $parent
