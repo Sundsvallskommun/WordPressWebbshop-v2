@@ -144,6 +144,7 @@ class SK_Webshop {
 		include __DIR__ . '/class-sk-webshop-required-fields.php';
 		include __DIR__ . '/class-sk-gf-privacy.php';
 		include __DIR__ . '/class-sk-webshop-category-menu.php';
+		include __DIR__ . '/class-sk-related-products.php';
 	}
 
 	/**

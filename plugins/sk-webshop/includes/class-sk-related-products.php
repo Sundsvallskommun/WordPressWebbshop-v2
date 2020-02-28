@@ -137,7 +137,7 @@ class SK_Related_Products {
 			'priority' => 10,
 		) );
 		$customizer->add_setting( 'related_products_modal_heading', array(
-			'default'           => 'Lorem ipsum',
+			'default'           => 'Relaterade tillbehör',
 			'sanitize_callback' => 'sanitize_text_field',
 		) );
 		$customizer->add_control( new WP_Customize_Control(
@@ -150,7 +150,7 @@ class SK_Related_Products {
 			)
 		) );
 		$customizer->add_setting( 'related_products_modal_text', array(
-			'default'           => 'Lorem ipsum',
+			'default'           => 'Tillbehör som tangentbord, mus, skärm osv ingår ej vid beställning av dator, du hittar några rekommenderade tillbehör längre ner på sidan under "Du kanske behöver".',
 			'sanitize_callback' => 'sanitize_text_field',
 		) );
 		$customizer->add_control( new WP_Customize_Control(
