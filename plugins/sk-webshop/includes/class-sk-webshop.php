@@ -26,6 +26,9 @@ class SK_Webshop {
 		// Init Timber.
 		$this->init_timber();
 
+		// Remove logout link from my account tabs.
+		add_filter( 'woocommerce_account_menu_items', array( $this, 'remove_logout_link' ) );
+
 		// Add the order action item for re-trying our gateway.
 		add_filter( 'woocommerce_order_actions', array( $this, 'add_order_meta_box_action' ) );
 
@@ -94,6 +97,17 @@ class SK_Webshop {
 	private function init_timber() {
 		$timber = new \Timber\Timber();
 		Timber::$dirname = [ 'views' ];
+	}
+
+	/**
+	 * Unset customer logout to prevent logouts from my account.
+	 * @param  array $menu_links
+	 * @return array
+	 */
+	public function remove_logout_link( $menu_links ) {
+		unset( $menu_links['customer-logout'] ); // Remove Logout link
+
+		return $menu_links;
 	}
 
 	/**
