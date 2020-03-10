@@ -254,6 +254,8 @@ function skios_owner_order_email( $email_address, $order, $items ) {
 
 	$message .= "<h1 style='font-size: 1.5em;'>Beställning</h1>";
 
+	$message .= '<p>Webbshoppens beställningsnummer: ' . $order->get_id() . '</p>';
+
 	$message .= skios_email_customer_details($order);
 
 	$message .= "<h2 style='font-size: 1.2em;'>Produkter</h2>";
