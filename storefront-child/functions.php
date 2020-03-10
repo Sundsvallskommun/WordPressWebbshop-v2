@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Unhooks certain parent theme actions.
+ * @return void
+ */
+function remove_parent_theme_actions() {
+	remove_action( 'storefront_footer', 'storefront_credit', 20 );
+}
+add_action( 'after_setup_theme', 'remove_parent_theme_actions' );
+
+/**
  * Adds an option to pages to hide the page title.
  */
 include_once __DIR__ . '/functions/hide-page-title.php';
