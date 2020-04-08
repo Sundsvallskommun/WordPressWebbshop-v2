@@ -420,6 +420,8 @@ function get_pob_string_data( $order, $item ) {
 	$metas     = $sk_smex->ADDITIONAL_BILLING_FIELDS; // phpcs:ignore
 	$new_metas = [];
 
+	$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+
 	// Get order meta values.
 	foreach ( $metas as $key => $arr ) {
 		$meta_val = get_post_meta( $order->get_id(), "_{$key}", true );
@@ -427,12 +429,11 @@ function get_pob_string_data( $order, $item ) {
 		$new_metas[ $key ]['meta_val'] = $meta_val;
 
 		if ( 'billing_responsibility_number' === $key ) {
-			$subaccount_field = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
 			$new_metas['subaccount'] = [
 				'id'       => 'Underkonto',
 				'label'    => 'Underkonto',
 				'length'   => 6,
-				'meta_val' => isset( $subaccount_field['Underkonto'] ) ? $subaccount_field['Underkonto'] : '',
+				'meta_val' => isset( $item_pob_fields['Underkonto'] ) ? $item_pob_fields['Underkonto'] : '',
 			];
 		}
 
@@ -445,7 +446,7 @@ function get_pob_string_data( $order, $item ) {
 		'id'       => 'motpart',
 		'label'    => 'Motpart',
 		'length'   => 3,
-		'meta_val' => '',
+		'meta_val' => isset( $item_pob_fields['Motpart'] ) ? $item_pob_fields['Motpart'] : 155,
 	];
 
 	return $new_metas;
