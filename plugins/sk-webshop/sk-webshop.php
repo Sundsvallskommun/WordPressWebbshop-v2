@@ -14,7 +14,7 @@
  * Author URI:		http://www.fmca.se/
  * Developer:		FMCA
  * Developer URI:	http://www.fmca.se/
- * Text Domain:		sk-smex
+ * Text Domain:		sk-webshop
  * Domain Path:		/languages
  */
 
@@ -22,8 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if acccessed directly.
 }
 
-// Make sure WooCommerce is active.
-if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+$active_plugins = apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+
+// Make sure all dependencies are active.
+if ( ! in_array( 'woocommerce/woocommerce.php', $active_plugins ) || ! in_array( 'fmca-base/fmca-base.php', $active_plugins ) ) {
 	return;
 }
 
