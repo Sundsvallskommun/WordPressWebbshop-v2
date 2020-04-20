@@ -26,6 +26,9 @@ class SK_Webshop {
 		// Init Timber.
 		$this->init_timber();
 
+		// Remove logout link from my account tabs.
+		add_filter( 'woocommerce_account_menu_items', array( $this, 'remove_logout_link' ) );
+
 		// Add the order action item for re-trying our gateway.
 		add_filter( 'woocommerce_order_actions', array( $this, 'add_order_meta_box_action' ) );
 
@@ -97,6 +100,17 @@ class SK_Webshop {
 	}
 
 	/**
+	 * Unset customer logout to prevent logouts from my account.
+	 * @param  array $menu_links
+	 * @return array
+	 */
+	public function remove_logout_link( $menu_links ) {
+		unset( $menu_links['customer-logout'] ); // Remove Logout link
+
+		return $menu_links;
+	}
+
+	/**
 	 * Adds our action for re-trying the order
 	 * through the gateway.
 	 * @param array $actions
@@ -138,10 +152,13 @@ class SK_Webshop {
 	 * @return void
 	 */
 	private function includes() {
+		include __DIR__ . '/class-sk-term.php';
 		include __DIR__ . '/class-sk-webshop-unittype.php';
 		include __DIR__ . '/class-sk-webshop-checkout-fields.php';
 		include __DIR__ . '/class-sk-webshop-required-fields.php';
 		include __DIR__ . '/class-sk-gf-privacy.php';
+		include __DIR__ . '/class-sk-webshop-category-menu.php';
+		include __DIR__ . '/class-sk-related-products.php';
 	}
 
 	/**
@@ -153,6 +170,7 @@ class SK_Webshop {
 		$this->checkout_fields = new SK_Webshop_Checkout_Fields();
 		$this->required_fields = new SK_Webshop_Required_Fields();
 		$this->gf_privacy = new SK_GF_Privacy();
+		$this->related_products = new SK_Related_Products();
 	}
 
 	/**

@@ -33,6 +33,7 @@ h6 {
 
 .site-header {
 	background-color: #f9f9f9;
+	z-index: 1000;
 }
 
 .site-header p {

@@ -3,6 +3,7 @@
 jQuery(document).ready(function($) {
     $('.js-search-enduser').select2({
         placeholder: "Ange slutanvändare",
+        allowClear: true,
         delay: 250,
         minimumInputLength: 3,
         language: "sv",

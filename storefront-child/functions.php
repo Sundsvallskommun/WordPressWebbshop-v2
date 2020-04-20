@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * Adds an option to pages to hide the page title.
+ */
+include_once __DIR__ . '/functions/hide-page-title.php';
+
+/**
  * Adds the css and javascript needed in order
  * to be able to collapse categories in the widget.
  * @return void
@@ -174,3 +179,13 @@ add_action( 'wp_footer', 'sk_product_tooltip_script' );
  * being changed.
  */
 include_once __DIR__.'/inline-styles.php';
+
+/**
+ * Change the translation of the upsells title on the product page.
+ */
+function translate_upsells_title( $translated ) {
+   $translated = str_ireplace( 'Du gillar kanske också&hellip;', 'Du kanske behöver', $translated );
+   return $translated;
+}
+
+add_filter( 'gettext', 'translate_upsells_title' );

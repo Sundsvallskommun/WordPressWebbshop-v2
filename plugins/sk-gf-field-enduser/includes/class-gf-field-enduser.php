@@ -60,16 +60,6 @@ class GF_Field_Enduser extends GF_Field {
 			'id'          => $id,
 			'placeholder' => $placeholder_attribute,
 		) );
-
-		$input = '<div class="ginput_container ginput_container_select2">';
-
-		$input .=
-		"<select class='js-search-enduser {$size}' id='input_{$id}' name='input_{$id}' data-placeholder='{$placeholder_attribute}'>
-			<option></option>
-		</select>";
-
-		$input .= '</div>';
-		return $input;
 	}
 
 }

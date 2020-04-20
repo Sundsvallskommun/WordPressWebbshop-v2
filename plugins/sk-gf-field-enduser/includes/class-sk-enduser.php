@@ -38,6 +38,8 @@ class SK_Enduser {
 		wp_localize_script( 'gf_field_enduser', 'ajax', array(
 			'url' => admin_url( 'admin-ajax.php' ),
 		) );
+
+		wp_enqueue_script( 'enduser', SK_GF_FIELD_ENDUSER_PLUGIN_URL . 'assets/enduser.js', array( 'gf_field_enduser', 'jquery' ) );
 	}
 
 	/**

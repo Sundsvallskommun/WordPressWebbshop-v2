@@ -1,0 +1,51 @@
+{% macro recursiveCategory(category) %}
+    {% import _self as self %}
+    <li>
+        <a href="{{ category.link }}">{{ category }}</a>
+        {% if category.children|length %}
+            <ul>
+                {% for child in category.children %}
+                    {{ self.recursiveCategory(child) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% from _self import recursiveCategory %}
+
+<div class="sk-category-menu || js-megamenu">
+	<div class="sk-category-menu__container || col-full">
+		<ul class="sk-category-menu__top">
+			{% for category in categories %}
+				<li>
+					<a 
+						href="{{ category.link }}"
+						:class="activeTab === {{ category.id }} ? 'active' : null" 
+						@mouseover="activeTab = {{ category.id }}">
+							{{ category.name }}
+					</a>
+				</li>
+			{% endfor %}
+		</ul>
+
+
+		{% for category in categories %}
+			<div class="sk-category-menu__sub" v-if="activeTab === {{ category.id }}">
+				{% if category.children %}
+						{% for cat in category.children if cat.id != category.id %}
+							<div>
+								<h3><a href="{{ cat.link }}">{{ cat.name }}</a></h3>
+								<ul>
+							        {% for category in cat.children %}
+							            {{ recursiveCategory(category) }}
+							        {% endfor %}
+							    </ul>
+							</div>
+						{% endfor %}
+
+				{% endif %}
+			</div>
+		{% endfor %}
+	</div>
+</div>
