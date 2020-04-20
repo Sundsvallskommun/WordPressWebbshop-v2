@@ -31,6 +31,7 @@ class SK_POB_Product_Fields {
 	 */
 	private $FIELDS = array(
 		'Underkonto' => null,
+		'Motpart'    => 155,
 	);
 
 	/**
