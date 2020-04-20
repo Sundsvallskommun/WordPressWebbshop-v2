@@ -220,7 +220,15 @@ class SK_SMEX_API {
 			$found_parent = false;
 			$found_child  = false;
 
-			foreach ( explode( '¤', $this->get_user_data( 'OrgTree' ) ) as $level ) {
+			// Make sure that we can retrieve the organisation tree.
+			// Edge cases returns a WP_Error from API class.
+			$org_tree = $this->get_user_data( 'OrgTree' );
+			if ( is_wp_error( $org_tree ) ) {
+				SKW()->log( $org_tree->get_error_message() );
+				return false;
+			}
+
+			foreach ( explode( '¤', $org_tree ) as $level ) {
 				list( $level, $org_id, $name ) = explode( '|', $level );
 				if ( 13 === (int) $org_id ) {
 					$found_parent = true;
