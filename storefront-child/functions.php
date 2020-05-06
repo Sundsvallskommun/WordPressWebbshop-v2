@@ -198,3 +198,47 @@ function translate_upsells_title( $translated ) {
 }
 
 add_filter( 'gettext', 'translate_upsells_title' );
+
+/**
+ * Add navigation icons (my account and support) to site header.
+ */
+function sk_navigation_icons() {
+
+	echo '<div class="sk-navigation-icons">';
+		echo get_icon_link( 'Mitt konto', get_permalink( get_option('woocommerce_myaccount_page_id') ), 'user' );
+
+		$support_url = get_theme_mod( 'sk_support_url' );
+		if ( $support_url ) {
+			echo get_icon_link( 'Support', $support_url, 'headset' );
+		}
+	echo '</div>';
+}
+add_action('storefront_header', 'sk_navigation_icons', 41 );
+
+/**
+ * Get link with icon.
+ */
+function get_icon_link( $text, $url, $icon ) {
+	return sprintf(
+		'<a class="icon-link" href="%s"><span class="icon"><i class="fas fa-%s"></i></span>%s</a>',
+		$url,
+		$icon,
+		$text
+	);
+}
+
+/**
+ * Add support-url setting to the customizer.
+ * The value is used in the site header.
+ */
+function support_url_setting( $wp_customize ) {
+	$wp_customize->add_setting( 'sk_support_url' );
+	$wp_customize->add_control( 'sk_support_url', array(
+		'label'    => __( 'Support-url', '' ),
+		'section'  => 'header_image',
+		'settings' => 'sk_support_url',
+		'type'     => 'text'
+	));
+}
+
+add_action( 'customize_register', 'support_url_setting' );

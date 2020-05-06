@@ -57,20 +57,20 @@ background-color: #f8f8f8;
 @media (min-width: 768px) {
 
 	.woocommerce-active .site-header .site-branding {
-		width: 30%;
+		width: 25%;
 		margin: 0;
 		padding-right: 1em;
+		padding-bottom: 2em;
 	}
 
 	.woocommerce-active .site-header .site-search,
 	.site-header .site-search {
 		width: 70%;
-		margin-top: 2.25em;
+		margin-top: 1em;
 	}
 
 	.storefront-primary-navigation {
 		background: transparent;
-		border-bottom: 4px solid #DEE4E9;
 	}
 }
 input[type="search"]:not(.select2-search__field) {
@@ -168,4 +168,83 @@ h1.product_title {
     content: "\f058";
     font-family: "Font Awesome 5 Free" !important;
     margin-right: 8px;
+}
+
+
+/**
+* New header
+*/
+
+.icon-link {
+	display: inline-block;
+	text-align: center;
+	margin-left: 1em;
+}
+
+.icon-link .icon {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: auto;
+	background: #fff;
+	border-radius: 50%;
+	width: 3em;
+	height: 3em;
+}
+
+@media screen and ( min-width: 768px ) {
+
+	.site-header .site-branding img {
+		max-width: 180px;
+	}
+
+	.storefront-primary-navigation {
+		background-color: rgb(0, 115, 59); /* Grönsta 2 */
+	}
+
+	.main-navigation ul.menu > li > a {
+		padding: 0.618em 1em;
+	}
+
+	.site-header-cart .cart-contents {
+		color: white;
+		padding: 0.618em 0;
+		text-align: right;
+	}
+
+	.site-header-cart:hover .cart-contents {
+		color: white;
+	}
+
+	.site-header-cart .cart-contents:after {
+		margin-left: 1em;
+	}
+
+	.storefront-primary-navigation .nav-menu a {
+		color: white !important;
+	}
+
+	.woocommerce-active .site-header .site-search, .site-header .site-search {
+		width: 50%;
+		float: left;
+	}
+
+	.sk-navigation-icons {
+		padding-left: 2em;
+		padding-top: .5em;
+		float: right;
+		text-align: right;
+		width: 25%;
+	}
+
+	.sk-navigation-icons a {
+		color: black;
+	}
+
+}
+
+@media screen and ( max-width: 767px ) {
+	.sk-navigation-icons {
+		display: none;
+	}
 }
