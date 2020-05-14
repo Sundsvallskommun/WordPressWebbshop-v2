@@ -72,6 +72,12 @@ class SK_SMEX_API {
 			global $wpdb;
 			$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s", $search . '%' );
 			$rows  = $wpdb->get_results( $query );
+
+			if ( empty( $rows ) ) {
+				$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s LIMIT 1", '%' . $search . '%' );
+				$rows  = $wpdb->get_results( $query );
+			}
+
 			$results = [];
 			foreach ( $rows as $row ) {
 				$results[] = $row->person;
