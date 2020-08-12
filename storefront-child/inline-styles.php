@@ -1,8 +1,15 @@
 <?php
 add_action( 'wp_footer', 'theme_inline_styles');
 
+
 function theme_inline_styles() {
 
+  $gronsta1 = "rgb(106, 176, 35)";
+  $gronsta2 = "rgb(0, 115, 59)";
+  $gronsta3 = "rgb(206, 226, 185)";
+
+  $primary = $gronsta2;
+  $primary_hover = '#004f29';
 ?>
 
 <style>
@@ -28,7 +35,7 @@ a.cart-contents:hover,
 .site-header-cart .widget_shopping_cart a:hover,
 .site-header-cart:hover > li > a,
 .site-header ul.menu li.current-menu-item > a {
-  color: #3c3b3b;
+  color: #ffffff;
 }
 
 table th {
@@ -98,7 +105,7 @@ body,
 }
 
 a  {
-  color: #a90074;
+  color: <?php echo $primary; ?>;
 }
 
 a:focus,
@@ -110,18 +117,18 @@ button:focus,
 input[type="button"]:focus,
 input[type="reset"]:focus,
 input[type="submit"]:focus {
-  outline-color: #a90074;
+  outline-color: <?php echo $primary; ?>;
 }
 
 button, input[type="button"], input[type="reset"], input[type="submit"], .button, .added_to_cart, .widget a.button, .site-header-cart .widget_shopping_cart a.button {
-  background-color: #a90074;
-  border-color: #a90074;
+  background-color: <?php echo $primary; ?>;
+  border-color: <?php echo $primary; ?>;
   color: #ffffff;
 }
 
 button:hover, input[type="button"]:hover, input[type="reset"]:hover, input[type="submit"]:hover, .button:hover, .added_to_cart:hover, .widget a.button:hover, .site-header-cart .widget_shopping_cart a.button:hover {
-  background-color: #90005b;
-  border-color: #90005b;
+  background-color: <?php echo $primary_hover ?>;
+  border-color: <?php echo $primary_hover ?>;
   color: #ffffff;
 }
 
@@ -142,7 +149,7 @@ button.alt:hover, input[type="button"].alt:hover, input[type="reset"].alt:hover,
 }
 
 .site-footer {
-  background-color: #5b1f78;
+  background-color: <?php echo $primary; ?>;
   color: #ffffff;
 }
 
@@ -217,12 +224,12 @@ p.stars a:hover:after,
 p.stars a:after,
 .star-rating span:before,
 #payment .payment_methods li input[type=radio]:first-child:checked+label:before {
-  color: #a90074;
+  color: <?php echo $primary; ?>;
 }
 
 .widget_price_filter .ui-slider .ui-slider-range,
 .widget_price_filter .ui-slider .ui-slider-handle {
-  background-color: #a90074;
+  background-color: <?php echo $primary; ?>;
 }
 
 .woocommerce-breadcrumb,
@@ -253,17 +260,17 @@ p.stars.selected a.active:before,
 p.stars:hover a:before,
 p.stars.selected a:not(.active):before,
 p.stars.selected a.active:before {
-  color: #a90074;
+  color: <?php echo $primary; ?>;
 }
 
 .single-product div.product .woocommerce-product-gallery .woocommerce-product-gallery__trigger {
-  background-color: #a90074;
+  background-color: <?php echo $primary; ?>;
   color: #ffffff;
 }
 
 .single-product div.product .woocommerce-product-gallery .woocommerce-product-gallery__trigger:hover {
-  background-color: #90005b;
-  border-color: #90005b;
+  background-color: <?php echo $primary_hover ?>;
+  border-color: <?php echo $primary_hover ?>;
   color: #ffffff;
 }
 
