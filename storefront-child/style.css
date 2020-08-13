@@ -224,6 +224,18 @@ h1.product_title {
 		color: white !important;
 	}
 
+	.storefront-primary-navigation .nav-menu a:focus {
+		outline-color: #004f29 !important;
+	}
+
+	.storefront-primary-navigation .nav-menu .sub-menu .menu-item {
+		background-color: rgb(0, 115, 59);
+	}
+
+	.storefront-primary-navigation .nav-menu .sub-menu .menu-item:hover {
+		background-color: #004f29;
+	}
+
 	.woocommerce-active .site-header .site-search, .site-header .site-search {
 		width: 50%;
 		float: left;
