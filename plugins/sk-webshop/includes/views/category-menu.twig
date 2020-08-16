@@ -23,6 +23,7 @@
 						href="{{ category.link }}"
 						:class="activeTab === {{ category.id }} ? 'active' : null" 
 						@mouseover="activeTab = {{ category.id }}">
+							<i class="fas fa-{{ category.fa_icon }}"></i>&nbsp;
 							{{ category.name }}
 					</a>
 				</li>
