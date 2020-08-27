@@ -144,6 +144,16 @@ button.alt:hover, input[type="button"].alt:hover, input[type="reset"].alt:hover,
   color: #ffffff;
 }
 
+.wp-block-button__link {
+    background-color: <?php echo $primary; ?> !important;
+    color: #ffffff !important;
+}
+
+.wp-block-button__link:hover {
+    background-color: <?php echo $primary_hover; ?> !important;
+    color: #ffffff !important;
+}
+
 #comments .comment-list .comment-content .comment-text {
   background-color: #f8f8f8;
 }
