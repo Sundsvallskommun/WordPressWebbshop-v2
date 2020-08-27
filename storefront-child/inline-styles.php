@@ -205,6 +205,11 @@ a.cart-contents,
   color: #0a0909;
 }
 
+a.cart-contents,
+.site-header-cart .widget_shopping_cart a:hover {
+  color: #0a0909;
+}
+
 table.cart td.product-remove,
 table.cart td.actions {
   border-top-color: #ffffff;
