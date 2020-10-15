@@ -379,7 +379,7 @@ function skios_email_items( $order, $items ) {
 							$string .= get_pob_string( $order, $item );
 							$string .= '<br>';
 							$string .= '<strong>Verksamhetsbeskrivning: </strong>';
-							$string .= get_occupation_string( $order, $item );
+							$string .= get_occupation_string( $order );
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
@@ -389,7 +389,14 @@ function skios_email_items( $order, $items ) {
 	return $string;
 }
 
-function get_occupation_string( $order, $item ) {
+/**
+ * Get a comma separated string for "verksamhetsbeskrivning".
+ *
+ * @param WC_Order $order
+ *
+ * @return string
+ */
+function get_occupation_string( $order ) {
 	$string  = "<span id='occupationString'>";
 	$values = [];
 
@@ -403,11 +410,17 @@ function get_occupation_string( $order, $item ) {
 	return $string;
 }
 
+/**
+ * Get a comma separated string for tele2.
+ *
+ * @param WC_Order $order
+ * @param array $items
+ *
+ * @return string
+ */
 function get_tele2_string( $order, $item ) {
 
 	$pob_string_data = get_pob_string_data( $order, $item );
-
-	error_log( $pob_string_data );
 
 	$string  = "<span id='tele2String'>";
 
@@ -425,7 +438,6 @@ function get_tele2_string( $order, $item ) {
 		$values[] = $pob_string_data[ $key ][ 'meta_val' ];
 	}
 
-	// Add a space between every data field.
 	$string .= implode( ',', $values );
 	$string .= '</span>';
 
