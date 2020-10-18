@@ -372,12 +372,74 @@ function skios_email_items( $order, $items ) {
 								$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $meta->key, $meta->value );
 							}
 							$string .= '<br>';
+							$string .= '<strong>Tele2 kostnadsställe: </strong>';
+							$string .= get_tele2_string( $order, $item );
+							$string .= '<br>';
+							$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';
 							$string .= get_pob_string( $order, $item );
+							$string .= '<br>';
+							$string .= '<strong>Verksamhetsbeskrivning: </strong>';
+							$string .= get_occupation_string( $order );
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
 		$string .= '</tbody>';
 	$string .= '</table>';
+
+	return $string;
+}
+
+/**
+ * Get a comma separated string for "verksamhetsbeskrivning".
+ *
+ * @param WC_Order $order
+ *
+ * @return string
+ */
+function get_occupation_string( $order ) {
+	$string  = "<span id='occupationString'>";
+	$values = [];
+
+	$values[] = $order->get_meta( '_billing_organization', true );
+	$values[] = $order->get_meta( '_billing_department', true );
+	$values[] = $order->get_billing_first_name() . ' ' .  $order->get_billing_last_name();
+
+	$string .= implode( ', ', $values );
+	$string .= '</span>';
+
+	return $string;
+}
+
+/**
+ * Get a comma separated string for tele2.
+ *
+ * @param WC_Order $order
+ * @param array $items
+ *
+ * @return string
+ */
+function get_tele2_string( $order, $item ) {
+
+	$pob_string_data = get_pob_string_data( $order, $item );
+
+	$string  = "<span id='tele2String'>";
+
+	$fields = array(
+		'billing_responsibility_number',
+		'billing_occupation_number',
+		'billing_activity_number',
+		'billing_project_number',
+		'billing_object_number',
+	);
+
+	$values = [];
+
+	foreach ( $fields as $key ) {
+		$values[] = $pob_string_data[ $key ][ 'meta_val' ];
+	}
+
+	$string .= implode( ',', $values );
+	$string .= '</span>';
 
 	return $string;
 }
