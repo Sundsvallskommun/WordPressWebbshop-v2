@@ -367,24 +367,46 @@ function skios_email_items( $order, $items ) {
 						$string .= '<br>';
 						$string .= wc_price( $item->get_total() ) . $item->get_product()->get_price_suffix();
 						$string .= '<br>';
-							// Add all meta data at the end of the line.
-							foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
-								$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $meta->key, $meta->value );
-							}
-							$string .= '<br>';
-							$string .= '<strong>Tele2 kostnadsställe: </strong>';
-							$string .= get_tele2_string( $order, $item );
-							$string .= '<br>';
-							$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';
-							$string .= get_pob_string( $order, $item );
-							$string .= '<br>';
-							$string .= '<strong>Verksamhetsbeskrivning: </strong>';
-							$string .= get_occupation_string( $order );
+						
+						$string .= skios_get_item_meta( $item );
+
+						$string .= '<br>';
+						$string .= '<strong>Tele2 kostnadsställe: </strong>';
+						$string .= get_tele2_string( $order, $item );
+						$string .= '<br>';
+						$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';
+						$string .= get_pob_string( $order, $item );
+						$string .= '<br>';
+						$string .= '<strong>Verksamhetsbeskrivning: </strong>';
+						$string .= get_occupation_string( $order );
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
 		$string .= '</tbody>';
 	$string .= '</table>';
+
+	return $string;
+}
+
+/**
+ * Output item meta.
+ * 
+ * @param WC_Order_Item $item
+ * 
+ * @return string
+ */
+function skios_get_item_meta( $item ) {
+
+	$string = '';
+
+	// Add all meta data at the end of the line.
+	foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+
+		$key   = apply_filters( 'sk_order_item_meta_key', $meta->key, $meta->value, $item );
+		$value = apply_filters( 'sk_order_item_meta_value', $meta->value, $meta->key, $item );
+
+		$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $key, $value );
+	}
 
 	return $string;
 }
