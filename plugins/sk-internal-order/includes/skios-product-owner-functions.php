@@ -367,16 +367,16 @@ function skios_email_items( $order, $items ) {
 						$string .= '<br>';
 						$string .= wc_price( $item->get_total() ) . $item->get_product()->get_price_suffix();
 						$string .= '<br>';
-						
+
 						$string .= skios_get_item_meta( $item );
 
 						$string .= '<br>';
 						$string .= '<strong>Tele2 kostnadsställe: </strong>';
 						$string .= get_tele2_string( $order, $item );
-						$string .= '<br>';
+						$string .= '<br><br>';
 						$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';
 						$string .= get_pob_string( $order, $item );
-						$string .= '<br>';
+						$string .= '<br><br>';
 						$string .= '<strong>Verksamhetsbeskrivning: </strong>';
 						$string .= get_occupation_string( $order );
 					$string .= '</td>';
