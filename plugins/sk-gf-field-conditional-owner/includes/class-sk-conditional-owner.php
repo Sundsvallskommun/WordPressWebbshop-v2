@@ -56,7 +56,7 @@ class SK_Conditional_Owner {
 					}
 				}
 
-				$extra_email = $email_answer === 'ja' ? $field['ownerEmailYes'] : $field['ownerEmailNo'];
+				$extra_email = $data['value'] === 'ja' ? $field['ownerEmailYes'] : $field['ownerEmailNo'];
 
 				$conditional_owner_field = [
 					'original_label'  => $field_label,
