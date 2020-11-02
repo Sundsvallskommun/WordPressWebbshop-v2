@@ -17,8 +17,7 @@ class SK_Conditional_Owner {
 	public function __construct() {
 		add_action( 'woocommerce_checkout_create_order_line_item', [ $this, 'add_order_item_meta' ], 10, 4 );
 
-		add_filter( 'sk_order_item_meta_key', [ $this, 'conditional_owner_order_item_meta_key' ], 10, 3 );
-		add_filter( 'sk_order_item_meta_value', [ $this, 'conditional_owner_order_item_meta_value' ], 10, 3 );
+		add_filter( 'sk_order_item_meta_string', [ $this, 'conditional_owner_item_meta_string' ], 10, 3 );
 		add_filter( 'skios_order_notification', [ $this, 'handle_order_notification' ], 10, 5 );
 	}
 
@@ -75,40 +74,23 @@ class SK_Conditional_Owner {
 	}
 
 	/**
-	 * Display the correct meta key we want to show in the owner email for conditional owner field.
+	 * Add secondary info from conditional field to the email.
+	 *
+	 * @return string
 	 */
-	public function conditional_owner_order_item_meta_key( $key, $value, $item ) {
-
-		// Get conditional owner field which will override the key and value in the email.
+	public function conditional_owner_item_meta_string( $string, $meta, $item ) {
+		// Get conditional owner field
 		$conditional_owner_data = $item->get_meta( '_sk_conditional_owner', false );
-
 		foreach ( $conditional_owner_data as $data ) {
-			$meta = $data->get_data();
-			$meta = $meta['value'];
-			if ( isset( $meta['original_label'] ) && $meta['original_label'] === $key) {
-				return $meta['new_label'];
+			$email_meta = $data->get_data();
+			$email_meta = $email_meta['value'];
+
+			if ( isset( $email_meta['original_label'] ) && $email_meta['original_label'] === $meta->key ) {
+				$string .= sprintf( '<br><br><strong>%s</strong>: %s', $email_meta['new_label'], $email_meta['new_answer']);
 			}
 		}
 
-		return $key;
-	}
-
-	/**
-	 * Display the correct meta value we want to show in the owner email for conditional owner field.
-	 */
-	public function conditional_owner_order_item_meta_value( $value, $key, $item ) {
-		// Get conditional owner field which will override the key and value in the email.
-		$conditional_owner_data = $item->get_meta( '_sk_conditional_owner', false );
-
-		foreach ( $conditional_owner_data as $data ) {
-			$meta = $data->get_data();
-			$meta = $meta['value'];
-			if ( isset( $meta['original_label'] ) && $meta['original_label'] === $key) {
-				return $meta['new_answer'];
-			}
-		}
-
-		return $value;
+		return $string;
 	}
 
 	/**

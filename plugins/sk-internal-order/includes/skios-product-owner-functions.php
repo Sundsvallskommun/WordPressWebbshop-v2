@@ -402,10 +402,11 @@ function skios_get_item_meta( $item ) {
 	// Add all meta data at the end of the line.
 	foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
 
-		$key   = apply_filters( 'sk_order_item_meta_key', $meta->key, $meta->value, $item );
-		$value = apply_filters( 'sk_order_item_meta_value', $meta->value, $meta->key, $item );
+		$meta_string = sprintf( '<strong>%s</strong>: %s', $meta->key, $meta->value );
+		$meta_string = apply_filters( 'sk_order_item_meta_string', $meta_string, $meta, $item );
 
-		$string .= sprintf( '<br><strong>%s</strong>: %s <br>', $key, $value );
+		$string .= sprintf( '<br>%s<br>', $meta_string );
+
 	}
 
 	return $string;
