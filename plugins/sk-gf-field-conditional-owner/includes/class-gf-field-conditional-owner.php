@@ -37,6 +37,7 @@ class GF_Field_Conditional_Owner extends GF_Field {
 	public function get_form_editor_field_settings() {
 		return array(
 			'label_setting',
+			'description_setting',
 			'rules_setting',
 			'css_class_setting',
 			'conditional_logic_field_setting',
