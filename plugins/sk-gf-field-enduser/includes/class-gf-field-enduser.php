@@ -35,6 +35,7 @@ class GF_Field_Enduser extends GF_Field {
 			'label_setting',
 			'placeholder_setting',
 			'conditional_logic_field_setting',
+			'rules_setting',
 		);
 	}
 
