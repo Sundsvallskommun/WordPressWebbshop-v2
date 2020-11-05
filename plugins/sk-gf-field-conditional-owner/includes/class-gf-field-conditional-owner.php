@@ -57,18 +57,31 @@ class GF_Field_Conditional_Owner extends GF_Field {
 			return '';
 		}
 
-		$form_id         = $form['id'];
+		$form_id         = absint( $form['id'] );
 		$is_entry_detail = $this->is_entry_detail();
+		$is_form_editor  = $this->is_form_editor();
+
 		$id              = (int) $this->id;
+		$field_id        = $is_entry_detail || $is_form_editor || $form_id == 0 ? "input_$id" : 'input_' . $form_id . "_$id";
 
-		$invert_answer = $this->emailInvertField;
+		$invert_answer   = $this->emailInvertField;
 
-		$size                  = $this->size;
+		$size            = $this->size;
 
 		return Timber::compile( __DIR__ . '/views/input.twig', array(
 			'size'        => $size,
+			'form_id'     => $form_id,
+			'field_id'    => $field_id,
 			'id'          => $id,
+			'value'       => $value,
 		) );
+	}
+
+	/**
+	 * Add support for conditional logic
+	 */
+	public function is_conditional_logic_supported() {
+		return true;
 	}
 
 }
