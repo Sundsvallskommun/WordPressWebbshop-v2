@@ -378,7 +378,7 @@ function skios_email_items( $order, $items ) {
 						$string .= get_pob_string( $order, $item );
 						$string .= '<br><br>';
 						$string .= '<strong>Verksamhetsbeskrivning: </strong>';
-						$string .= get_occupation_string( $order );
+						$string .= get_occupation_string( $order, $item );
 					$string .= '</td>';
 				$string .= '</tr>';
 			}
@@ -414,21 +414,47 @@ function skios_get_item_meta( $item ) {
 
 /**
  * Get a comma separated string for "verksamhetsbeskrivning".
+ * This is build from settings on product gravity form that specifies the three parts.
  *
  * @param WC_Order $order
  *
  * @return string
  */
-function get_occupation_string( $order ) {
+function get_occupation_string( $order, $item ) {
 	$string  = "<span id='occupationString'>";
 	$values = [];
 
-	$values[] = $order->get_meta( '_billing_organization', true );
-	$values[] = $order->get_meta( '_billing_department', true );
-	$values[] = $order->get_billing_first_name() . ' ' .  $order->get_billing_last_name();
+	$field1 = '';
+	$field2 = '';
+	$field3 = '';
+
+	$form_id = rgars( $item, '_gravity_forms_history/_gravity_form_lead/form_id' );
+	$form = GFFormsModel::get_form_meta( $form_id );
+
+	if ( !$form ) {
+		return '';
+	}
+
+	foreach ( $item->get_formatted_meta_data() as $meta_id => $meta ) {
+		if ( $meta->key === $form['occupation_string_1'] ) {
+			$field1 = $meta->value;
+		}
+		if ( $meta->key === $form['occupation_string_2'] ) {
+			$field2 = $meta->value;
+		}
+		if ( $meta->key === $form['occupation_string_3'] ) {
+			$field3 = $meta->value;
+		}
+	}
+
+	$values[] = $field1;
+	$values[] = $field2;
+	$values[] = $field3;
 
 	$string .= implode( ', ', $values );
 	$string .= '</span>';
+
+	$string .= '<br>';
 
 	return $string;
 }

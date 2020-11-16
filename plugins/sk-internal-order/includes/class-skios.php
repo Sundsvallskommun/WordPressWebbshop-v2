@@ -53,6 +53,7 @@ class SKIOS {
 		include __DIR__ . '/class-skios-admin-columns.php';
 		include __DIR__ . '/class-skios-product-owner.php';
 		include __DIR__ . '/class-skios-unique-order.php';
+		include __DIR__ . '/class-skios-occupation-string.php';
 		include __DIR__ . '/class-sk-pob-product-fields.php';
 	}
 
@@ -63,6 +64,7 @@ class SKIOS {
 		$skios_admin_columns = new SKIOS_Admin_Columns();
 		$skios_product_owner = new SKIOS_Product_Owner();
 		$skios_unique_order = new SKIOS_Unique_Order();
+		$skios_occupation_string = new SKIOS_Occupation_string();
 		$skios_unique_order = new SK_POB_Product_Fields();
 	}
 
