@@ -41,6 +41,7 @@ class SKIOS {
 
 		// Fix for free orders that otherwise never go through the gateway.
 		add_filter( 'woocommerce_cart_needs_payment', '__return_true', 747 );
+		add_filter( 'woocommerce_order_needs_payment', '__return_true', 747 );
 	}
 
 	/**
