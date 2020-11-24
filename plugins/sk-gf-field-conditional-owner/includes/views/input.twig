@@ -1,0 +1,11 @@
+<div class="ginput_container" id="{{ field_id }}">
+	<label>
+		<input type="radio" id="{{ field_id }}_yes" name="input_{{ id }}" value="ja" {{ value == 'ja' ? 'checked="checked"' : null }}>
+		Ja
+	</label>
+	<br>
+	<label>
+		<input type="radio" id="{{ field_id }}_no" name="input_{{ id }}" value="nej" {{ value == 'nej' ? 'checked="checked"' : null }}>
+		Nej
+	</label>
+</div>
