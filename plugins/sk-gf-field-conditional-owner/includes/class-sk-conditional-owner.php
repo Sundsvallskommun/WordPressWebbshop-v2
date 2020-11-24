@@ -54,18 +54,18 @@ class SK_Conditional_Owner {
 					if ( $invert_answer ) {
 						$email_answer = $email_answer === 'ja' ? 'nej' : 'ja';
 					}
+
+					$extra_email = $data['value'] === 'ja' ? $field['ownerEmailYes'] : $field['ownerEmailNo'];
+
+					$conditional_owner_field = [
+						'original_label'  => $field_label,
+						'new_label'       => $email_label,
+						'new_answer'      => $email_answer,
+						'email_cc'        => $extra_email,
+					];
+
+					$item->add_meta_data( '_sk_conditional_owner', $conditional_owner_field );
 				}
-
-				$extra_email = $data['value'] === 'ja' ? $field['ownerEmailYes'] : $field['ownerEmailNo'];
-
-				$conditional_owner_field = [
-					'original_label'  => $field_label,
-					'new_label'       => $email_label,
-					'new_answer'      => $email_answer,
-					'email_cc'        => $extra_email,
-				];
-
-				$item->add_meta_data( '_sk_conditional_owner', $conditional_owner_field );
 
 			}
 
