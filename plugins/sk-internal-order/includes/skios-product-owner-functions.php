@@ -371,7 +371,7 @@ function skios_email_items( $order, $items ) {
 						$string .= skios_get_item_meta( $item );
 
 						$string .= '<br>';
-						$string .= '<strong>Tele2 kostnadsställe: </strong>';
+						$string .= '<strong>Tele2 kostnadsställe (Ordernr. kund): </strong>';
 						$string .= get_tele2_string( $order, $item );
 						$string .= '<br><br>';
 						$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';

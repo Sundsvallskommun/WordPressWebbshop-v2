@@ -31,7 +31,10 @@ class SK_Conditional_Owner {
 		foreach ( $cart as $key => $cart_item ) {
 			if ( $key === $cart_item_key ) {
 				$item_data = apply_filters( 'woocommerce_get_item_data', [], $cart_item );
+			} else {
+				continue;
 			}
+
 			$form_id = rgars( $cart_item, '_gravity_form_data/id' );
 			$form = GFFormsModel::get_form_meta( $form_id );
 
