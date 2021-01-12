@@ -487,6 +487,16 @@ function get_tele2_string( $order, $item ) {
 		$values[] = $pob_string_data[ $key ][ 'meta_val' ];
 	}
 
+	/**
+	 * Return NULL if the user is a "bolagsanvändare"
+	 */
+	$api = SK_SMEX_API::get_instance();
+	$requires_additional_fields = $api::user_requires_additional_fields();
+
+	if ( ! is_wp_error( $requires_additional_fields ) && ! $requires_additional_fields ) {
+		return 'NULL';
+	}
+
 	$string .= implode( ',', $values );
 	$string .= '</span>';
 
@@ -509,6 +519,16 @@ function get_pob_string( $order, $item ) {
 		// POB expect all fields to be outputted with same ammount of
 		// spaces as expected data length if data is missing.
 		$pob_string[] = str_pad( $data['meta_val'], $data['length'], ' ' );
+	}
+
+	/**
+	 * Return empty string if the user is a "bolagsanvändare"
+	 */
+	$api = SK_SMEX_API::get_instance();
+	$requires_additional_fields = $api::user_requires_additional_fields();
+
+	if ( ! is_wp_error( $requires_additional_fields ) && ! $requires_additional_fields ) {
+		return '';
 	}
 
 	// Add a space between every data field.
