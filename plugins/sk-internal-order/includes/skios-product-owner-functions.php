@@ -491,7 +491,7 @@ function get_tele2_string( $order, $item ) {
 	 * Return NULL if the user is a "bolagsanvändare"
 	 */
 	$api = SK_SMEX_API::get_instance();
-	$requires_additional_fields = $api::user_requires_additional_fields();
+	$requires_additional_fields = $api->user_requires_additional_fields();
 
 	if ( ! is_wp_error( $requires_additional_fields ) && ! $requires_additional_fields ) {
 		return 'NULL';
@@ -525,7 +525,7 @@ function get_pob_string( $order, $item ) {
 	 * Return empty string if the user is a "bolagsanvändare"
 	 */
 	$api = SK_SMEX_API::get_instance();
-	$requires_additional_fields = $api::user_requires_additional_fields();
+	$requires_additional_fields = $api->user_requires_additional_fields();
 
 	if ( ! is_wp_error( $requires_additional_fields ) && ! $requires_additional_fields ) {
 		return '';
