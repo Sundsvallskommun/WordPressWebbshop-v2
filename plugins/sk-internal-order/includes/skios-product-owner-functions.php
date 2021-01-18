@@ -557,7 +557,7 @@ function get_pob_string_data( $order, $item ) {
 		'id'       => 'motpart',
 		'label'    => 'Motpart',
 		'length'   => 3,
-		'meta_val' => isset( $item_pob_fields['Motpart'] ) ? $item_pob_fields['Motpart'] : 155,
+		'meta_val' => isset( $item_pob_fields['Motpart'] ) ? $item_pob_fields['Motpart'] : 115,
 	];
 
 	return $new_metas;
