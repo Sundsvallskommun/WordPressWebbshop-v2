@@ -205,9 +205,10 @@ class SK_SMEX_API {
 	 * @return boolean
 	 */
 	public function user_requires_additional_fields() {
+		$company_id = $this->get_user_data( 'CompanyId' );
 		// First check company id to make sure user
 		// belongs to Sundsvalls Kommun.
-		if ( (int) $this->get_user_data( 'CompanyId' ) !== 1 ) {
+		if ( is_wp_error( $company_id ) || (int) $this->get_user_data( 'CompanyId' ) !== 1 ) {
 			return false;
 		} else {
 			/**
