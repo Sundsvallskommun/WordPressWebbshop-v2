@@ -74,7 +74,7 @@ class SK_SMEX_API {
 			$rows  = $wpdb->get_results( $query );
 
 			if ( empty( $rows ) ) {
-				$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s LIMIT 1", '%' . $search . '%' );
+				$query = $wpdb->prepare( "SELECT * FROM {$wpdb->prefix}sk_smex_searchable_persons AS sp WHERE sp.person LIKE %s", '%' . $search . '%' );
 				$rows  = $wpdb->get_results( $query );
 			}
 
@@ -85,11 +85,19 @@ class SK_SMEX_API {
 		}
 
 		$return = [];
+		$found_usernames = [];
 		foreach ( $results as $person ) { // phpcs:ignore
 			if ( preg_match( '/\((.*)\)/', $person, $matches ) ) {
-				$key  = $matches[1];
+				$username  = $matches[1];
+				// We only need to show one result per username,
+				// there might be two of each in the result
+				// (with first name and surname first).
+				if ( in_array( $username, $found_usernames ) ) {
+					continue;
+				}
+				$found_usernames[] = $username;
 				$return[] = array(
-					'id'   => $key,
+					'id'   => $username,
 					'text' => $person,
 				);
 			}
