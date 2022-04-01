@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 /**
  * Unhooks certain parent theme actions.
