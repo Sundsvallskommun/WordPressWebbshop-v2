@@ -99,9 +99,6 @@ function skios_insert_product_owner( $args = array() ) {
 		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom typ.', 'skios' ) );
 	}
 
-	if ( '' === trim( $args[ 'identifier' ] ) ) {
-		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom identifierare.', 'skios' ) );
-	}
 
 	// Get the current id from options.
 	$options = get_option( 'woocommerce_skios_settings' );
@@ -578,6 +575,13 @@ function get_pob_string_data( $order, $item ) {
 		'label'    => 'Motpart',
 		'length'   => 3,
 		'meta_val' => isset( $item_pob_fields['Motpart'] ) ? $item_pob_fields['Motpart'] : 115,
+	];
+
+	$new_metas['external_articlenumber'] = [
+		'id'       => 'external_articlenumber',
+		'label'    => 'Externt artikelnummer',
+		'length'   => 8,
+		'meta_val' => isset( $item_pob_fields['Externt artikelnummer'] ) ? $item_pob_fields['Externt artikelnummer'] : '',
 	];
 
 	return $new_metas;

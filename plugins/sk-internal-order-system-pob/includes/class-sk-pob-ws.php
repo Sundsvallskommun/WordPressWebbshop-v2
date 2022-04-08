@@ -80,22 +80,22 @@ class Sk_POB_WS {
 				"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
 			];
 			$memo = 
-				"Description: " . "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}".PHP_EOL.
-				"CaseType: " . "{$casetype}".PHP_EOL.
-				"PriorityInfo.Priority: " . "IT4".PHP_EOL.
-				"ResponsibleGroup: " . "First Line IT".PHP_EOL.
-				"SLAInfo.Service: " . "{$item->get_name()}".PHP_EOL.
-				"Virtual.Shop_Office: " . "1".PHP_EOL.
-				"Virtual.Shop_Kst_Underkonto: " . "{$item_pob_fields['Underkonto']}".PHP_EOL.
-				"Virtual.Shop_Kst_Motpart: " . "{$item_pob_fields['Motpart']}".PHP_EOL.   
-				"Virtual.Shop_ExterntArtikelnummer: " . "{$item_pob_fields['Externt artikelnummer']}".PHP_EOL.   
-				"Virtual.Shop_CI_Description: " . "{$CI_description[1]}".PHP_EOL.
-				"Virtual.Shop_Adr_Gatuadress: " . "{$order->data['billing']['address_1']}".PHP_EOL.
-				"Virtual.Shop_Adr_Postnr: " . "{$order->data['billing']['postcode']}".PHP_EOL.
-				"Virtual.Shop_Adr_Postort: " . "{$order->data['billing']['city']}".PHP_EOL.
-				"Virtual.Shop_Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}".PHP_EOL.
-				"Virtual.Shop_Telefonnummer: " . "{$order->data['billing']['phone']}".PHP_EOL.
-				"Virtual.Shop_Epost: " . "{$order->data['billing']['email']}".PHP_EOL;
+				"Description: " . "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}\r\n".
+				"CaseType: " . "{$casetype}\r\n" .
+				"PriorityInfo.Priority: " . "IT4\r\n" .
+				"ResponsibleGroup: " . "First Line IT\r\n" .
+				"SLAInfo.Service: " . "{$item->get_name()}\r\n" .
+				"Virtual.Shop_Office: " . "1\r\n" .
+				"Virtual.Shop_Kst_Underkonto: " . "{$item_pob_fields['Underkonto']}\r\n" .
+				"Virtual.Shop_Kst_Motpart: " . "{$item_pob_fields['Motpart']}\r\n" .   
+				"Virtual.Shop_ExterntArtikelnummer: " . "{$item_pob_fields['Externt artikelnummer']}\r\n" .   
+				"Virtual.Shop_CI_Description: " . "{$CI_description[1]}\r\n" .
+				"Virtual.Shop_Adr_Gatuadress: " . "{$order->data['billing']['address_1']}\r\n" .
+				"Virtual.Shop_Adr_Postnr: " . "{$order->data['billing']['postcode']}\r\n" .
+				"Virtual.Shop_Adr_Postort: " . "{$order->data['billing']['city']}\r\n" .
+				"Virtual.Shop_Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}\r\n" .
+				"Virtual.Shop_Telefonnummer: " . "{$order->data['billing']['phone']}\r\n" .
+				"Virtual.Shop_Epost: " . "{$order->data['billing']['email']}\r\n" ;
 			
 			$meta = $item->get_meta_data();
 			foreach ($meta as $m) {
@@ -105,7 +105,7 @@ class Sk_POB_WS {
 				
 				if ($pob_id) {
 					$data[$pob_id] = $m->get_data()['value'];
-					$memo .= $pob_id . ": " . $m->get_data()['value'].PHP_EOL;
+					$memo .= $pob_id . ": " . $m->get_data()['value']. "\r\n" ;
 				}
 			}
 			$this->create_pob_case($data, $memo);
