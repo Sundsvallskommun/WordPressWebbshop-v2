@@ -66,7 +66,6 @@ class Sk_POB_WS {
 				"CaseType" => "{$casetype}",
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
-				"SLAInfo.Service" => "{$item->get_name()}",
 				"Virtual.Shop_Office" => "1",
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
@@ -84,7 +83,6 @@ class Sk_POB_WS {
 				"CaseType: " . "{$casetype}\r\n" .
 				"PriorityInfo.Priority: " . "IT4\r\n" .
 				"ResponsibleGroup: " . "First Line IT\r\n" .
-				"SLAInfo.Service: " . "{$item->get_name()}\r\n" .
 				"Virtual.Shop_Office: " . "1\r\n" .
 				"Virtual.Shop_Kst_Underkonto: " . "{$item_pob_fields['Underkonto']}\r\n" .
 				"Virtual.Shop_Kst_Motpart: " . "{$item_pob_fields['Motpart']}\r\n" .   
@@ -166,7 +164,10 @@ class Sk_POB_WS {
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 		$err_no = curl_errno( $ch );
-		file_put_contents(ABSPATH . '/wp-content/uploads/pob_debug.json', $data);
+		if ($status_code === 400 ) {
+			$message = json_decode($data);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
 		// Check if we had any errors and if the HTTP status code was 201.
 		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
 			return true;
