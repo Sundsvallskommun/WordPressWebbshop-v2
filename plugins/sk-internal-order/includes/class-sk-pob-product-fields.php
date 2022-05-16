@@ -31,7 +31,8 @@ class SK_POB_Product_Fields {
 	 */
 	private $FIELDS = array(
 		'Underkonto' => null,
-		'Motpart'    => 115,
+		'Motpart' => 115,
+		'Externt artikelnummer' => null,
 	);
 
 	/**
@@ -144,4 +145,5 @@ class SK_POB_Product_Fields {
 			update_post_meta( $post_id, self::$FIELDS_META_KEY, $this->FIELDS );
 		}
 	}
+
 }
