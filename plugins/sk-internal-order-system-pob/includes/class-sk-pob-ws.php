@@ -59,16 +59,18 @@ class Sk_POB_WS {
 	 * @return
 	 */
 	// "Virtual.Shop_JoinContact" => "test01test",
-				// "Virtual.Shop_ForvaltningBolag" => "{$item->get_meta('Arbetsplats')}",
+	// "Virtual.Shop_ForvaltningBolag" => "{$item->get_meta('Arbetsplats')}",
 	public function send_order( WC_Order $order, $order_items ) {
 		$current_user = wp_get_current_user();
 		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
 		$form = GFAPI::get_form( $form_id );
 		$casetype = rgar($form, 'form_type');
+
 		foreach ($order_items as $item) {
 			$occupations .= get_occupation_string( $order, $item );
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+
 			$data = [
 				"Description" => "Beställning {$order->id} - {$item->get_name()}",
 				"CaseType" => "{$casetype}",
@@ -89,22 +91,24 @@ class Sk_POB_WS {
 				"Virtual.Shop_Telefonnummer" => "{$order->data['billing']['phone']}",
 				"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
 			];
+
 			$memo = 
-				"Description: " . "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}\r\n".
-				"CaseType: " . "{$casetype}\r\n" .
-				"PriorityInfo.Priority: " . "IT4\r\n" .
-				"ResponsibleGroup: " . "First Line IT\r\n" .
-				"Virtual.Shop_Office: " . "1\r\n" .
-				"Virtual.Shop_Kst_Underkonto: " . "{$item_pob_fields['Underkonto']}\r\n" .
-				"Virtual.Shop_Kst_Motpart: " . "{$item_pob_fields['Motpart']}\r\n" .   
-				"Virtual.Shop_ExterntArtikelnummer: " . "{$item_pob_fields['Externt artikelnummer']}\r\n" .   
-				"Virtual.Shop_CI_Description: " . "{$CI_description[1]}\r\n" .
-				"Virtual.Shop_Adr_Gatuadress: " . "{$order->data['billing']['address_1']}\r\n" .
-				"Virtual.Shop_Adr_Postnr: " . "{$order->data['billing']['postcode']}\r\n" .
-				"Virtual.Shop_Adr_Postort: " . "{$order->data['billing']['city']}\r\n" .
-				"Virtual.Shop_Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}\r\n" .
-				"Virtual.Shop_Telefonnummer: " . "{$order->data['billing']['phone']}\r\n" .
-				"Virtual.Shop_Epost: " . "{$order->data['billing']['email']}\r\n" ;
+				"Beställning {$order->id} - {$item->get_name()} <br/><br/>".
+				"Typ: " . "{$casetype} <br/>" .
+				"Prioritet: " . "IT4 <br/>" .
+				"Ansvarig grupp: " . "First Line IT <br/>" .
+				"Kontor: " . "1 <br/>" .
+				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
+				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
+				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
+				"SKU: " . "{$item->get_sku()} <br/>" .
+				"Beskrivning: " . "{$CI_description[1]} <br/>" .
+				"Gatuadress: " . "{$order->data['billing']['address_1']} <br/>" .
+				"Postnr: " . "{$order->data['billing']['postcode']} <br/>" .
+				"Postort: " . "{$order->data['billing']['city']} <br/>" .
+				"Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
+				"Telefonnummer: " . "{$order->data['billing']['phone']} <br/>" .
+				"Epost: " . "{$order->data['billing']['email']} <br/>" ;
 			
 			$meta = $item->get_meta_data();
 			foreach ($meta as $m) {
