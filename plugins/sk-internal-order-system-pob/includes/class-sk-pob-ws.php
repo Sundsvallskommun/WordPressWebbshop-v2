@@ -70,7 +70,7 @@ class Sk_POB_WS {
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
 			$data = [
-				"Description" => "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}",
+				"Description" => "Beställning {$order->id} - {$item->get_name()}",
 				"CaseType" => "{$casetype}",
 				"CaseCategory" => $this->get_case_category_by_type(),
 				"Contact.Customer" => $current_user->user_login,
