@@ -80,6 +80,7 @@ class Sk_POB_WS {
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
 				"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
+				"Virtual.Shop_ServiceIdExternalSync" => "{$item->get_sku()}",
 				"Virtual.Shop_CI_Description" => "{$CI_description[1]}",
 				"Virtual.Shop_Adr_Gatuadress" => "{$order->data['billing']['address_1']}",
 				"Virtual.Shop_Adr_Postnr" => "{$order->data['billing']['postcode']}",
