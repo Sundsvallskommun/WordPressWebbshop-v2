@@ -116,7 +116,7 @@ class SK_POB {
 		if ( ('pob' === $type && $this->has_credentials())) {
 			try {
 				// Init WS class.
-				$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password );
+				$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 
 				// Send order.
 				return $pob_ws->send_order( $order, $items );

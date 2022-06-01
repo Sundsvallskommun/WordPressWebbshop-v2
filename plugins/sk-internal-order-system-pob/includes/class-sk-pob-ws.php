@@ -24,6 +24,12 @@ class Sk_POB_WS {
 	private $ws_password;
 
 	/**
+	 * Type of POB case to send.
+	 * @var string
+	 */
+	private $pob_type;
+
+	/**
 	 * The URL for the endpoint for creating tasks.
 	 * @var string
 	 */
@@ -35,7 +41,7 @@ class Sk_POB_WS {
 	 * @param string $username
 	 * @param string $password
 	 */
-	public function __construct( $base_url, $username, $password ) {
+	public function __construct( $base_url, $username, $password, $type ) {
 		// Set URLs.
 		$this->ws_create_task_url = untrailingslashit( $base_url ) . $this->ws_create_task_url;
 		
@@ -43,6 +49,7 @@ class Sk_POB_WS {
 		// Set credentials as class properties.
 		$this->ws_username = $username;
 		$this->ws_password = $password;
+		$this->pob_type = $type;
 	}
 
 	/**
@@ -64,6 +71,7 @@ class Sk_POB_WS {
 			$data = [
 				"Description" => "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}",
 				"CaseType" => "{$casetype}",
+				"CaseCategory" => $this->get_case_category_by_type(),
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
 				"Virtual.Shop_Office" => "1",
@@ -193,5 +201,13 @@ class Sk_POB_WS {
 			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
 		}
 		curl_close($ch);
+	}
+
+	private function get_case_category_by_type() {
+		switch($this->pob_type) {
+			case 'pob':
+			default:
+				return 'Beställning av Hårdvara Advania';
+		}
 	}
 }
