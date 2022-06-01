@@ -111,16 +111,17 @@ class Sk_POB_WS {
 				"Epost: " . "{$order->data['billing']['email']} <br/>" ;
 			
 			$meta = $item->get_meta_data();
+
 			foreach ($meta as $m) {
 				$meta_label = $m->get_data()['key'];
 				$pob_id = $this->get_pob_id($item, $meta_label);
-				$datavalue = $m->get_data();
 				
 				if ($pob_id) {
 					$data[$pob_id] = $m->get_data()['value'];
-					$memo .= $pob_id . ": " . $m->get_data()['value']. "\r\n" ;
+					$memo .= $meta_label . ": " . $m->get_data()['value']. "<br/>" ;
 				}
 			}
+
 			$this->create_pob_case($data, $memo);
 		}
 	} 
