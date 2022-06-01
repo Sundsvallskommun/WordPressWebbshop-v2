@@ -61,6 +61,7 @@ class Sk_POB_WS {
 	// "Virtual.Shop_JoinContact" => "test01test",
 				// "Virtual.Shop_ForvaltningBolag" => "{$item->get_meta('Arbetsplats')}",
 	public function send_order( WC_Order $order, $order_items ) {
+		$current_user = wp_get_current_user();
 		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
 		$form = GFAPI::get_form( $form_id );
 		$casetype = rgar($form, 'form_type');
@@ -72,6 +73,7 @@ class Sk_POB_WS {
 				"Description" => "[Shop] Beställning av tjänst {$order->id} {$item->get_id()}",
 				"CaseType" => "{$casetype}",
 				"CaseCategory" => $this->get_case_category_by_type(),
+				"Contact.Customer" => $current_user->user_login,
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
 				"Virtual.Shop_Office" => "1",
