@@ -70,6 +70,8 @@ class Sk_POB_WS {
 			$occupations .= get_occupation_string( $order, $item );
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+			$product = $item->get_product();
+			$sku = $product !== false ? $product->get_sku() : $item->get_id();
 
 			$data = [
 				"Description" => "Beställning {$order->id} - {$item->get_name()}",
@@ -82,7 +84,7 @@ class Sk_POB_WS {
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
 				"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
-				"Virtual.Shop_ServiceIdExternalSync" => "{$item->get_sku()}",
+				"Virtual.Shop_ServiceIdExternalSync" => "{$sku}",
 				"Virtual.Shop_CI_Description" => "{$CI_description[1]}",
 				"Virtual.Shop_Adr_Gatuadress" => "{$order->data['billing']['address_1']}",
 				"Virtual.Shop_Adr_Postnr" => "{$order->data['billing']['postcode']}",
@@ -101,7 +103,7 @@ class Sk_POB_WS {
 				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
 				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
 				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
-				"SKU: " . "{$item->get_sku()} <br/>" .
+				"SKU: " . "{$sku} <br/>" .
 				"Beskrivning: " . "{$CI_description[1]} <br/>" .
 				"Gatuadress: " . "{$order->data['billing']['address_1']} <br/>" .
 				"Postnr: " . "{$order->data['billing']['postcode']} <br/>" .
