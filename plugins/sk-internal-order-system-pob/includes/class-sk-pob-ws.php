@@ -80,6 +80,7 @@ class Sk_POB_WS {
 				"Contact.Customer" => $current_user->user_login,
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
+				"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
 				"Virtual.Shop_Office" => "1",
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
@@ -99,6 +100,7 @@ class Sk_POB_WS {
 				"Typ: " . "{$casetype} <br/>" .
 				"Prioritet: " . "IT4 <br/>" .
 				"Ansvarig grupp: " . "First Line IT <br/>" .
+				"WebbshopOrdernummer: " . "{$order->id} <br/>" .
 				"Kontor: " . "1 <br/>" .
 				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
 				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
