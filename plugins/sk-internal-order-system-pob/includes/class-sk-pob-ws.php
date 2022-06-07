@@ -104,7 +104,7 @@ class Sk_POB_WS {
 				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
 				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
 				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
-				"SKU: " . "{$sku} <br/>" .
+				"Artikelnummer: " . "{$sku} <br/>" .
 				"Beskrivning: " . "{$CI_description[1]} <br/>" .
 				"Gatuadress: " . "{$order->data['billing']['address_1']} <br/>" .
 				"Postnr: " . "{$order->data['billing']['postcode']} <br/>" .
