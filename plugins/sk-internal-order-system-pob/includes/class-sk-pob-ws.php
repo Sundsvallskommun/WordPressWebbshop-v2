@@ -106,9 +106,6 @@ class Sk_POB_WS {
 				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
 				"Artikelnummer: " . "{$sku} <br/>" .
 				"Beskrivning: " . "{$CI_description[1]} <br/>" .
-				"Gatuadress: " . "{$order->data['billing']['address_1']} <br/>" .
-				"Postnr: " . "{$order->data['billing']['postcode']} <br/>" .
-				"Postort: " . "{$order->data['billing']['city']} <br/>" .
 				"Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
 				"Telefonnummer: " . "{$order->data['billing']['phone']} <br/>" .
 				"Epost: " . "{$order->data['billing']['email']} <br/>" ;
