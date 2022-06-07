@@ -101,7 +101,6 @@ class Sk_POB_WS {
 				"Prioritet: " . "IT4 <br/>" .
 				"Ansvarig grupp: " . "First Line IT <br/>" .
 				"WebbshopOrdernummer: " . "{$order->id} <br/>" .
-				"Kontor: " . "1 <br/>" .
 				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
 				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
 				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
