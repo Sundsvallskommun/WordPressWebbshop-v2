@@ -81,7 +81,7 @@ class Sk_POB_WS {
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
 				"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
-				"Virtual.Shop_Office" => "1",
+				"Virtual.Shop_Office" => "0",
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
 				"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
@@ -116,9 +116,14 @@ class Sk_POB_WS {
 				$meta_label = $m->get_data()['key'];
 				$pob_id = $this->get_pob_id($item, $meta_label);
 				
-				if ($pob_id) {
-					$data[$pob_id] = $m->get_data()['value'];
-					$memo .= $meta_label . ": " . $m->get_data()['value']. "<br/>" ;
+				if ( $pob_id ) {
+					if ( $pob_id == 'Virtual.Shop_Office' ) {
+						$value = $this->get_pob_boolean( $m->get_data()['value'] );
+					} else {
+						$value = $m->get_data()['value'];
+					}
+					$data[$pob_id] = $value;
+					$memo .= $meta_label . ": " . $value . "<br/>" ;
 				}
 			}
 
@@ -212,10 +217,24 @@ class Sk_POB_WS {
 	}
 
 	private function get_case_category_by_type() {
-		switch($this->pob_type) {
+		switch( $this->pob_type ) {
 			case 'pob':
 			default:
 				return 'Beställning av Hårdvara Advania';
+		}
+	}
+
+	private function get_pob_boolean( $value ) {
+		switch( $value ) {
+			case 1:
+			case '1':
+			case 'Ja':
+				return 'Yes';
+			case 0:
+			case '0':
+			case 'Nej':
+			default:
+				return 'No';
 		}
 	}
 }
