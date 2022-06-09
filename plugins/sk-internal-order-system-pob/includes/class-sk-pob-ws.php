@@ -65,6 +65,7 @@ class Sk_POB_WS {
 		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
 		$form = GFAPI::get_form( $form_id );
 		$casetype = rgar($form, 'form_type');
+		$casetype = ! empty( $casetype ) ? $casetype : 'Service Request';
 
 		foreach ($order_items as $item) {
 			$occupations .= get_occupation_string( $order, $item );
