@@ -387,7 +387,7 @@ function set_post_content( $entry, $form ) {
 
 	}
 	if ($send_with_pob) {
-		$sk_pob->create_pob_case($data, $memo);
+		$sk_pob->create_pob_case($data, $memo, 'pob_form');
 	}
 }
 
