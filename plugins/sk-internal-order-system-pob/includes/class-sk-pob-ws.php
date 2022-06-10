@@ -219,6 +219,8 @@ class Sk_POB_WS {
 
 	private function get_case_category_by_type() {
 		switch( $this->pob_type ) {
+			case 'pob_form':
+				return 'Felanmälan via formulär';
 			case 'pob':
 			default:
 				return 'Beställning av Hårdvara Advania';
