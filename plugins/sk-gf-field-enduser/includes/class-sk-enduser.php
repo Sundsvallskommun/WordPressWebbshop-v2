@@ -57,5 +57,4 @@ class SK_Enduser {
 			wp_send_json_error( $result );
 		}
 	}
-
 }

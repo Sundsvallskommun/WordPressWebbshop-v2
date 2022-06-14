@@ -106,7 +106,7 @@ class SK_POB {
 	 * @param  booelan $result
 	 * @param  string  $type  Type of product owner
 	 * @param  array   $owner The product owner
-	 * @param  array   $order WC_Order
+	 * @param  WC_Order   $order WC_Order
 	 * @param  array   $items The products associated with this product owner
 	 * @return void
 	 */
@@ -116,7 +116,7 @@ class SK_POB {
 		if ( ('pob' === $type && $this->has_credentials())) {
 			try {
 				// Init WS class.
-				$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password );
+				$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 
 				// Send order.
 				return $pob_ws->send_order( $order, $items );
@@ -129,8 +129,8 @@ class SK_POB {
 		return $result;
 	}
 
-	public function create_pob_case($data, $memo) {
-		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password );
+	public function create_pob_case($data, $memo, $type) {
+		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 		return $pob_ws->create_pob_case($data, $memo);
 	}
 }
