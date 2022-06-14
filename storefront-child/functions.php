@@ -359,6 +359,7 @@ function set_post_content( $entry, $form ) {
 	global $sk_pob;
 	$send_with_pob = false;
 	$casetype = rgar($form, 'form_type');
+	$casetype = ! empty( $casetype ) ? $casetype : 'Incident';
 	$data = [
 		"CaseType" => $casetype,
 		"Description" =>  "Test av Web Service Rest 1", 
