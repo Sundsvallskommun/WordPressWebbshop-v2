@@ -339,7 +339,7 @@ function sundsvall_form_type_setting( $settings, $form ) {
 			<select name="form_type" id="form_type">
 				<option value="0">Välj typ</option>
 				<option value="Service Request"' .( ( rgar($form, 'form_type') == 'Service Request' ) ? 'selected' : '' ) . '>Service Request</option>
-				<option value="Formulär"' . (( rgar($form, 'form_type') == 'Formulär' ) ? 'selected' : '') . '>Formulär</option>
+				<option value="Incident"' . (( rgar($form, 'form_type') == 'Incident' ) ? 'selected' : '') . '>Incident</option>
 			</select>
 		</td>
 	</tr>';
