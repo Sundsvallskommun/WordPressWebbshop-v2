@@ -66,7 +66,8 @@ class Sk_POB_WS {
 		$form = GFAPI::get_form( $form_id );
 		$casetype = rgar($form, 'form_type');
 		$casetype = ! empty( $casetype ) ? $casetype : 'Service Request';
-
+		$count = 1;
+		$total_items = count($order_items);
 		foreach ($order_items as $item) {
 			$occupations .= get_occupation_string( $order, $item );
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
@@ -75,7 +76,7 @@ class Sk_POB_WS {
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
 
 			$data = [
-				"Description" => "Beställning {$order->id} - {$item->get_name()}",
+				"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
 				"CaseType" => "{$casetype}",
 				"CaseCategory" => $this->get_case_category_by_type(),
 				"Contact.Customer" => $current_user->user_login,
@@ -97,7 +98,7 @@ class Sk_POB_WS {
 			];
 
 			$memo = 
-				"Beställning {$order->id} - {$item->get_name()} <br/><br/>".
+				"Beställning {$order->id} - {$item->get_name()} ($count/$total_items) <br/><br/>".
 				"Typ: " . "{$casetype} <br/>" .
 				"Prioritet: " . "IT4 <br/>" .
 				"Ansvarig grupp: " . "First Line IT <br/>" .
@@ -129,6 +130,7 @@ class Sk_POB_WS {
 			}
 
 			$this->create_pob_case($data, $memo);
+			$count++;
 		}
 	} 
 
