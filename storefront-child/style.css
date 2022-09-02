@@ -169,7 +169,7 @@ h1.product_title {
     font-family: "Font Awesome 5 Free" !important;
     margin-right: 8px;
 }
-#gform_168 .gform_confirmation_wrapper {
+.product .gform_confirmation_wrapper {
 	display:none;
 }
 
