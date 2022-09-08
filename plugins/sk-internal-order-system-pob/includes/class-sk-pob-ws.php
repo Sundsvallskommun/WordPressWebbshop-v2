@@ -83,6 +83,7 @@ class Sk_POB_WS {
 				"PriorityInfo.Priority" => "IT4",
 				"ResponsibleGroup" => "First Line IT",
 				"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
+				"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
 				"Virtual.Shop_Office" => "0",
 				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
@@ -103,6 +104,7 @@ class Sk_POB_WS {
 				"Prioritet: " . "IT4 <br/>" .
 				"Ansvarig grupp: " . "First Line IT <br/>" .
 				"Webbshop Ordernummer: " . "{$order->id} <br/>" .
+				"Antalet artiklar: " . "$count/$total_items <br/>" .
 				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
 				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
 				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
