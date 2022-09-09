@@ -361,11 +361,14 @@ function set_post_content( $entry, $form ) {
 	$form_title = rgar($form, 'title');
 	$casetype = rgar($form, 'form_type');
 	$casetype = ! empty( $casetype ) ? $casetype : 'Incident';
+	$current_user = wp_get_current_user();
+
 	$data = [
 		"CaseType" => $casetype,
 		"Description" => $form_title,
 		"PriorityInfo.Priority" =>  "IT4",
 		"ResponsibleGroup" => "First Line IT",
+		"Contact.Customer" => $current_user->user_login,
 	];
 
 	$memo = '';
