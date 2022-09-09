@@ -375,7 +375,7 @@ function set_post_content( $entry, $form ) {
 		$notification = rgar($field, "notificationType");
 
 		if (!empty($field_value)) {
-			$memo .= $field_label . ": " . $field_value.PHP_EOL;
+			$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
 		}
 
 		if ($pob_id) {
