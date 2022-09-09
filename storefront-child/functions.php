@@ -358,11 +358,12 @@ add_action( 'gform_after_submission', 'set_post_content', 10, 2 );
 function set_post_content( $entry, $form ) {
 	global $sk_pob;
 	$send_with_pob = false;
+	$form_title = rgar($form, 'title');
 	$casetype = rgar($form, 'form_type');
 	$casetype = ! empty( $casetype ) ? $casetype : 'Incident';
 	$data = [
 		"CaseType" => $casetype,
-		"Description" =>  "Test av Web Service Rest 1", 
+		"Description" => $form_title,
 		"PriorityInfo.Priority" =>  "IT4",
 		"ResponsibleGroup" => "First Line IT",
 	];
