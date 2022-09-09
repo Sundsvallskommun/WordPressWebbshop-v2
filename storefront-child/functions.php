@@ -365,6 +365,7 @@ function set_post_content( $entry, $form ) {
 
 	$data = [
 		"CaseType" => $casetype,
+		"CaseCategory" => "Felanmälan via formulär",
 		"Description" => $form_title,
 		"PriorityInfo.Priority" =>  "IT4",
 		"ResponsibleGroup" => "First Line IT",
