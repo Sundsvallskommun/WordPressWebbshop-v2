@@ -380,6 +380,8 @@ function set_post_content( $entry, $form ) {
 		$notification = rgar($field, "notificationType");
 
 		if (!empty($field_value)) {
+			$field_value = maybe_unserialize($field_value);
+			$field_value = is_array($field_value) ? implode(',', $field_value) : $field_value;
 			$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
 		}
 
