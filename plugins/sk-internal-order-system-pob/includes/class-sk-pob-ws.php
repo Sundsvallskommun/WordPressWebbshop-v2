@@ -34,6 +34,7 @@ class Sk_POB_WS {
 	 * @var string
 	 */
 	private $ws_create_task_url = '/pobg6/api/v110/cases';
+	private $ws_get_equipment_name_url = '/pobg6/api/v110/configurationitems?fields=Id,OptionalNumber&filter=Virtual.WebLookupPCandMore=LookupDator01,OptionalNumber=';
 
 	/**
 	 * Authenticates with the WebService on construct.
@@ -44,6 +45,7 @@ class Sk_POB_WS {
 	public function __construct( $base_url, $username, $password, $type ) {
 		// Set URLs.
 		$this->ws_create_task_url = untrailingslashit( $base_url ) . $this->ws_create_task_url;
+		$this->ws_get_equipment_name_url = untrailingslashit( $base_url ) . $this->ws_get_equipment_name_url;
 		
 
 		// Set credentials as class properties.
@@ -217,6 +219,57 @@ class Sk_POB_WS {
 
 			// Return a generic error message.
 			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		}
+		curl_close($ch);
+	}
+
+	public function get_equipment_name ($term) {
+		$ch = curl_init();
+		
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $this->ws_get_equipment_name_url . $term . '%',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'GET',
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		$err_no = curl_errno( $ch );
+		if ($status_code === 400 ) {
+			$message = json_decode($data);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			$data = json_decode($data);
+			return $data;
+		} else {
+
+			// Translators: WC_Order::ID.
+			SKW()->log( sprintf(
+				'PHP Notice: Failed to get equipment name from POB.',
+				$term,
+			), E_WARNING );
+
+			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
+			// Otherwise, log the incident and the request.
+			// Translators: the cURL response.
+			SKW()->log( sprintf( __( 'PHP Debug: Equipment Name cURL response: %2$s', 'sk-pob' ), $log_entry ), E_WARNING );
+
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid hämtning av utrustningsnamn.', 'sk-pob' ) );
 		}
 		curl_close($ch);
 	}
