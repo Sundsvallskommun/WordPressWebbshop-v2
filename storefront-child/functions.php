@@ -358,13 +358,18 @@ add_action( 'gform_after_submission', 'set_post_content', 10, 2 );
 function set_post_content( $entry, $form ) {
 	global $sk_pob;
 	$send_with_pob = false;
+	$form_title = rgar($form, 'title');
 	$casetype = rgar($form, 'form_type');
 	$casetype = ! empty( $casetype ) ? $casetype : 'Incident';
+	$current_user = wp_get_current_user();
+
 	$data = [
 		"CaseType" => $casetype,
-		"Description" =>  "Test av Web Service Rest 1", 
+		"CaseCategory" => "Felanmälan via formulär",
+		"Description" => $form_title,
 		"PriorityInfo.Priority" =>  "IT4",
 		"ResponsibleGroup" => "First Line IT",
+		"Contact.Customer" => $current_user->user_login,
 	];
 
 	$memo = '';
@@ -375,7 +380,9 @@ function set_post_content( $entry, $form ) {
 		$notification = rgar($field, "notificationType");
 
 		if (!empty($field_value)) {
-			$memo .= $field_label . ": " . $field_value.PHP_EOL;
+			$field_value = maybe_unserialize($field_value);
+			$field_value = is_array($field_value) ? implode(',', $field_value) : $field_value;
+			$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
 		}
 
 		if ($pob_id) {
