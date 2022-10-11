@@ -308,6 +308,7 @@ function sundsvall_editor_script(){
         fieldSettings.sk_conditional_owner += ', .pob_id_setting';
         fieldSettings['sk-enduser'] += ', .pob_id_setting';
         fieldSettings['sk-raindance-number'] += ', .pob_id_setting';
+        fieldSettings['sk-epuipment-name'] += ', .pob_id_setting';
         fieldSettings['sk-raindance-number'] += ', .raindance_number_type_setting';
         // binding to the load field settings event to initialize the checkbox
         jQuery(document).on('gform_load_field_settings', function(event, field, form){
