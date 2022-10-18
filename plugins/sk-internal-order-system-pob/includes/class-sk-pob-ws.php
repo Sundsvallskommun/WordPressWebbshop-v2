@@ -261,6 +261,7 @@ class Sk_POB_WS {
 			SKW()->log( sprintf(
 				'PHP Notice: Failed to get equipment name from POB.',
 				$term,
+				
 			), E_WARNING );
 
 			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
