@@ -58,9 +58,9 @@ class SK_Equipment_Name {
 					'text' => $row->Data->OptionalNumber
 				];
 			}
-			wp_send_json( $result );
+			wp_send_json( $output );
 		} else {
-			wp_send_json_error( $result );
+			wp_send_json_error( $output );
 		}
 	}
 
