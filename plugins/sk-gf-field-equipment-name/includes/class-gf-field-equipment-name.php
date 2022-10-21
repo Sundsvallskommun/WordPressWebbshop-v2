@@ -36,6 +36,7 @@ class GF_Field_Equipment_Name extends GF_Field {
 			'placeholder_setting',
 			'conditional_logic_field_setting',
 			'rules_setting',
+			'pob_id_setting'
 		);
 	}
 

@@ -133,7 +133,7 @@ class SK_POB {
 		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 		return $pob_ws->create_pob_case($data, $memo);
 	}
-		
+	
 	public function get_equipment_name ($term) {
 		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 		return $pob_ws->get_equipment_name($term);

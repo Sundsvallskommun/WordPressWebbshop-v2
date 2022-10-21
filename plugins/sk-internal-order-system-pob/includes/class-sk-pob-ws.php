@@ -260,7 +260,8 @@ class Sk_POB_WS {
 			// Translators: WC_Order::ID.
 			SKW()->log( sprintf(
 				'PHP Notice: Failed to get equipment name from POB.',
-				$term,
+				$term
+				
 			), E_WARNING );
 
 			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
