@@ -103,21 +103,21 @@ class Sk_POB_WS {
 			];
 
 			$memo = 
-				"Datum: {$date_string} <br/><br/>" .
-				"Beställning {$order->id} - {$item->get_name()} ($count/$total_items) <br/><br/>".
-				"Typ: " . "{$casetype} <br/>" .
-				"Prioritet: " . "IT4 <br/>" .
-				"Ansvarig grupp: " . "First Line IT <br/>" .
-				"Webbshop Ordernummer: " . "{$order->id} <br/>" .
-				"Antalet artiklar: " . "$count/$total_items <br/>" .
-				"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
-				"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .   
-				"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
-				"Artikelnummer: " . "{$sku} <br/>" .
-				"Beskrivning: " . "{$CI_description[1]} <br/>" .
-				"Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
-				"Telefonnummer: " . "{$order->data['billing']['phone']} <br/>" .
-				"Epost: " . "{$order->data['billing']['email']} <br/>" ;
+				"<strong>Datum:</strong> {$date_string} <br/><br/>" .
+				"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>".
+				"<strong>Typ:</strong> " . "{$casetype} <br/>" .
+				"<strong>Prioritet:</strong> " . "IT4 <br/>" .
+				"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
+				"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
+				"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
+				"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
+				"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .   
+				"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
+				"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
+				"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
+				"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
+				"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
+				"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>" ;
 			
 			$meta = $item->get_meta_data();
 
@@ -132,10 +132,10 @@ class Sk_POB_WS {
 						$value = $m->get_data()['value'];
 					}
 					$data[$pob_id] = $value;
-					$memo .= $meta_label . ": " . $value . "<br/>" ;
+					$memo .= "<strong>" . $meta_label . "</strong>: " . $value . "<br/>" ;
 				}
 			}
-
+			$memo = str_replace('&amp;', '&', $memo);
 			$this->create_pob_case($data, $memo);
 			$count++;
 		}

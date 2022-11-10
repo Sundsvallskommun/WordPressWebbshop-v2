@@ -347,7 +347,7 @@ function sundsvall_form_type_setting( $settings, $form ) {
  
     return $settings;
 }
- 
+
 // save your custom form setting
 add_filter( 'gform_pre_form_settings_save', 'save_sundsvall_form_type_setting' );
 function save_sundsvall_form_type_setting($form) {
@@ -381,18 +381,18 @@ function set_post_content( $entry, $form ) {
 		$pob_id = rgar($field, 'pobId');
 		$notification = rgar($field, "notificationType");
 
-		if ($field->type == 'section' && $field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare") {
+		if ($field->type == 'section' || $field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare") {
 			$memo .= "<br/><strong>" . $field_label . "</strong><br/>";
 		}
 
-		if ($field->type == "sk-equipment-name") {
+		if ($field->type == "sk-equipment-name" && $casetype == 'Incident') {
 			$device_info = explode( '|', $field_value );
 		}
 
 		if (!empty($field_value)) {
 			$field_value = maybe_unserialize($field_value);
 			$field_value = is_array($field_value) ? implode(',', $field_value) : $field_value;
-			if (isset($device_info[1])) {
+			if (isset($device_info[1]) && $field->type == 'sk-equipment-name') {
 				$memo .= "<strong>" . $field_label . "</strong>: " . $device_info[1] . "<br/>";
 			} else {
 				$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
@@ -400,7 +400,7 @@ function set_post_content( $entry, $form ) {
 		}
 
 		if ($pob_id) {
-			if (isset($device_info[0])) {
+			if (isset($device_info[0]) && $field->type =='sk-equipment-name') {
 				$data[$pob_id] = $device_info[0];
 			} else {
 				$data[$pob_id] = $field_value;
