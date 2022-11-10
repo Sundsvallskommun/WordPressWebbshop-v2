@@ -54,7 +54,7 @@ class SK_Equipment_Name {
 		if ( ! is_wp_error( $result ) ) {
 			foreach ( $result as $row) {
 				$output[] = [
-					'id' => $row->Data->Id,
+					'id' => $row->Data->Id . "|" . $row->Data->OptionalNumber,
 					'text' => $row->Data->OptionalNumber
 				];
 			}
