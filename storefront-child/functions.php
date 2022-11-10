@@ -358,11 +358,13 @@ function save_sundsvall_form_type_setting($form) {
 add_action( 'gform_after_submission', 'set_post_content', 10, 2 );
 function set_post_content( $entry, $form ) {
 	global $sk_pob;
+	date_default_timezone_set("Europe/Stockholm");
 	$send_with_pob = false;
 	$form_title = rgar($form, 'title');
 	$casetype = rgar($form, 'form_type');
 	$casetype = ! empty( $casetype ) ? $casetype : 'Incident';
 	$current_user = wp_get_current_user();
+	$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
 
 	$data = [
 		"CaseType" => $casetype,
@@ -372,21 +374,37 @@ function set_post_content( $entry, $form ) {
 		"Contact.Customer" => $current_user->user_login,
 	];
 
-	$memo = '';
+	$memo = "Datum: " . $date_string . "<br/>";
 	foreach ($form['fields'] as $field) {
 		$field_label = $field->label;
 		$field_value = rgar($entry, $field->id);
 		$pob_id = rgar($field, 'pobId');
 		$notification = rgar($field, "notificationType");
 
+		if ($field->type == 'section' && $field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare") {
+			$memo .= "<br/><strong>" . $field_label . "</strong><br/>";
+		}
+
+		if ($field->type == "sk-equipment-name") {
+			$device_info = explode( '|', $field_value );
+		}
+
 		if (!empty($field_value)) {
 			$field_value = maybe_unserialize($field_value);
 			$field_value = is_array($field_value) ? implode(',', $field_value) : $field_value;
-			$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
+			if (isset($device_info[1])) {
+				$memo .= "<strong>" . $field_label . "</strong>: " . $device_info[1] . "<br/>";
+			} else {
+				$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
+			}
 		}
 
 		if ($pob_id) {
-			$data[$pob_id] = $field_value;
+			if (isset($device_info[0])) {
+				$data[$pob_id] = $device_info[0];
+			} else {
+				$data[$pob_id] = $field_value;
+			}
 		}
 
 		if (!empty($notification) && $field_value == $notification) {
