@@ -381,7 +381,7 @@ function set_post_content( $entry, $form ) {
 		$pob_id = rgar($field, 'pobId');
 		$notification = rgar($field, "notificationType");
 
-		if ($field->type == 'section' || $field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare") {
+		if ($field->type == 'section' && ($field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare")) {
 			$memo .= "<br/><strong>" . $field_label . "</strong><br/>";
 		}
 
