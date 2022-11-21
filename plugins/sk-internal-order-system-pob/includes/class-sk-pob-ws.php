@@ -73,7 +73,7 @@ class Sk_POB_WS {
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
 		foreach ($order_items as $item) {
-			$occupations .= get_occupation_string( $order, $item );
+			$occupations = get_occupation_string( $order, $item );
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
 			$product = $item->get_product();
