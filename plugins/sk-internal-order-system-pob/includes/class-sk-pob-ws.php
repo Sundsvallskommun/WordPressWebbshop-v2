@@ -78,6 +78,7 @@ class Sk_POB_WS {
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
 			$product = $item->get_product();
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
+			$quantity = $item->get_quantity();
 
 			$data = [
 				"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
@@ -136,7 +137,9 @@ class Sk_POB_WS {
 				}
 			}
 			$memo = str_replace('&amp;', '&', $memo);
-			$this->create_pob_case($data, $memo);
+			$this->create_pob_case($data, $memo, function($message) use ($order) {
+				$order->add_order_note($message);
+			});
 			$count++;
 		}
 	} 
@@ -158,7 +161,7 @@ class Sk_POB_WS {
 		return false;
 	}
 
-	public function create_pob_case($data, $memo) {
+	public function create_pob_case($data, $memo, $error_callback) {
 		$memo = str_replace('&amp;', '&', $memo);
 		// Init cURL.
  		$ch = curl_init();
@@ -170,7 +173,7 @@ class Sk_POB_WS {
 					"Extension" => ".html", 
 					"IsValidForWeb" => false, 
 					"Style" => 2,
-					"Memo" => $memo
+					"Memo" => $memo,
 				] 
 			]
 		];
@@ -191,6 +194,92 @@ class Sk_POB_WS {
 			CURLOPT_SSL_VERIFYHOST => 0,
 			CURLOPT_SSL_VERIFYPEER => 0
 		));
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		
+		$err_no = curl_errno( $ch );
+		$message = json_decode($data);
+
+		if ($status_code === 400 ) {
+			call_user_func( $error_callback, $message->Message);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( ! curl_errno( $ch )) { 
+			if (isset($message->UserMessage)) {
+				call_user_func( $error_callback, $message->UserMessage); //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			}
+			return json_decode( $data );
+		} else {
+			call_user_func( $error_callback, $message->UserMessage);
+			// Try to get the error from headers.
+			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
+				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+
+			// Translators: WC_Order::ID.
+			SKW()->log( sprintf(
+				'PHP Notice: Failed to export WC_Order #%1$s to POB in %2$s. Message from POB: %3$s',
+				$order->get_id(),
+				__FILE__,
+				$error
+			), E_WARNING );
+
+			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
+			// Otherwise, log the incident and the request.
+			// Translators: the cURL response.
+			SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-pob' ), $order->get_id(), $log_entry ), E_WARNING );
+
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		}
+		curl_close($ch);
+	}
+
+	public function create_pob_attachment ($data, $file) {
+		if (!isset($data[0])) {
+			return false;
+		}
+		$url = $this->ws_create_task_url . '/' . $data[0]->Data->Id . '/attachments/';
+		$basename = basename($file);
+		$ext = substr(strrchr($basename, '.'), 1);
+		$ch = curl_init();
+		$file_path = $this->attachment_url_to_path($file);
+		$file_data = file_get_contents($file_path);
+		$mime_type = mime_content_type($file_path);
+		$base64 = $mime_type . ';base64,' . base64_encode($file_data);
+		$post_fields = [
+			"Type" => "BinaryData",
+			"Data" => [
+				"OriginalFileName" => $basename,
+				"IsSystem" => false,
+				"IsStoredInDB" => true,
+				"FileType" => '.' . $ext,
+				"IsOkForWeb" => true,
+				"Keywords" => "test",
+				"LocalLink" => false,
+				"FileData" => 'data:' . $base64
+			]
+		];
+	
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'PUT',
+			CURLOPT_POSTFIELDS => json_encode($post_fields),
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+
 		// Execute request.
 		$data = curl_exec( $ch );
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -301,5 +390,19 @@ class Sk_POB_WS {
 			default:
 				return 'No';
 		}
+	}
+	private function attachment_url_to_path( $url ) {
+		$parsed_url = parse_url( $url );
+		if(empty($parsed_url['path'])){
+			return false;
+		} 
+
+		$file = ABSPATH . ltrim( $parsed_url['path'], '/');
+
+		if (file_exists( $file)) {
+			return $file;
+		}
+
+		return false;
 	}
 }
