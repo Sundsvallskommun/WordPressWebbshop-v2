@@ -411,11 +411,36 @@ function set_post_content( $entry, $form ) {
 			$send_with_pob = true;
 		}
 
+		if ($field->type == 'fileupload') {
+			$file = $field_value;
+		}
+
 	}
 	if ($send_with_pob) {
-		$sk_pob->create_pob_case($data, $memo, 'pob_form');
+		$data = $sk_pob->create_pob_case($data, $memo, 'pob_form');
+		if (isset($file)) {
+			$sk_pob->create_pob_attachment($data, $file);
+		} 
 	}
 }
+
+add_filter( 'woocommerce_cart_item_quantity', function( $product_quantity, $cart_item_key, $cart_item ) {
+	$cart = WC()->cart->get_cart();
+	foreach ($cart as $cart_item_key => $cart_item) {
+		$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+		$pob_fields = $_product->get_meta('sk_pob_fields');
+		foreach($pob_fields as $pob_field) {
+			if ($pob_field == 'yes') {
+				$hide_product_quantity = true;
+			}
+		}
+		if ( $hide_product_quantity ) {
+			$product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_item_key );
+		} 
+	}	
+	return $product_quantity;
+}, 10, 3);
+
 
 function console_log($output, $with_script_tags = true) {
     $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . ');';

@@ -33,6 +33,7 @@ class SK_POB_Product_Fields {
 		'Underkonto' => null,
 		'Motpart' => 115,
 		'Externt artikelnummer' => null,
+		'Dölj antal artiklar' => null,
 	);
 
 	/**
@@ -102,17 +103,28 @@ class SK_POB_Product_Fields {
 			foreach ( $this->FIELDS as $field => $default_value ) {
 				// Check if we have a saved value.
 				$value = ( $values && ! empty( $values[ $field ] ) ) ? $values[ $field ] : $default_value;
-
 				// Create field.
-				woocommerce_wp_text_input( array(
-					'id'			=> self::$FIELDS_META_KEY . '[' . $field . ']',
-					'wrapper_class'	=> '',
-					'label'			=> $field,
-					'description'	=> sprintf( __( 'Fyll i %s.', 'skios' ), $field ),
-					'default'		=> '0',
-					'value'			=> $value,
-					'desc_tip'		=> false,
-				) );
+				if ($field !== 'Dölj antal artiklar') {
+					woocommerce_wp_text_input( array(
+						'id'			=> self::$FIELDS_META_KEY . '[' . $field . ']',
+						'wrapper_class'	=> '',
+						'label'			=> $field,
+						'description'	=> sprintf( __( 'Fyll i %s.', 'skios' ), $field ),
+						'default'		=> '0',
+						'value'			=> $value,
+						'desc_tip'		=> false,
+					) );
+				} else {
+					woocommerce_wp_checkbox( array(
+						'id'            => self::$FIELDS_META_KEY . '[' . $field . ']',
+						'wrapper_class' => '',
+						'label'         => $field,
+						'description'   => 'Inaktivera fältet ' . $field,
+						'default'       => 'no',
+						'value'         => $value,
+						'desc_tip'      => false,
+					) );
+				}
 			}
 			?>
 		</div>

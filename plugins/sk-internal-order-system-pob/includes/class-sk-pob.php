@@ -1,141 +1,408 @@
 <?php
 /**
- * SK_pob
- * ======
+ * SK_pob_WS
+ * ==========
  *
- * Main plugin file.
- *
- * Register hooks and filters.
+ * Wrapper class for sending order data to the pob WebService.
  *
  * @since   0.1
  * @package SK_pob
  */
 
-class SK_POB {
+class Sk_POB_WS {
 
 	/**
-	 * Singleton instance of class.
-	 * @var null|SK_POB
+	 * Given username.
+	 * @var string
 	 */
-	private static $instance = null;
+	private $ws_username;
 
 	/**
-	 * Sets up the plugin correctly regarding hooks etc.
+	 * Given password.
+	 * @var string
 	 */
-	public function __construct() {
-		// Get all values from options.
-		$this->url      = get_option( 'pob_url' );
-		$this->username = get_option( 'pob_username' );
-		$this->password = get_option( 'pob_password' );
+	private $ws_password;
 
-		spl_autoload_register( array( $this, 'register_autoload' ) );
+	/**
+	 * Type of POB case to send.
+	 * @var string
+	 */
+	private $pob_type;
 
-		// Init classes.
-		$this->init_classes();
+	/**
+	 * The URL for the endpoint for creating tasks.
+	 * @var string
+	 */
+	private $ws_create_task_url = '/pobg6/api/v110/cases';
+	private $ws_get_equipment_name_url = '/pobg6/api/v110/configurationitems?fields=Id,OptionalNumber&filter=Virtual.WebLookupPCandMore=LookupDator01,OptionalNumber=';
 
-		// Add our product owner type.
-		add_filter( 'skios_product_owner_types', array( $this, 'add_pob_as_product_owner_type' ) );
+	/**
+	 * Authenticates with the WebService on construct.
+	 * @param string $base_url
+	 * @param string $username
+	 * @param string $password
+	 */
+	public function __construct( $base_url, $username, $password, $type ) {
+		// Set URLs.
+		$this->ws_create_task_url = untrailingslashit( $base_url ) . $this->ws_create_task_url;
+		$this->ws_get_equipment_name_url = untrailingslashit( $base_url ) . $this->ws_get_equipment_name_url;
+		
 
-		// Hook in to the order notification action.
-		add_filter( 'skios_order_notification', array( $this, 'handle_pob_order_notification' ), 10, 5 );
+		// Set credentials as class properties.
+		$this->ws_username = $username;
+		$this->ws_password = $password;
+		$this->pob_type = $type;
 	}
 
 	/**
-	 * Returns Singleton instance of class.
-	 * @return SK_POB
+	 * Sends an order to the pob WebService.
+	 * @param  WC_Order $order
+	 * @param  array    $order_items Array of products
+	 * @return
 	 */
-	public static function get_instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new self();
+	// "Virtual.Shop_JoinContact" => "test01test",
+	// "Virtual.Shop_ForvaltningBolag" => "{$item->get_meta('Arbetsplats')}",
+	public function send_order( WC_Order $order, $order_items ) {
+		$current_user = wp_get_current_user();
+		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
+		$form = GFAPI::get_form( $form_id );
+		$casetype = rgar($form, 'form_type');
+		$casetype = ! empty( $casetype ) ? $casetype : 'Service Request';
+		$count = 1;
+		$total_items = count($order_items);
+		date_default_timezone_set("Europe/Stockholm");
+		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
+		foreach ($order_items as $item) {
+			$occupations = get_occupation_string( $order, $item );
+			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
+			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+			$product = $item->get_product();
+			$sku = $product !== false ? $product->get_sku() : $item->get_id();
+			$quantity = $item->get_quantity();
+
+			$data = [
+				"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
+				"CaseType" => "{$casetype}",
+				"CaseCategory" => $this->get_case_category_by_type(),
+				"Contact.Customer" => $current_user->user_login,
+				"PriorityInfo.Priority" => "IT4",
+				"ResponsibleGroup" => "First Line IT",
+				"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
+				"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
+				"Virtual.Shop_Office" => "0",
+				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
+				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
+				"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
+				"Virtual.Shop_ServiceIdExternalSync" => "{$sku}",
+				"Virtual.Shop_CI_Description" => "{$CI_description[1]}",
+				"Virtual.Shop_Adr_Gatuadress" => "{$order->data['billing']['address_1']}",
+				"Virtual.Shop_Adr_Postnr" => "{$order->data['billing']['postcode']}",
+				"Virtual.Shop_Adr_Postort" => "{$order->data['billing']['city']}",
+				"Virtual.Shop_Kontaktperson" => "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}",
+				"Virtual.Shop_Telefonnummer" => "{$order->data['billing']['phone']}",
+				"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
+			];
+
+			$memo = 
+				"<strong>Datum:</strong> {$date_string} <br/><br/>" .
+				"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>".
+				"<strong>Typ:</strong> " . "{$casetype} <br/>" .
+				"<strong>Prioritet:</strong> " . "IT4 <br/>" .
+				"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
+				"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
+				"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
+				"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
+				"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .   
+				"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
+				"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
+				"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
+				"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
+				"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
+				"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>" ;
+			
+			$meta = $item->get_meta_data();
+
+			foreach ($meta as $m) {
+				$meta_label = $m->get_data()['key'];
+				$pob_id = $this->get_pob_id($item, $meta_label);
+				
+				if ( $pob_id ) {
+					if ( $pob_id == 'Virtual.Shop_Office' ) {
+						$value = $this->get_pob_boolean( $m->get_data()['value'] );
+					} else {
+						$value = $m->get_data()['value'];
+					}
+					$data[$pob_id] = $value;
+					$memo .= "<strong>" . $meta_label . "</strong>: " . $value . "<br/>" ;
+				}
+			}
+			$memo = str_replace('&amp;', '&', $memo);
+			$this->create_pob_case($data, $memo, function($message) use ($order) {
+				$order->add_order_note($message);
+			});
+			$count++;
 		}
+	} 
 
-		return self::$instance;
-	}
-
-	/**
-	 * Registers our autoloader.
-	 * @param  string $class Class name
-	 * @return void
-	 */
-	public function register_autoload( $class ) {
-		// Only load plugin class files.
-		if ( false !== strpos( $class, 'SK_POB' ) ) {
-			// Change all _ to - and to lowercase.
-			$class = strtolower( str_replace( '_', '-', $class ) );
-
-			// Include file.
-			include __DIR__ . '/class-' . $class . '.php';
-		}
-	}
-
-	/**
-	 * Helper function for checking if pob credentials
-	 * are set.
-	 * @return boolean
-	 */
-	private function has_credentials() {
-		return ! empty( $this->url ) && ! empty( $this->username ) && ! empty( $this->password );
-	}
-
-	/**
-	 * Initiates classes.
-	 * @return void
-	 */
-	private function init_classes() {
-
-		if ( is_admin() ) {
-			require_once __DIR__ . '/../admin/class-sk-pob-settings.php';
-			$this->admin_settings = new SK_POB_Settings();
-		}
-	}
-
-	/**
-	 * Adds pob as a product owner type.
-	 * @param  array $types
-	 * @return array
-	 */
-	public function add_pob_as_product_owner_type( $types ) {
-		if ( empty( $types[ 'pob' ] ) ) {
-			$types[ 'pob' ] = 'POB';
-		}
-		return $types;
-	}
-
-	/**
-	 * Creates and sends an order to pob.
-	 * @param  booelan $result
-	 * @param  string  $type  Type of product owner
-	 * @param  array   $owner The product owner
-	 * @param  WC_Order   $order WC_Order
-	 * @param  array   $items The products associated with this product owner
-	 * @return void
-	 */
-	public function handle_pob_order_notification( $result, $type, $owner, $order, $items ) {
-		// Only handle pob orders.
-		// Also make sure we have credentials.
-		if ( ('pob' === $type && $this->has_credentials())) {
-			try {
-				// Init WS class.
-				$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
-
-				// Send order.
-				return $pob_ws->send_order( $order, $items );
-			} catch ( Exception $e ) {
-				// Couldn't connect to pob. Return a WP_Error.
-				return new WP_Error( 'pob_connection_failed', 'Något gick fel vid beställningen.' );
+	private function get_pob_id($item, $field_label) {
+		$gravity_form_data = get_post_meta( $item->get_product_id(), '_gravity_form_data', true );
+		$gravityform       = null;
+		if ( is_array( $gravity_form_data ) && isset( $gravity_form_data['id'] ) && is_numeric( $gravity_form_data['id'] ) ) {
+			$form_meta = RGFormsModel::get_form_meta( $gravity_form_data['id'] );
+			if ( ! empty( $form_meta ) ) {
+				$gravityform = RGFormsModel::get_form( $gravity_form_data['id'] );
+			}
+			foreach ($form_meta['fields'] as $field) {
+				if ($field->label == $field_label) {
+					return rgar($field, 'pobId');
+				}
 			}
 		}
-		
-		return $result;
+		return false;
 	}
 
-	public function create_pob_case($data, $memo, $type) {
-		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
-		return $pob_ws->create_pob_case($data, $memo);
+	public function create_pob_case($data, $memo, $error_callback) {
+		$memo = str_replace('&amp;', '&', $memo);
+		// Init cURL.
+ 		$ch = curl_init();
+		$post_fields = [
+			"Type" => "Case",
+			"Data" => $data,
+			"Memo" => [
+				"Problem"=> [
+					"Extension" => ".html", 
+					"IsValidForWeb" => false, 
+					"Style" => 2,
+					"Memo" => $memo,
+				] 
+			]
+		];
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $this->ws_create_task_url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'PUT',
+			CURLOPT_POSTFIELDS => json_encode($post_fields),
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		
+		$err_no = curl_errno( $ch );
+		$message = json_decode($data);
+
+		if ($status_code === 400 ) {
+			call_user_func( $error_callback, $message->Message);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( ! curl_errno( $ch )) { 
+			if (isset($message->UserMessage)) {
+				call_user_func( $error_callback, $message->UserMessage); //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			}
+			return json_decode( $data );
+		} else {
+			call_user_func( $error_callback, $message->UserMessage);
+			// Try to get the error from headers.
+			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
+				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+
+			// Translators: WC_Order::ID.
+			SKW()->log( sprintf(
+				'PHP Notice: Failed to export WC_Order #%1$s to POB in %2$s. Message from POB: %3$s',
+				$order->get_id(),
+				__FILE__,
+				$error
+			), E_WARNING );
+
+			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
+			// Otherwise, log the incident and the request.
+			// Translators: the cURL response.
+			SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-pob' ), $order->get_id(), $log_entry ), E_WARNING );
+
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		}
+		curl_close($ch);
 	}
+
+	public function create_pob_attachment ($data, $file) {
+		if (!isset($data[0])) {
+			return false;
+		}
+		$url = $this->ws_create_task_url . '/' . $data[0]->Data->Id . '/attachments/';
+		$basename = basename($file);
+		$ext = substr(strrchr($basename, '.'), 1);
+		$ch = curl_init();
+		$file_path = $this->attachment_url_to_path($file);
+		$file_data = file_get_contents($file_path);
+		$mime_type = mime_content_type($file_path);
+		$base64 = $mime_type . ';base64,' . base64_encode($file_data);
+		$post_fields = [
+			"Type" => "BinaryData",
+			"Data" => [
+				"OriginalFileName" => $basename,
+				"IsSystem" => false,
+				"IsStoredInDB" => true,
+				"FileType" => '.' . $ext,
+				"IsOkForWeb" => true,
+				"Keywords" => "test",
+				"LocalLink" => false,
+				"FileData" => 'data:' . $base64
+			]
+		];
 	
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'PUT',
+			CURLOPT_POSTFIELDS => json_encode($post_fields),
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		$err_no = curl_errno( $ch );
+		if ($status_code === 400 ) {
+			$message = json_decode($data);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			return true;
+		} else {
+			// Try to get the error from headers.
+			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
+				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
+
+			// Translators: WC_Order::ID.
+			SKW()->log( sprintf(
+				'PHP Notice: Failed to export WC_Order #%1$s to POB in %2$s. Message from POB: %3$s',
+				$order->get_id(),
+				__FILE__,
+				$error
+			), E_WARNING );
+
+			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
+			// Otherwise, log the incident and the request.
+			// Translators: the cURL response.
+			SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-pob' ), $order->get_id(), $log_entry ), E_WARNING );
+
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		}
+		curl_close($ch);
+	}
+
 	public function get_equipment_name ($term) {
-		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
-		return $pob_ws->get_equipment_name($term);
+		$ch = curl_init();
+		
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $this->ws_get_equipment_name_url . $term . '%',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'GET',
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		$err_no = curl_errno( $ch );
+		if ($status_code === 400 ) {
+			$message = json_decode($data);
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			$data = json_decode($data);
+			return $data;
+		} else {
+
+			// Translators: WC_Order::ID.
+			SKW()->log( sprintf(
+				'PHP Notice: Failed to get equipment name from POB.',
+				$term
+				
+			), E_WARNING );
+
+			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
+			// Otherwise, log the incident and the request.
+			// Translators: the cURL response.
+			SKW()->log( sprintf( __( 'PHP Debug: Equipment Name cURL response: %2$s', 'sk-pob' ), $log_entry ), E_WARNING );
+
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid hämtning av utrustningsnamn.', 'sk-pob' ) );
+		}
+		curl_close($ch);
+	}
+
+	private function get_case_category_by_type() {
+		switch( $this->pob_type ) {
+			case 'pob_form':
+				return 'Felanmälan via formulär';
+			case 'pob':
+			default:
+				return 'Beställning av Hårdvara Advania';
+		}
+	}
+
+	private function get_pob_boolean( $value ) {
+		switch( $value ) {
+			case 1:
+			case '1':
+			case 'Ja':
+				return 'Yes';
+			case 0:
+			case '0':
+			case 'Nej':
+			default:
+				return 'No';
+		}
+	}
+	private function attachment_url_to_path( $url ) {
+		$parsed_url = parse_url( $url );
+		if(empty($parsed_url['path'])){
+			return false;
+		} 
+
+		$file = ABSPATH . ltrim( $parsed_url['path'], '/');
+
+		if (file_exists( $file)) {
+			return $file;
+		}
+
+		return false;
 	}
 }
