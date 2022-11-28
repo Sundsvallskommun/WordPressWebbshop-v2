@@ -426,21 +426,38 @@ function set_post_content( $entry, $form ) {
 
 add_filter( 'woocommerce_cart_item_quantity', function( $product_quantity, $cart_item_key, $cart_item ) {
 	$cart = WC()->cart->get_cart();
-	foreach ($cart as $cart_item_key => $cart_item) {
-		$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
-		$pob_fields = $_product->get_meta('sk_pob_fields');
-		foreach($pob_fields as $pob_field) {
-			if ($pob_field == 'yes') {
-				$hide_product_quantity = true;
-			}
+	$_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+	$pob_fields = $_product->get_meta('sk_pob_fields');
+	foreach($pob_fields as $pob_field) {
+		if ($pob_field == 'yes') {
+			$hide_product_quantity = true;
 		}
-		if ( $hide_product_quantity ) {
-			$product_quantity = sprintf( '1 <input type="hidden" name="cart[%s][qty]" value="1" />', $cart_item_key );
-		} 
-	}	
+	}
+	if ( $hide_product_quantity ) {
+		$product_quantity = sprintf(
+			'%d <input type="hidden" name="cart[%s][qty]" value="%d" />',
+			$cart_item['quantity'],
+			$cart_item_key,
+			$cart_item['quantity']
+		);
+	}
 	return $product_quantity;
 }, 10, 3);
 
+if ( $_SERVER['REQUEST_URI'] != ('/varukorg/')) {
+	add_action('woocommerce_before_quantity_input_field', 'remove_quantity_field');
+	function remove_quantity_field () {
+		global $product;
+		$id = $product->get_id();
+		$product_jadda = wc_get_product($id);
+		$pob_fields = $product_jadda->get_meta('sk_pob_fields');
+		foreach($pob_fields as $pob_field) {
+			if ($pob_field == 'yes') { ?>
+				<style type="text/css">.quantity, .buttons_added { width:0; height:0; display: none; visibility: hidden; }</style>
+			<?php }
+		}
+	}
+}
 
 function console_log($output, $with_script_tags = true) {
     $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . ');';
