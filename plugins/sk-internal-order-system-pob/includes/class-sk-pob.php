@@ -125,20 +125,25 @@ class SK_POB {
 				return new WP_Error( 'pob_connection_failed', 'Något gick fel vid beställningen.' );
 			}
 		}
-		
+
 		return $result;
 	}
 
-	public function create_pob_case($data, $memo, $type) {
-		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
-		return $pob_ws->create_pob_case($data, $memo);
+	public function create_pob_case($data, $memo, $order, $error_callback) {
+		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $error_callback );
+		return $pob_ws->create_pob_case($data, $memo, $order, $error_callback);
 	}
-	
+
+	public function create_pob_case_error_report($data, $memo, $error_callback) {
+		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $error_callback );
+		return $pob_ws->create_pob_case_error_report($data, $memo, $error_callback);
+	}
+
 	public function get_equipment_name ($term) {
 		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 		return $pob_ws->get_equipment_name($term);
 	}
-	
+
 	public function create_pob_attachment($data, $file) {
 		$pob_ws = new SK_POB_WS( $this->url, $this->username, $this->password, $type );
 		return $pob_ws->create_pob_attachment($data, $file);
