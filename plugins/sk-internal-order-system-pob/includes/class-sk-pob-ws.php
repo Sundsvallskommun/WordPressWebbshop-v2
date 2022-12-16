@@ -46,7 +46,7 @@ class Sk_POB_WS {
 		// Set URLs.
 		$this->ws_create_task_url = untrailingslashit( $base_url ) . $this->ws_create_task_url;
 		$this->ws_get_equipment_name_url = untrailingslashit( $base_url ) . $this->ws_get_equipment_name_url;
-		
+
 
 		// Set credentials as class properties.
 		$this->ws_username = $username;
@@ -78,7 +78,7 @@ class Sk_POB_WS {
 			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
 			$product = $item->get_product();
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
-			$quantity = $item->get_quantity();
+
 
 			$data = [
 				"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
@@ -103,7 +103,7 @@ class Sk_POB_WS {
 				"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
 			];
 
-			$memo = 
+			$memo =
 				"<strong>Datum:</strong> {$date_string} <br/><br/>" .
 				"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>".
 				"<strong>Typ:</strong> " . "{$casetype} <br/>" .
@@ -112,20 +112,20 @@ class Sk_POB_WS {
 				"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
 				"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
 				"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
-				"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .   
-				"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .   
+				"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .
+				"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
 				"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
 				"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
 				"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
 				"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
 				"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>" ;
-			
+
 			$meta = $item->get_meta_data();
 
 			foreach ($meta as $m) {
 				$meta_label = $m->get_data()['key'];
 				$pob_id = $this->get_pob_id($item, $meta_label);
-				
+
 				if ( $pob_id ) {
 					if ( $pob_id == 'Virtual.Shop_Office' ) {
 						$value = $this->get_pob_boolean( $m->get_data()['value'] );
@@ -137,12 +137,12 @@ class Sk_POB_WS {
 				}
 			}
 			$memo = str_replace('&amp;', '&', $memo);
-			$this->create_pob_case($data, $memo, function($message) use ($order) {
+			$this->create_pob_case($data, $memo, $order, function($message) use ($order) {
 				$order->add_order_note($message);
 			});
 			$count++;
 		}
-	} 
+	}
 
 	private function get_pob_id($item, $field_label) {
 		$gravity_form_data = get_post_meta( $item->get_product_id(), '_gravity_form_data', true );
@@ -161,7 +161,7 @@ class Sk_POB_WS {
 		return false;
 	}
 
-	public function create_pob_case($data, $memo, $error_callback) {
+	public function create_pob_case($data, $memo, $order, $error_callback ) {
 		$memo = str_replace('&amp;', '&', $memo);
 		// Init cURL.
  		$ch = curl_init();
@@ -170,11 +170,11 @@ class Sk_POB_WS {
 			"Data" => $data,
 			"Memo" => [
 				"Problem"=> [
-					"Extension" => ".html", 
-					"IsValidForWeb" => false, 
+					"Extension" => ".html",
+					"IsValidForWeb" => false,
 					"Style" => 2,
 					"Memo" => $memo,
-				] 
+				]
 			]
 		];
 		curl_setopt_array($ch, array(
@@ -197,22 +197,32 @@ class Sk_POB_WS {
 		// Execute request.
 		$data = curl_exec( $ch );
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		
+
 		$err_no = curl_errno( $ch );
 		$message = json_decode($data);
+		$the_message = $message->Message;
+		if (isset($message->UserMessage)){
+			$user_message = $message->UserMessage;
+		}
 
 		if ($status_code === 400 ) {
-			call_user_func( $error_callback, $message->Message);
-			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
+			call_user_func( $error_callback, $the_message);
+
+			// If an error occurs send mail to admin
+			$this->send_error_mail_to_admin( $the_message, 'Ett fel uppstod vid kommunikation med POB: ', $order );
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $the_message);
+
 		}
 		// Check if we had any errors and if the HTTP status code was 201.
-		if ( ! curl_errno( $ch )) { 
-			if (isset($message->UserMessage)) {
-				call_user_func( $error_callback, $message->UserMessage); //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+		if ( !$err_no ) {
+			if ($user_message) {
+				call_user_func( $error_callback, $user_message); //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
 			}
 			return json_decode( $data );
-		} else {
-			call_user_func( $error_callback, $message->UserMessage);
+		} elseif ( $order ) {
+			if ($user_message){
+				call_user_func( $error_callback, $user_message);
+			}
 			// Try to get the error from headers.
 			$error = ( isset( SKW()->get_headers_from_curl( $data )['ErrorDescription'] ) ) ?
 				SKW()->get_headers_from_curl( $data )['ErrorDescription'] : '';
@@ -225,6 +235,9 @@ class Sk_POB_WS {
 				$error
 			), E_WARNING );
 
+			// If an error occurs send mail to admin
+			$this->send_error_mail_to_admin( $the_message, 'Något gick fel vid beställningen.', null );
+
 			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
 			// Otherwise, log the incident and the request.
 			// Translators: the cURL response.
@@ -232,11 +245,87 @@ class Sk_POB_WS {
 
 			// Return a generic error message.
 			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		} else {
+
+			// If an error occurs send mail to admin
+			$this->send_error_mail_to_admin( $the_message, 'Något gick fel vid beställningen.', null );
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
 		}
+
 		curl_close($ch);
 	}
 
-	public function create_pob_attachment ($data, $file) {
+	public function create_pob_case_error_report($data, $memo, $error_callback ) {
+		$memo = str_replace('&amp;', '&', $memo);
+		// Init cURL.
+ 		$ch = curl_init();
+		$post_fields = [
+			"Type" => "Case",
+			"Data" => $data,
+			"Memo" => [
+				"Problem"=> [
+					"Extension" => ".html",
+					"IsValidForWeb" => false,
+					"Style" => 2,
+					"Memo" => $memo,
+				]
+			]
+		];
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $this->ws_create_task_url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'PUT',
+			CURLOPT_POSTFIELDS => json_encode($post_fields),
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: ' . $this->ws_username . ' ' . $this->ws_password,
+			  'Content-Type: application/json'
+			),
+			CURLOPT_SSL_VERIFYHOST => 0,
+			CURLOPT_SSL_VERIFYPEER => 0
+		));
+		// Execute request.
+		$data = curl_exec( $ch );
+		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		$err_no = curl_errno( $ch );
+		$message = json_decode($data);
+		$the_message = $message->Message;
+		if (isset($message->UserMessage)){
+			$user_message = $message->UserMessage;
+		}
+
+		if ($status_code === 400 ) {
+			call_user_func( $error_callback, $the_message);
+
+			// If an error occurs send mail to admin
+			$this->send_error_mail_to_admin( $the_message, 'Ett fel uppstod vid kommunikation med POB: ', null );
+			error_log("Ett fel uppstod vid kommunikation med POB: " . $the_message);
+
+		}
+		// Check if we had any errors and if the HTTP status code was 201.
+		if ( !$err_no ) {
+			if ($user_message) {
+				call_user_func( $error_callback, $user_message); //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+			}
+			return json_decode( $data );
+		} else {
+
+			// If an error occurs send mail to admin
+			$this->send_error_mail_to_admin( $the_message, 'Något gick fel vid beställningen.', null );
+			// Return a generic error message.
+			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
+		}
+
+		curl_close($ch);
+	}
+
+	public function create_pob_attachment ( $data, $file ) {
 		if (!isset($data[0])) {
 			return false;
 		}
@@ -261,7 +350,7 @@ class Sk_POB_WS {
 				"FileData" => 'data:' . $base64
 			]
 		];
-	
+
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
@@ -290,7 +379,7 @@ class Sk_POB_WS {
 			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
 		}
 		// Check if we had any errors and if the HTTP status code was 201.
-		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+		if ( !$err_no ) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
 			return true;
 		} else {
 			// Try to get the error from headers.
@@ -299,8 +388,7 @@ class Sk_POB_WS {
 
 			// Translators: WC_Order::ID.
 			SKW()->log( sprintf(
-				'PHP Notice: Failed to export WC_Order #%1$s to POB in %2$s. Message from POB: %3$s',
-				$order->get_id(),
+				'PHP Notice: Failed to create attachment to POB in %1$s. Message from POB: %2$s',
 				__FILE__,
 				$error
 			), E_WARNING );
@@ -308,7 +396,7 @@ class Sk_POB_WS {
 			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
 			// Otherwise, log the incident and the request.
 			// Translators: the cURL response.
-			SKW()->log( sprintf( __( 'PHP Debug: WC_Order #%1$s cURL response: %2$s', 'sk-pob' ), $order->get_id(), $log_entry ), E_WARNING );
+			SKW()->log( sprintf( __( 'PHP Debug: Create attachment cURL response: %1$s', 'sk-pob' ), $log_entry ), E_WARNING );
 
 			// Return a generic error message.
 			return new WP_Error( 'pob_error', __( 'Något gick fel vid beställningen.', 'sk-pob' ) );
@@ -318,7 +406,7 @@ class Sk_POB_WS {
 
 	public function get_equipment_name ($term) {
 		$ch = curl_init();
-		
+
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $this->ws_get_equipment_name_url . $term . '%',
 			CURLOPT_RETURNTRANSFER => true,
@@ -345,7 +433,7 @@ class Sk_POB_WS {
 			error_log("Ett fel uppstod vid kommunikation med POB: " . $message->Message);
 		}
 		// Check if we had any errors and if the HTTP status code was 201.
-		if ( ! curl_errno( $ch )) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
+		if ( ! $err_no ) {  //&& curl_getinfo( $ch, CURLINFO_HTTP_CODE ) === 201
 			$data = json_decode($data);
 			return $data;
 		} else {
@@ -354,13 +442,13 @@ class Sk_POB_WS {
 			SKW()->log( sprintf(
 				'PHP Notice: Failed to get equipment name from POB.',
 				$term
-				
+
 			), E_WARNING );
 
 			$log_entry = str_replace( "\r", ' ', str_replace( "\n", ' ', $data ) );
 			// Otherwise, log the incident and the request.
 			// Translators: the cURL response.
-			SKW()->log( sprintf( __( 'PHP Debug: Equipment Name cURL response: %2$s', 'sk-pob' ), $log_entry ), E_WARNING );
+			SKW()->log( sprintf( __( 'PHP Debug: Equipment Name cURL response: %1$s', 'sk-pob' ), $log_entry ), E_WARNING );
 
 			// Return a generic error message.
 			return new WP_Error( 'pob_error', __( 'Något gick fel vid hämtning av utrustningsnamn.', 'sk-pob' ) );
@@ -395,7 +483,7 @@ class Sk_POB_WS {
 		$parsed_url = parse_url( $url );
 		if(empty($parsed_url['path'])){
 			return false;
-		} 
+		}
 
 		$file = ABSPATH . ltrim( $parsed_url['path'], '/');
 
@@ -404,5 +492,14 @@ class Sk_POB_WS {
 		}
 
 		return false;
+	}
+
+	private function send_error_mail_to_admin( $message, $error_type, $order ){
+		$to_admin = get_option( 'admin_email' );
+		$mail_header = 'Content-Type: text/html; charset=UTF-8';
+		if( !$order ){
+			return wp_mail( $to_admin, $error_type, $message, $mail_header );
+		}
+		return wp_mail( $to_admin, $error_type, $message . $order->get_id(), $mail_header );
 	}
 }
