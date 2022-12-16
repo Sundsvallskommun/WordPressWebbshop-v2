@@ -249,7 +249,7 @@ add_action( 'customize_register', 'support_url_setting' );
 
 add_action( 'gform_field_standard_settings', 'sundsvall_standard_settings', 10, 2 );
 function sundsvall_standard_settings( $position, $form_id ) {
-  
+
     //create settings on position 25 (right after Field Label)
     if ( $position == 25 ) {
         ?>
@@ -344,7 +344,7 @@ function sundsvall_form_type_setting( $settings, $form ) {
 			</select>
 		</td>
 	</tr>';
- 
+
     return $settings;
 }
 
@@ -376,9 +376,9 @@ function set_post_content( $entry, $form ) {
 
 	$memo = "Datum: " . $date_string . "<br/>";
 	foreach ($form['fields'] as $field) {
-		$field_label = $field->label;
-		$field_value = rgar($entry, $field->id);
-		$pob_id = rgar($field, 'pobId');
+   		$field_label = $field->label;
+ 		$field_value = rgar($entry, $field->id);
+ 		$pob_id = rgar($field, 'pobId');
 		$notification = rgar($field, "notificationType");
 
 		if ($field->type == 'section' && ($field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare")) {
@@ -393,13 +393,13 @@ function set_post_content( $entry, $form ) {
 			$field_value = maybe_unserialize($field_value);
 			$field_value = is_array($field_value) ? implode(',', $field_value) : $field_value;
 			if (isset($device_info[1]) && $field->type == 'sk-equipment-name') {
-				$memo .= "<strong>" . $field_label . "</strong>: " . $device_info[1] . "<br/>";
+				$memo .=  $field_label . ": " . $device_info[1] . "<br/>";
 			} else {
-				$memo .= "<strong>" . $field_label . "</strong>: " . $field_value . "<br/>";
+				$memo .= $field_label . ": " . $field_value . "<br/>";
 			}
 		}
 
-		if ($pob_id) {
+ 		if ($pob_id) {
 			if (isset($device_info[0]) && $field->type =='sk-equipment-name') {
 				$data[$pob_id] = $device_info[0];
 			} else {
@@ -417,10 +417,10 @@ function set_post_content( $entry, $form ) {
 
 	}
 	if ($send_with_pob) {
-		$data = $sk_pob->create_pob_case($data, $memo, 'pob_form');
+		$data = $sk_pob->create_pob_case_error_report($data, $memo, 'pob_form');
 		if (isset($file)) {
 			$sk_pob->create_pob_attachment($data, $file);
-		} 
+		}
 	}
 }
 
