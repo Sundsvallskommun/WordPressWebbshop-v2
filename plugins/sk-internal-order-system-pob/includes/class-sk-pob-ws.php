@@ -62,85 +62,89 @@ class Sk_POB_WS {
 	 */
 	// "Virtual.Shop_JoinContact" => "test01test",
 	// "Virtual.Shop_ForvaltningBolag" => "{$item->get_meta('Arbetsplats')}",
-	public function send_order( WC_Order $order, $order_items ) {
+	public function send_order(WC_Order $order, $order_items)
+	{
 		$current_user = wp_get_current_user();
 		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
-		$form = GFAPI::get_form( $form_id );
+		$form = GFAPI::get_form($form_id);
 		$casetype = rgar($form, 'form_type');
-		$casetype = ! empty( $casetype ) ? $casetype : 'Service Request';
-		$count = 1;
+		$casetype = !empty($casetype) ? $casetype : 'Service Request';
+		// $count = 1;
 		$total_items = count($order_items);
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
 		foreach ($order_items as $item) {
-			$occupations = get_occupation_string( $order, $item );
+			$item_count = $item->get_quantity();
+			$occupations = get_occupation_string($order, $item);
 			preg_match("/<span id='occupationString'>(.*?)<\/span><br>/s", $occupations, $CI_description);
-			$item_pob_fields = get_post_meta( $item['product_id'], 'sk_pob_fields', true );
+			$item_pob_fields = get_post_meta($item['product_id'], 'sk_pob_fields', true);
 			$product = $item->get_product();
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
 
+			for ($i = 0; $i < $item_count; $i++) {
+				$count = $i + 1;
+				$data = [
+					"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$item_count)",
+					"CaseType" => "{$casetype}",
+					"CaseCategory" => $this->get_case_category_by_type(),
+					"Contact.Customer" => $current_user->user_login,
+					"PriorityInfo.Priority" => "IT4",
+					"ResponsibleGroup" => "First Line IT",
+					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
+					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$item_count",
+					"Virtual.Shop_Office" => "0",
+					"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
+					"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
+					"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
+					"Virtual.Shop_ServiceIdExternalSync" => "{$sku}",
+					"Virtual.Shop_CI_Description" => "{$CI_description[1]}",
+					"Virtual.Shop_Adr_Gatuadress" => "{$order->data['billing']['address_1']}",
+					"Virtual.Shop_Adr_Postnr" => "{$order->data['billing']['postcode']}",
+					"Virtual.Shop_Adr_Postort" => "{$order->data['billing']['city']}",
+					"Virtual.Shop_Kontaktperson" => "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}",
+					"Virtual.Shop_Telefonnummer" => "{$order->data['billing']['phone']}",
+					"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
+				];
 
-			$data = [
-				"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
-				"CaseType" => "{$casetype}",
-				"CaseCategory" => $this->get_case_category_by_type(),
-				"Contact.Customer" => $current_user->user_login,
-				"PriorityInfo.Priority" => "IT4",
-				"ResponsibleGroup" => "First Line IT",
-				"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
-				"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
-				"Virtual.Shop_Office" => "0",
-				"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
-				"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
-				"Virtual.Shop_ExterntArtikelnummer" => "{$item_pob_fields['Externt artikelnummer']}",
-				"Virtual.Shop_ServiceIdExternalSync" => "{$sku}",
-				"Virtual.Shop_CI_Description" => "{$CI_description[1]}",
-				"Virtual.Shop_Adr_Gatuadress" => "{$order->data['billing']['address_1']}",
-				"Virtual.Shop_Adr_Postnr" => "{$order->data['billing']['postcode']}",
-				"Virtual.Shop_Adr_Postort" => "{$order->data['billing']['city']}",
-				"Virtual.Shop_Kontaktperson" => "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']}",
-				"Virtual.Shop_Telefonnummer" => "{$order->data['billing']['phone']}",
-				"Virtual.Shop_Epost" => "{$order->data['billing']['email']}",
-			];
+				$memo =
+					"<strong>Datum:</strong> {$date_string} <br/><br/>" .
+					"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$item_count) </strong><br/><br/>" .
+					"<strong>Typ:</strong> " . "{$casetype} <br/>" .
+					"<strong>Prioritet:</strong> " . "IT4 <br/>" .
+					"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
+					"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
+					"<strong>Antalet artiklar:</strong> " . "$count/$item_count <br/>" .
+					"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
+					"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .
+					"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
+					"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
+					"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
+					"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
+					"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
+					"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>";
 
-			$memo =
-				"<strong>Datum:</strong> {$date_string} <br/><br/>" .
-				"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>".
-				"<strong>Typ:</strong> " . "{$casetype} <br/>" .
-				"<strong>Prioritet:</strong> " . "IT4 <br/>" .
-				"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
-				"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
-				"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
-				"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
-				"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .
-				"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
-				"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
-				"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
-				"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
-				"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
-				"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>" ;
+				$meta = $item->get_meta_data();
 
-			$meta = $item->get_meta_data();
+				foreach ($meta as $m) {
+					$meta_label = $m->get_data()['key'];
+					$pob_id = $this->get_pob_id($item, $meta_label);
 
-			foreach ($meta as $m) {
-				$meta_label = $m->get_data()['key'];
-				$pob_id = $this->get_pob_id($item, $meta_label);
-
-				if ( $pob_id ) {
-					if ( $pob_id == 'Virtual.Shop_Office' ) {
-						$value = $this->get_pob_boolean( $m->get_data()['value'] );
-					} else {
-						$value = $m->get_data()['value'];
+					if ($pob_id) {
+						if ($pob_id == 'Virtual.Shop_Office') {
+							$value = $this->get_pob_boolean($m->get_data()['value']);
+						} else {
+							$value = $m->get_data()['value'];
+						}
+						$data[$pob_id] = $value;
+						$memo .= "<strong>" . $meta_label . "</strong>: " . $value . "<br/>";
 					}
-					$data[$pob_id] = $value;
-					$memo .= "<strong>" . $meta_label . "</strong>: " . $value . "<br/>" ;
 				}
+				$memo = str_replace('&amp;', '&', $memo);
+				$this->create_pob_case($data, $memo, $order, function ($message) use ($order) {
+					$order->add_order_note($message);
+				});
+				// $count++;
 			}
-			$memo = str_replace('&amp;', '&', $memo);
-			$this->create_pob_case($data, $memo, $order, function($message) use ($order) {
-				$order->add_order_note($message);
-			});
-			$count++;
 		}
 	}
 
