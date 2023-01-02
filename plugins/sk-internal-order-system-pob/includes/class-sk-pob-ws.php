@@ -70,10 +70,15 @@ class Sk_POB_WS {
 		$form = GFAPI::get_form($form_id);
 		$casetype = rgar($form, 'form_type');
 		$casetype = !empty($casetype) ? $casetype : 'Service Request';
-		// $count = 1;
-		$total_items = count($order_items);
+		// $total_items = count($order_items);
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
+		$total_items = 0;
+		$count = 1;
+
+		foreach( $order_items as $item ){
+			$total_items = $total_items + $item->get_quantity();
+		}
 		foreach ($order_items as $item) {
 			$item_count = $item->get_quantity();
 			$occupations = get_occupation_string($order, $item);
@@ -83,16 +88,16 @@ class Sk_POB_WS {
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
 
 			for ($i = 0; $i < $item_count; $i++) {
-				$count = $i + 1;
+				// $count = $i + 1;
 				$data = [
-					"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$item_count)",
+					"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
 					"CaseType" => "{$casetype}",
 					"CaseCategory" => $this->get_case_category_by_type(),
 					"Contact.Customer" => $current_user->user_login,
 					"PriorityInfo.Priority" => "IT4",
 					"ResponsibleGroup" => "First Line IT",
 					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
-					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$item_count",
+					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
 					"Virtual.Shop_Office" => "0",
 					"Virtual.Shop_Kst_Underkonto" => "{$item_pob_fields['Underkonto']}",
 					"Virtual.Shop_Kst_Motpart" => "{$item_pob_fields['Motpart']}",
@@ -109,12 +114,12 @@ class Sk_POB_WS {
 
 				$memo =
 					"<strong>Datum:</strong> {$date_string} <br/><br/>" .
-					"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$item_count) </strong><br/><br/>" .
+					"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>" .
 					"<strong>Typ:</strong> " . "{$casetype} <br/>" .
 					"<strong>Prioritet:</strong> " . "IT4 <br/>" .
 					"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
 					"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
-					"<strong>Antalet artiklar:</strong> " . "$count/$item_count <br/>" .
+					"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
 					"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
 					"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .
 					"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
@@ -144,7 +149,7 @@ class Sk_POB_WS {
 				$this->create_pob_case($data, $memo, $order, function ($message) use ($order) {
 					$order->add_order_note($message);
 				});
-				// $count++;
+				$count++;
 			}
 		}
 	}

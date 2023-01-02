@@ -35,26 +35,26 @@
 			}
 		},
 		maybeChangeQty: function() {
-			if ( this.conditionalLogic ) {
-				if ( $( this.conditionalLogic.requiredField ).is( ':checked' ) ) {
-					this.hideQty();
-				} else {
-					this.showQty();
-				}
+			// if ( this.conditionalLogic ) {
+			// 	if ( $( this.conditionalLogic.requiredField ).is( ':checked' ) ) {
+			// 		this.hideQty();
+			// 	} else {
+			// 		this.showQty();
+			// 	}
 
-				return;
-			}
+			// 	return;
+			// }
 
-			if ( this.el.value.trim().length > 0 ) {
-				this.hideQty();
-			} else {
+			// if ( this.el.value.trim().length > 0 ) {
+			// 	this.hideQty();
+			// } else {
 				this.showQty();
-			}
+			// }
 		},
-		hideQty: function() {
-			$( this.qty ).hide();
-			this.setQty( 1 );
-		},
+		// hideQty: function() {
+		// 	$( this.qty ).hide();
+		// 	this.setQty( 1 );
+		// },
 		showQty: function() {
 			$( this.qty ).show();
 		},
