@@ -131,7 +131,20 @@ class Sk_POB_WS {
 
 				$meta = $item->get_meta_data();
 
-				foreach ($meta as $m) {
+				if ( isset($form_section) ){
+					foreach ($form_section as $field){
+						$memo .= "<strong>$field->label</strong><br/><br/>";
+					}
+				}
+				foreach ($form['fields'] as $field) {
+					if ($field->type == 'section'){
+						$memo .= "<strong>$field->label</strong><br/><br/>";
+					}
+					$m = $this->get_meta_by_key($field->label, $meta);
+					if (!$m){
+						continue;
+					}
+					
 					$meta_label = $m->get_data()['key'];
 					$pob_id = $this->get_pob_id($item, $meta_label);
 
@@ -152,6 +165,15 @@ class Sk_POB_WS {
 				$count++;
 			}
 		}
+	}
+
+	private function get_meta_by_key($key, $meta){
+		foreach($meta as $m){
+			if($key == $m->get_data()['key']){
+				return $m;
+			}
+		}
+		return false;
 	}
 
 	private function get_pob_id($item, $field_label)
