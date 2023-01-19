@@ -66,9 +66,6 @@ class Sk_POB_WS {
 	public function send_order(WC_Order $order, $order_items)
 	{
 		$current_user = wp_get_current_user();
-		$form_id = RGFormsModel::get_form_id('Hårdvarubeställning - Advania');
-		$form = GFAPI::get_form($form_id);
-
 		// $total_items = count($order_items);
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
