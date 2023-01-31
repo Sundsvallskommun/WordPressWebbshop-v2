@@ -66,10 +66,6 @@ class Sk_POB_WS {
 	public function send_order(WC_Order $order, $order_items)
 	{
 		$current_user = wp_get_current_user();
-		$form_id = RGFormsModel::get_form_id('Slutanvändare på utrustning');
-		$form = GFAPI::get_form($form_id);
-		$casetype = rgar($form, 'form_type');
-		$casetype = !empty($casetype) ? $casetype : 'Service Request';
 		// $total_items = count($order_items);
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
@@ -86,7 +82,10 @@ class Sk_POB_WS {
 			$item_pob_fields = get_post_meta($item['product_id'], 'sk_pob_fields', true);
 			$product = $item->get_product();
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
-
+			$form_id = get_post_meta( $item['product_id'], '_gravity_form_data', true );
+			$form = GFAPI::get_form($form_id['id']);
+			$casetype = rgar($form, 'form_type');
+			$casetype = !empty($casetype) ? $casetype : 'Service Request';
 			for ($i = 0; $i < $item_count; $i++) {
 				// $count = $i + 1;
 				$data = [
@@ -130,8 +129,19 @@ class Sk_POB_WS {
 					"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>";
 
 				$meta = $item->get_meta_data();
-
-				foreach ($meta as $m) {
+				if ( isset($form_section) ){
+					foreach ($form_section as $field){
+						$memo .= "<strong>$field->label</strong><br/><br/>";
+					}
+				}
+				foreach ($form['fields'] as $field) {
+					if ($field->type == 'section'){
+						$memo .= "<strong>$field->label</strong><br/><br/>";
+					}
+					$m = $this->get_meta_by_key($field->label, $meta);
+					if (!$m){
+						continue;
+					}
 					$meta_label = $m->get_data()['key'];
 					$pob_id = $this->get_pob_id($item, $meta_label);
 
@@ -152,6 +162,15 @@ class Sk_POB_WS {
 				$count++;
 			}
 		}
+	}
+
+	private function get_meta_by_key($key, $meta){
+		foreach($meta as $m){
+			if($key == $m->get_data()['key']){
+				return $m;
+			}
+		}
+		return false;
 	}
 
 	private function get_pob_id($item, $field_label)
