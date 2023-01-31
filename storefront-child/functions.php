@@ -431,7 +431,7 @@ add_filter( 'woocommerce_cart_item_quantity', function( $product_quantity, $cart
 	foreach($pob_fields as $pob_field) {
 		if ($pob_field == 'yes') {
 			$hide_product_quantity = true;
-		}
+		} 
 	}
 	if ( $hide_product_quantity ) {
 		$product_quantity = sprintf(
