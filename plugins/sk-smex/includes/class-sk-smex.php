@@ -70,7 +70,7 @@ class SK_SMEX {
 
 		register_activation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'install' ] );
 		register_deactivation_hook( SK_SMEX_FILE, [ 'SK_SMEX_Install', 'uninstall' ] );
-		
+
 		// Check if we can successfully connect to SMEX.
 		$this->is_smex_active = $this->init_smex();
 		if ( $this->is_smex_active && is_user_logged_in() ) {
@@ -168,7 +168,7 @@ class SK_SMEX {
 	public function update_searchable_persons() {
 		$return = 0;
 
-		if ( $this->smex_api ) { 
+		if ( $this->smex_api ) {
 			// Get the remote persons.
 			$persons = $this->smex_api->get_all_endusers();
 
@@ -205,7 +205,7 @@ class SK_SMEX {
 	private function init_smex() {
 		try {
 			$this->smex_api = SK_SMEX_API::get_instance();
-			
+
 			return true;
 		} catch ( Throwable $e ) {
 			error_log( __( 'Couldn\'t connect to SMEX.', 'sk-smex' ) );
@@ -300,7 +300,8 @@ class SK_SMEX {
 					'type'			=> 'text',
 					'label'			=> __( 'Aktivitetsnummer', 'sk-smex' ),
 					'class'			=> array(),
-					'required'		=> $this->smex_api->is_activity_number_required(),
+					'required'		=> false,
+					// 'required'		=> $this->smex_api->is_activity_number_required(),
 					'clear'			=> true,
 					'label_class'	=> '',
 					'default'		=> '',
@@ -360,7 +361,7 @@ class SK_SMEX {
 				case 'shipping_first_name':
 					$new_value = $this->smex_api->get_user_data( 'Givenname' );
 				break;
-				
+
 				case 'billing_last_name':
 				case 'shipping_last_name':
 					$new_value = $this->smex_api->get_user_data( 'Lastname' );
@@ -462,7 +463,7 @@ class SK_SMEX {
 
 		// Change the country arg depending on how many
 		// we added.
-		
+
 		// Check if we added all.
 		if ( ( $original_count + count( $this->ADDITIONAL_BILLING_FIELDS ) ) === count( $billing ) ) {
 			$billing[ 'country' ] = $billing[ 'country' ] . '_ALL_ADDITIONAL';
@@ -514,7 +515,7 @@ class SK_SMEX {
 
 			// Get the correct country value.
 			$correct_country = substr( $values[ '{country}' ], 0, 2 );
-			
+
 			// Get the full country name.
 			$full_country = ( isset( $wc_countries->countries[ $correct_country ] ) ) ? $wc_countries->countries[ $correct_country ] : $correct_country;
 
@@ -527,10 +528,10 @@ class SK_SMEX {
 			// Check if this billing field exists.
 			if ( ! empty( $args[ substr( $id, 8 ) ] ) ) {
 				// Add it's value.
-				$values[ '{' . substr( $id, 8 ) . '}' ] = $args[ substr( $id, 8 ) ]; 
+				$values[ '{' . substr( $id, 8 ) . '}' ] = $args[ substr( $id, 8 ) ];
 
 				// Add it's uppercase value (don't know if this is necessary).
-				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = $args[ substr( $id, 8 ) ]; 
+				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = $args[ substr( $id, 8 ) ];
 			} else {
 				$values[ '{' . substr( $id, 8 ) . '}' ] = '';
 				$values[ '{' . substr( $id, 8 ) . '_upper}' ] = '';
