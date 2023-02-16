@@ -93,8 +93,8 @@ class Sk_POB_WS {
 					"CaseType" => "{$casetype}",
 					"CaseCategory" => $this->get_case_category_by_type(),
 					"Contact.Customer" => $current_user->user_login,
-					"PriorityInfo.Priority" => "IT4",
-					"ResponsibleGroup" => "First Line IT",
+					"PriorityInfo.Priority" => "",
+					"ResponsibleGroup" => "IT Support",
 					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
 					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
 					"Virtual.Shop_Office" => "0",
@@ -265,7 +265,7 @@ class Sk_POB_WS {
 			), E_WARNING);
 
 			// If an error occurs send mail to admin
-			$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
+				$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
 
 			$log_entry = str_replace("\r", ' ', str_replace("\n", ' ', $data));
 			// Otherwise, log the incident and the request.
