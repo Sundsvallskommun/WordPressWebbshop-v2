@@ -265,11 +265,8 @@ class Sk_POB_WS {
 			), E_WARNING);
 
 			// If an error occurs send mail to admin
-			$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
-
-
-
-
+				$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
+				
 			$log_entry = str_replace("\r", ' ', str_replace("\n", ' ', $data));
 			// Otherwise, log the incident and the request.
 			// Translators: the cURL response.
