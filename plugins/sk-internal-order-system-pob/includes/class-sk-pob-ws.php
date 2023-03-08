@@ -93,7 +93,7 @@ class Sk_POB_WS {
 					"CaseType" => "{$casetype}",
 					"CaseCategory" => $this->get_case_category_by_type(),
 					"Contact.Customer" => $current_user->user_login,
-					"PriorityInfo.Priority" => "",
+					"PriorityInfo.Priority" => "Oläst",
 					"ResponsibleGroup" => "IT Support",
 					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
 					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
@@ -115,8 +115,8 @@ class Sk_POB_WS {
 					"<strong>Datum:</strong> {$date_string} <br/><br/>" .
 					"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>" .
 					"<strong>Typ:</strong> " . "{$casetype} <br/>" .
-					"<strong>Prioritet:</strong> " . "IT4 <br/>" .
-					"<strong>Ansvarig grupp:</strong> " . "First Line IT <br/>" .
+					"<strong>Prioritet:</strong> " . "Oläst <br/>" .
+					"<strong>Ansvarig grupp:</strong> " . "IT Support <br/>" .
 					"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
 					"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
 					"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
@@ -265,7 +265,13 @@ class Sk_POB_WS {
 			), E_WARNING);
 
 			// If an error occurs send mail to admin
+			if ( $the_message ){
 				$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
+			} else{
+				$this->send_error_mail_to_admin('Gick inte ansluta till PoB ', 'Något gick fel vid beställningen.', $order);
+			}
+
+
 
 			$log_entry = str_replace("\r", ' ', str_replace("\n", ' ', $data));
 			// Otherwise, log the incident and the request.
