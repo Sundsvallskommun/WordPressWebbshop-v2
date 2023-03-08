@@ -265,11 +265,8 @@ class Sk_POB_WS {
 			), E_WARNING);
 
 			// If an error occurs send mail to admin
-			if ( $the_message ){
-				$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
-			} else{
-				$this->send_error_mail_to_admin('Gick inte ansluta till PoB ', 'Något gick fel vid beställningen.', $order);
-			}
+			$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
+
 
 
 
