@@ -515,7 +515,7 @@ function update_username_on_email_change($user_id)
 	// Match special characters after the dot of the user email if it contains any take only the first two otherwise take the first three
 	$dot_pos = strrpos($new_email, '.', -5);
 	if ($dot_pos !== false) {
-		if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', substr($new_email, $dot_pos + 1, 3))){
+		if (preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, $dot_pos + 1, 3))){
 			$username .= substr($new_email, $dot_pos + 1, 2);
 		} else {
 			$username .= substr($new_email, $dot_pos + 1, 3);
