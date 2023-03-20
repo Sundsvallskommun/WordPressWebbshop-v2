@@ -490,6 +490,9 @@ if ($_SERVER['REQUEST_URI'] != ('/varukorg/')) {
  */
 function update_username_on_email_change($user_id)
 {
+	if (is_page() || is_single() || is_cart() || is_checkout() || is_account_page() || is_wc_endpoint_url()) {
+		return;
+	}
 	$userdata = get_userdata($user_id);
 	$old_username = $userdata->user_login;
 	$new_email = $userdata->user_email;
