@@ -10,7 +10,8 @@
  * @package SK_pob
  */
 
-class Sk_POB_WS {
+class Sk_POB_WS
+{
 
 	/**
 	 * Given username.
@@ -43,7 +44,8 @@ class Sk_POB_WS {
 	 * @param string $username
 	 * @param string $password
 	 */
-	public function __construct($base_url, $username, $password, $type) {
+	public function __construct($base_url, $username, $password, $type)
+	{
 		// Set URLs.
 		$this->ws_create_task_url = untrailingslashit($base_url) . $this->ws_create_task_url;
 		$this->ws_get_equipment_name_url = untrailingslashit($base_url) . $this->ws_get_equipment_name_url;
@@ -72,7 +74,7 @@ class Sk_POB_WS {
 		$total_items = 0;
 		$count = 1;
 
-		foreach( $order_items as $item ){
+		foreach ($order_items as $item) {
 			$total_items = $total_items + $item->get_quantity();
 		}
 		foreach ($order_items as $item) {
@@ -82,7 +84,7 @@ class Sk_POB_WS {
 			$item_pob_fields = get_post_meta($item['product_id'], 'sk_pob_fields', true);
 			$product = $item->get_product();
 			$sku = $product !== false ? $product->get_sku() : $item->get_id();
-			$form_id = get_post_meta( $item['product_id'], '_gravity_form_data', true );
+			$form_id = get_post_meta($item['product_id'], '_gravity_form_data', true);
 			$form = GFAPI::get_form($form_id['id']);
 			$casetype = rgar($form, 'form_type');
 			$casetype = !empty($casetype) ? $casetype : 'Service Request';
@@ -112,34 +114,36 @@ class Sk_POB_WS {
 				];
 
 				$memo =
-					"<strong>Datum:</strong> {$date_string} <br/><br/>" .
-					"<strong>Beställning {$order->id} - {$item->get_name()} ($count/$total_items) </strong><br/><br/>" .
-					"<strong>Typ:</strong> " . "{$casetype} <br/>" .
-					"<strong>Prioritet:</strong> " . "Oläst <br/>" .
-					"<strong>Ansvarig grupp:</strong> " . "IT Support <br/>" .
-					"<strong>Webbshop Ordernummer:</strong> " . "{$order->id} <br/>" .
-					"<strong>Antalet artiklar:</strong> " . "$count/$total_items <br/>" .
-					"<strong>Underkonto:</strong> " . "{$item_pob_fields['Underkonto']} <br/>" .
-					"<strong>Motpart:</strong> " . "{$item_pob_fields['Motpart']} <br/>" .
-					"<strong>Externt Artikelnummer:</strong> " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
-					"<strong>Artikelnummer:</strong> " . "{$sku} <br/>" .
-					"<strong>Beskrivning:</strong> " . "{$CI_description[1]} <br/>" .
-					"<strong>Kontaktperson:</strong> " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
-					"<strong>Telefonnummer:</strong> " . "{$order->data['billing']['phone']} <br/>" .
-					"<strong>Epost:</strong> " . "{$order->data['billing']['email']} <br/>";
+					"Datum: {$date_string} <br/><br/>" .
+					"Beställning {$order->id} - {$item->get_name()} ($count/$total_items) <br/><br/>" .
+					"Typ: " . "{$casetype} <br/>" .
+					"Prioritet: " . "Oläst <br/>" .
+					"Ansvarig grupp: " . "IT Support <br/>" .
+					"Webbshop Ordernummer: " . "{$order->id} <br/>" .
+					"Antalet artiklar: " . "$count/$total_items <br/>" .
+					"Underkonto: " . "{$item_pob_fields['Underkonto']} <br/>" .
+					"Motpart: " . "{$item_pob_fields['Motpart']} <br/>" .
+					"Externt Artikelnummer: " . "{$item_pob_fields['Externt artikelnummer']} <br/>" .
+					"Artikelnummer: " . "{$sku} <br/>" .
+					"Beskrivning: " . "{$CI_description[1]} <br/>" .
+					"Kontaktperson: " . "{$order->data['billing']['first_name']} {$order->data['billing']['last_name']} <br/>" .
+					"Telefonnummer: " . "{$order->data['billing']['phone']} <br/>" .
+					"Epost: " . "{$order->data['billing']['email']} <br/>";
 
 				$meta = $item->get_meta_data();
-				if ( isset($form_section) ){
-					foreach ($form_section as $field){
+				if (isset($form_section)) {
+					foreach ($form_section as $field) {
 						$memo .= "<strong>$field->label</strong><br/><br/>";
 					}
 				}
 				foreach ($form['fields'] as $field) {
-					if ($field->type == 'section'){
+					if ($field->type == 'section' && $field[0]) {
 						$memo .= "<strong>$field->label</strong><br/><br/>";
+					} elseif ($field->type == 'section') {
+						$memo .= "<br/><strong>$field->label</strong><br/><br/>";
 					}
 					$m = $this->get_meta_by_key($field->label, $meta);
-					if (!$m){
+					if (!$m) {
 						continue;
 					}
 					$meta_label = $m->get_data()['key'];
@@ -152,7 +156,7 @@ class Sk_POB_WS {
 							$value = $m->get_data()['value'];
 						}
 						$data[$pob_id] = $value;
-						$memo .= "<strong>" . $meta_label . "</strong>: " . $value . "<br/>";
+						$memo .= $meta_label . ": " . $value . "<br/>";
 					}
 				}
 				$memo = str_replace('&amp;', '&', $memo);
@@ -164,9 +168,10 @@ class Sk_POB_WS {
 		}
 	}
 
-	private function get_meta_by_key($key, $meta){
-		foreach($meta as $m){
-			if($key == $m->get_data()['key']){
+	private function get_meta_by_key($key, $meta)
+	{
+		foreach ($meta as $m) {
+			if ($key == $m->get_data()['key']) {
 				return $m;
 			}
 		}
@@ -191,10 +196,13 @@ class Sk_POB_WS {
 		return false;
 	}
 
-	public function create_pob_case($data, $memo, $order, $error_callback) {
+	public function create_pob_case($data, $memo, $order, $error_callback)
+	{
+
+		//clean memo
 		$memo = str_replace('&amp;', '&', $memo);
-		// Init cURL.
-		$ch = curl_init();
+
+		// Set up post fields.
 		$post_fields = [
 			"Type" => "Case",
 			"Data" => $data,
@@ -207,6 +215,9 @@ class Sk_POB_WS {
 				]
 			]
 		];
+
+		// Set up curl configuration.
+		$ch = curl_init();
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $this->ws_create_task_url,
 			CURLOPT_RETURNTRANSFER => true,
@@ -224,11 +235,14 @@ class Sk_POB_WS {
 			CURLOPT_SSL_VERIFYHOST => 0,
 			CURLOPT_SSL_VERIFYPEER => 0
 		));
+
 		// Execute request.
 		$data = curl_exec($ch);
 		$status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+		// Last error number.
 		$err_no = curl_errno($ch);
+
 		$message = json_decode($data);
 		$the_message = $message->Message;
 		if (isset($message->UserMessage)) {
@@ -265,8 +279,14 @@ class Sk_POB_WS {
 			), E_WARNING);
 
 			// If an error occurs send mail to admin
+			if ($the_message) {
 				$this->send_error_mail_to_admin($the_message, 'Något gick fel vid beställningen.', $order);
-				
+			} else {
+				$this->send_error_mail_to_admin('Gick inte ansluta till PoB ', 'Något gick fel vid beställningen.', $order);
+			}
+
+
+
 			$log_entry = str_replace("\r", ' ', str_replace("\n", ' ', $data));
 			// Otherwise, log the incident and the request.
 			// Translators: the cURL response.
@@ -285,7 +305,8 @@ class Sk_POB_WS {
 		curl_close($ch);
 	}
 
-	public function create_pob_case_error_report($data, $memo, $error_callback) {
+	public function create_pob_case_error_report($data, $memo, $error_callback)
+	{
 		$memo = str_replace('&amp;', '&', $memo);
 		// Init cURL.
 		$ch = curl_init();
@@ -353,7 +374,8 @@ class Sk_POB_WS {
 		curl_close($ch);
 	}
 
-	public function create_pob_attachment($data, $file) {
+	public function create_pob_attachment($data, $file)
+	{
 		if (!isset($data[0])) {
 			return false;
 		}
@@ -432,7 +454,8 @@ class Sk_POB_WS {
 		curl_close($ch);
 	}
 
-	public function get_equipment_name($term) {
+	public function get_equipment_name($term)
+	{
 		$ch = curl_init();
 
 		curl_setopt_array($ch, array(
@@ -484,7 +507,8 @@ class Sk_POB_WS {
 		curl_close($ch);
 	}
 
-	private function get_case_category_by_type() {
+	private function get_case_category_by_type()
+	{
 		switch ($this->pob_type) {
 			case 'pob_form':
 				return 'Felanmälan via formulär';
@@ -494,7 +518,8 @@ class Sk_POB_WS {
 		}
 	}
 
-	private function get_pob_boolean($value) {
+	private function get_pob_boolean($value)
+	{
 		switch ($value) {
 			case 1:
 			case '1':
@@ -507,7 +532,8 @@ class Sk_POB_WS {
 				return 'No';
 		}
 	}
-	private function attachment_url_to_path($url) {
+	private function attachment_url_to_path($url)
+	{
 		$parsed_url = parse_url($url);
 		if (empty($parsed_url['path'])) {
 			return false;
@@ -522,7 +548,8 @@ class Sk_POB_WS {
 		return false;
 	}
 
-	private function send_error_mail_to_admin($message, $error_type, $order) {
+	private function send_error_mail_to_admin($message, $error_type, $order)
+	{
 		$to_admin = get_option('admin_email');
 		$mail_header = 'Content-Type: text/html; charset=UTF-8';
 		if (!$order) {
