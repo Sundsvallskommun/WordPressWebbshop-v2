@@ -20,7 +20,7 @@ include_once __DIR__ . '/functions/hide-page-title.php';
  * to be able to collapse categories in the widget.
  * @return void
  */
-function collapsable_categories() 
+function collapsable_categories()
 {
 ?>
 
@@ -490,49 +490,51 @@ if ($_SERVER['REQUEST_URI'] != ('/varukorg/')) {
  */
 function update_username_on_email_change($user_id)
 {
-	if (is_page() || is_single() || is_cart() || is_checkout() || is_account_page() || is_wc_endpoint_url()) {
-		return;
-	}
-	$userdata = get_userdata($user_id);
-	$old_username = $userdata->user_login;
-	$new_email = $userdata->user_email;
+	global $pagenow; // Get the current page
+	if ('profile.php' == $pagenow || 'users.php' == $pagenow || 'user-edit.php' == $pagenow) {
+		$userdata = get_userdata($user_id);
+		$old_username = $userdata->user_login;
+		$new_email = $userdata->user_email;
 
-	if (!is_email($new_email)) {
-		return;
-	}
-
-	// Match special characters in the beginning of the user email if it contains any take only the first two otherwise take the first three
-	if(preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, 0, 3))){
-		$username = substr($new_email, 0, 2);
-	} else {
-		$username = substr($new_email, 0, 3);
-	}
-	// Add two random digits
-	$username .= rand(0, 9);
-	$username .= rand(0, 9);
-
-	// Append the first three letters after a dot
-	// Match special characters after the dot of the user email if it contains any take only the first two otherwise take the first three
-	$dot_pos = strrpos($new_email, '.', -5);
-	if ($dot_pos !== false) {
-		if (preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, $dot_pos + 1, 3))){
-			$username .= substr($new_email, $dot_pos + 1, 2);
-		} else {
-			$username .= substr($new_email, $dot_pos + 1, 3);
+		if (!is_email($new_email)) {
+			return;
 		}
+
+		// Match special characters in the beginning of the user email if it contains any take only the first two otherwise take the first three
+		if(preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, 0, 3))){
+			$username = substr($new_email, 0, 2);
+		} else {
+			$username = substr($new_email, 0, 3);
+		}
+		// Add two random digits
+		$username .= rand(0, 9);
+		$username .= rand(0, 9);
+
+		// Append the first three letters after a dot
+		// Match special characters after the dot of the user email if it contains any take only the first two otherwise take the first three
+		$dot_pos = strrpos($new_email, '.', -5);
+		if ($dot_pos !== false) {
+			if (preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, $dot_pos + 1, 3))){
+				$username .= substr($new_email, $dot_pos + 1, 2);
+			} else {
+				$username .= substr($new_email, $dot_pos + 1, 3);
+			}
+		}
+
+		// Check if the new username already exists in the database and if so, search for a new random number.
+		while (username_exists($username)) {
+			preg_match('/\d+/', $username, $matches);
+			$random_num = rand(00, 99);
+			$username = str_replace($matches[0], $random_num, $username);
+		}
+
+		// call the function to update the username in the database
+		update_user_in_database($old_username, $username);
+
+		return;
+	} else {
+		return;
 	}
-
-	// Check if the new username already exists in the database and if so, search for a new random number.
-	while (username_exists($username)) {
-		preg_match('/\d+/', $username, $matches);
-		$random_num = rand(00, 99);
-		$username = str_replace($matches[0], $random_num, $username);
-	}
-
-	// call the function to update the username in the database
-	update_user_in_database($old_username, $username);
-
-	return;
 }
 add_action('profile_update', 'update_username_on_email_change', 10, 1);
 
