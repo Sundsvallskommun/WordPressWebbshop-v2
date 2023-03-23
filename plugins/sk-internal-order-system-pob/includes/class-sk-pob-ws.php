@@ -68,6 +68,7 @@ class Sk_POB_WS
 	public function send_order(WC_Order $order, $order_items)
 	{
 		$current_user = wp_get_current_user();
+		$user_name = get_user_by('id', $order->data['customer_id'])->user_login;
 		// $total_items = count($order_items);
 		date_default_timezone_set("Europe/Stockholm");
 		$date_string = date('Y/m/d H:i') . " Systemuser för POB WS API";
@@ -94,7 +95,7 @@ class Sk_POB_WS
 					"Description" => "Beställning {$order->id} - {$item->get_name()} ($count/$total_items)",
 					"CaseType" => "{$casetype}",
 					"CaseCategory" => $this->get_case_category_by_type(),
-					"Contact.Customer" => $current_user->user_login,
+					"Contact.Customer" => isset($user_name) ? $user_name : $current_user->user_login,
 					"PriorityInfo.Priority" => "Oläst",
 					"ResponsibleGroup" => "IT Support",
 					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
