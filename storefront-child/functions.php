@@ -553,19 +553,19 @@ function update_user_in_database($old_username, $new_username)
 	$wpdb->update(
 		'wp_rg_lead_detail',
 		array('value' => $new_username),
-		array('value' => $old_username),
+		array('value' => $old_username)
 	);
 
 	$wpdb->update(
 		'wp_users',
-		array('user_login' => $new_username,),
-		array('user_login' => $old_username,)
+		array('user_login' => $new_username),
+		array('user_login' => $old_username)
 	);
 
 	$wpdb->update(
 		'wp_wc_customer_lookup',
-		array('username' => $new_username,),
-		array('username' => $old_username,)
+		array('username' => $new_username),
+		array('username' => $old_username)
 	);
 
 	//Update the username in the searchable persons table
