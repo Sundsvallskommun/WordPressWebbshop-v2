@@ -386,6 +386,8 @@ function set_post_content($entry, $form)
 		"CaseType" => $casetype,
 		"Description" => $form_title,
 		"PriorityInfo.Priority" =>  "Oläst",
+		"PriorityInfo.Impact" => "",
+		"PriorityInfo.Urgency" => "",
 		"ResponsibleGroup" => "IT Support",
 		"Contact.Customer" => $current_user->user_login,
 	];
@@ -481,94 +483,4 @@ if ($_SERVER['REQUEST_URI'] != ('/varukorg/')) {
 <?php }
 		}
 	}
-}
-
-/**
- * Update the username when there's a change in the user email
- *
- * @param int $user_id The ID of the user.
- */
-function update_username_on_email_change($user_id)
-{
-	global $pagenow; // Get the current page
-	if ('profile.php' == $pagenow || 'users.php' == $pagenow || 'user-edit.php' == $pagenow) {
-		$userdata = get_userdata($user_id);
-		$old_username = $userdata->user_login;
-		$new_email = $userdata->user_email;
-
-		if (!is_email($new_email)) {
-			return;
-		}
-
-		// Match special characters in the beginning of the user email if it contains any take only the first two otherwise take the first three
-		if(preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, 0, 3))){
-			$username = substr($new_email, 0, 2);
-		} else {
-			$username = substr($new_email, 0, 3);
-		}
-		// Add two random digits
-		$username .= rand(0, 9);
-		$username .= rand(0, 9);
-
-		// Append the first three letters after a dot
-		// Match special characters after the dot of the user email if it contains any take only the first two otherwise take the first three
-		$dot_pos = strrpos($new_email, '.', -5);
-		if ($dot_pos !== false) {
-			if (preg_match('/[\'^£$%&*()}{@#~?><>,.|=_+¬-]/', substr($new_email, $dot_pos + 1, 3))){
-				$username .= substr($new_email, $dot_pos + 1, 2);
-			} else {
-				$username .= substr($new_email, $dot_pos + 1, 3);
-			}
-		}
-
-		// Check if the new username already exists in the database and if so, search for a new random number.
-		while (username_exists($username)) {
-			preg_match('/\d+/', $username, $matches);
-			$random_num = rand(00, 99);
-			$username = str_replace($matches[0], $random_num, $username);
-		}
-
-		// call the function to update the username in the database
-		update_user_in_database($old_username, $username);
-
-		return;
-	} else {
-		return;
-	}
-}
-add_action('profile_update', 'update_username_on_email_change', 10, 1);
-
-
-/**
- * Update the username in the database
- *
- * @param string $old_username The old username.
- * @param string $new_username The new username.
- */
-function update_user_in_database($old_username, $new_username)
-{
-	global $wpdb;
-
-	//Update the username in the database
-	$wpdb->update(
-		'wp_rg_lead_detail',
-		array('value' => $new_username),
-		array('value' => $old_username)
-	);
-
-	$wpdb->update(
-		'wp_users',
-		array('user_login' => $new_username),
-		array('user_login' => $old_username)
-	);
-
-	$wpdb->update(
-		'wp_wc_customer_lookup',
-		array('username' => $new_username),
-		array('username' => $old_username)
-	);
-
-	//Update the username in the searchable persons table
-	$wpdb->query("UPDATE wp_sk_smex_searchable_persons SET person = REPLACE(person, '$old_username', '$new_username') WHERE person LIKE '%$old_username%';");
-
 }
