@@ -385,9 +385,7 @@ function set_post_content($entry, $form)
 	$data = [
 		"CaseType" => $casetype,
 		"Description" => $form_title,
-		"PriorityInfo.Priority" =>  "Oläst",
-		"PriorityInfo.Impact" => "",
-		"PriorityInfo.Urgency" => "",
+		"PriorityInfo.Priority" =>  "IT4",
 		"ResponsibleGroup" => "IT Support",
 		"Contact.Customer" => $current_user->user_login,
 	];

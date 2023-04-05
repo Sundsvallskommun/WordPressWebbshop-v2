@@ -94,7 +94,7 @@ class Sk_POB_WS {
 					"CaseType" => "{$casetype}",
 					"CaseCategory" => $this->get_case_category_by_type(),
 					"Contact.Customer" => isset($user_name) ? $user_name : $current_user->user_login,
-					"PriorityInfo.Priority" => "Oläst",
+					"PriorityInfo.Priority" => "IT4",
 					"ResponsibleGroup" => "IT Support",
 					"Virtual.Shop_WebbshopOrdernummer" => "{$order->id}",
 					"Virtual.Shop_AntalArtiklarIOrder" => "$count/$total_items",
