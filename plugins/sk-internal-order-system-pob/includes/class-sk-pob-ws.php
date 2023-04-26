@@ -135,7 +135,15 @@ class Sk_POB_WS {
 						$memo .= "<strong>$field->label</strong><br/><br/>";
 					}
 				}
+				$field_label= '';
 				foreach ($form['fields'] as $field) {
+					if (!empty($field->label) && $field->type != 'section' ){
+						if (!empty($this->get_meta_by_key($field->label, $meta) && $field_label != $field->label)){
+							$field_label = $field->label;
+						} else {
+							continue;
+						}
+					}
 					if ($field->type == 'section' && $field[0]){
 						$memo .= "<strong>$field->label</strong><br/>";
 					} elseif ( $field->type == 'section'){
