@@ -1,7 +1,7 @@
 'use strict';
 
 jQuery(document).ready(function($) {
-    $('.js-search-equipment-name').select2({
+    $('.js-search-computer').select2({
         placeholder: "Ange datornamn",
         allowClear: true,
         delay: 250,
@@ -10,8 +10,8 @@ jQuery(document).ready(function($) {
         width: '100%',
         data: [
             {
-                id: localStorage.getItem('equipment_name_id'),
-                text: localStorage.getItem('equipment_name')
+                id: localStorage.getItem('computer_name_id'),
+                text: localStorage.getItem('computer_name')
             }
         ],
         ajax: {
@@ -34,27 +34,27 @@ jQuery(document).ready(function($) {
     });
 
     setTimeout(function() {
-        localStorage.removeItem('equipment_name_id');
-        localStorage.removeItem('equipment_name');
+        localStorage.removeItem('computer_name_id');
+        localStorage.removeItem('computer_name');
     }, 1000 * 60 * 4);
 
-    $('.js-search-equipment-name').val(localStorage.getItem('equipment_name_id'));
-    $('.js-search-equipment-name').trigger('change');
+    $('.js-search-computer').val(localStorage.getItem('computer_name_id'));
+    $('.js-search-computer').trigger('change');
 });
 
 jQuery(document).ready(function($) {
-    $('.js-search-equipment-name').on('select2:open', function (e) {
-        $('.js-search-equipment-name').val(null).trigger('change');
-        localStorage.removeItem('equipment_name_id');
-        localStorage.removeItem('equipment_name');
+    $('.js-search-computer').on('select2:open', function (e) {
+        $('.js-search-computer').val(null).trigger('change');
+        localStorage.removeItem('computer_name_id');
+        localStorage.removeItem('computer_name');
     });
 
-    $('.js-search-equipment-name').on('select2:select', function (e) {
+    $('.js-search-computer').on('select2:select', function (e) {
         var data = e.params.data;
-        localStorage.setItem('equipment_name_id', data.id);
-        localStorage.setItem('equipment_name', data.text);
-        $('.js-search-equipment-name').val(data.id);
-        $('.js-search-equipment-name').trigger('change');
+        localStorage.setItem('computer_name_id', data.id);
+        localStorage.setItem('computer_name', data.text);
+        $('.js-search-computer').val(data.id);
+        $('.js-search-computer').trigger('change');
     });
 
 });
