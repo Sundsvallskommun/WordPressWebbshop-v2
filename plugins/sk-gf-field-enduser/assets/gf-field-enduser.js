@@ -8,6 +8,12 @@ jQuery(document).ready(function($) {
         minimumInputLength: 3,
         language: "sv",
         width: '100%',
+        data: [
+            {
+                id: localStorage.getItem('enduser_id'),
+                text: localStorage.getItem('enduser_name')
+            }
+        ],
         ajax: {
             type: 'POST',
             url: ajax.url,
@@ -26,4 +32,30 @@ jQuery(document).ready(function($) {
               }
         }
     });
+    
+    setTimeout(function() {
+        localStorage.removeItem('enduser_id');
+        localStorage.removeItem('enduser_name');
+    }, 1000 * 60 * 4);
+
+    $('.js-search-enduser').val(localStorage.getItem('enduser_id'));
+    $('.js-search-enduser').trigger('change');
+});
+
+jQuery(document).ready(function($) { 
+    $('.js-search-enduser').on('select2:open', function (e) {
+        $('.js-search-enduser').val(null).trigger('change');
+        localStorage.removeItem('enduser_id');
+        localStorage.removeItem('enduser_name');
+
+    });
+
+    $('.js-search-enduser').on('select2:select', function (e) {
+        var data = e.params.data;
+        localStorage.setItem('enduser_id', data.id);
+        localStorage.setItem('enduser_name', data.text);
+        $('.js-search-enduser').val(data.id);
+        $('.js-search-enduser').trigger('change');
+    });
+
 });

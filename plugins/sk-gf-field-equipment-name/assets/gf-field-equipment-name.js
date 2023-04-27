@@ -8,6 +8,12 @@ jQuery(document).ready(function($) {
         minimumInputLength: 5,
         language: "sv",
         width: '100%',
+        data: [
+            {
+                id: localStorage.getItem('computer_name_id'),
+                text: localStorage.getItem('computer_name')
+            }
+        ],
         ajax: {
             type: 'POST',
             url: ajax.url,
@@ -26,4 +32,29 @@ jQuery(document).ready(function($) {
               }
         }
     });
+
+    setTimeout(function() {
+        localStorage.removeItem('computer_name_id');
+        localStorage.removeItem('computer_name');
+    }, 1000 * 60 * 4);
+
+    $('.js-search-computer').val(localStorage.getItem('computer_name_id'));
+    $('.js-search-computer').trigger('change');
+});
+
+jQuery(document).ready(function($) {
+    $('.js-search-computer').on('select2:open', function (e) {
+        $('.js-search-computer').val(null).trigger('change');
+        localStorage.removeItem('computer_name_id');
+        localStorage.removeItem('computer_name');
+    });
+
+    $('.js-search-computer').on('select2:select', function (e) {
+        var data = e.params.data;
+        localStorage.setItem('computer_name_id', data.id);
+        localStorage.setItem('computer_name', data.text);
+        $('.js-search-computer').val(data.id);
+        $('.js-search-computer').trigger('change');
+    });
+
 });
