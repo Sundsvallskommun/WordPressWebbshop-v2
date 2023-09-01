@@ -99,6 +99,9 @@ function skios_insert_product_owner( $args = array() ) {
 		return new WP_Error( 'empty_product_owner_type', __( 'Produktägare får inte ha en tom typ.', 'skios' ) );
 	}
 
+	if ( '' === trim( $args[ 'identifier' ] ) ) {
+		return new WP_Error( 'empty_product_owner_identifier', __( 'Produktägare får inte ha en tom identifierare.', 'skios' ) );
+	}
 
 	// Get the current id from options.
 	$options = get_option( 'woocommerce_skios_settings' );
@@ -371,7 +374,7 @@ function skios_email_items( $order, $items ) {
 						$string .= '<strong>Tele2 kostnadsställe (Ordernr. kund): </strong>';
 						$string .= get_tele2_string( $order, $item );
 						$string .= '<br><br>';
-						$string .= '<strong>Servicecenter IT kostnadsställe: </strong>';
+						$string .= '<strong>Digitalisering och IT kostnadsställe: </strong>';
 						$string .= get_pob_string( $order, $item );
 						$string .= '<br><br>';
 						$string .= '<strong>Verksamhetsbeskrivning: </strong>';
