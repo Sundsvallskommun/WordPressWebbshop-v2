@@ -36,7 +36,7 @@ class SK_SMEX {
 	 * @var array
 	 */
 	private $PRODUCT_OWNER_W_ADDITIONAL_FIELDS = array(
-		'Servicecenter IT'
+		'Digitalisering och IT'
 	);
 
 	/**
