@@ -15,21 +15,23 @@
 <?php if (is_product() || is_checkout()) : ?>
 	<?php $post = get_post(get_the_ID()); ?>
 	<?php
-	$form_id = get_post_meta(get_the_ID(), '_gravity_form_data', true)['id'];
-	$form_title = RGFormsModel::get_form($form_id)->title;
-	$is_advania = false;
-	$fields_to_exclude = array();
-	if ($form_advania = strpos($form_title, 'Advania') !== false) {
-		$is_advania = true;
-		$form = GFAPI::get_form($form_id);
-		$fields = $form['fields'];
-		foreach ($fields as $field) {
-			if ($field->type == 'sk-enduser') {
-				$fields_to_exclude[] = 'input_' . $field->id;
+		$gravity_form_data = get_post_meta(get_the_ID(), '_gravity_form_data', true);
+		if (is_array($gravity_form_data) && isset($gravity_form_data['id'])) {
+			$form_id = $gravity_form_data['id'];
+			$form_title = RGFormsModel::get_form($form_id)->title;
+			$is_advania = false;
+			$fields_to_exclude = array();
+			if ($form_advania = strpos($form_title, 'Advania') !== false) {
+				$is_advania = true;
+				$form = GFAPI::get_form($form_id);
+				$fields = $form['fields'];
+				foreach ($fields as $field) {
+					if ($field->type == 'sk-enduser') {
+						$fields_to_exclude[] = 'input_' . $field->id;
+					}
+				}
 			}
 		}
-	}
-
 	// Add the following JavaScript code to save the form values in local storage
 	?>
 	<script>

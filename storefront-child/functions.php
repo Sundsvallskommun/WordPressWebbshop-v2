@@ -397,9 +397,11 @@ function set_post_content($entry, $form)
 		$pob_id = rgar($field, 'pobId');
 		$notification = rgar($field, "notificationType");
 
-		if ($field->type == 'section' && ($field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm' || $field->label == "Kontaktuppgifter anmälare")) {
-			$memo .= "<br/><strong>" . $field_label . "</strong><br/>";
-		}
+		if ($field->type == 'section' && 
+		( (is_array($field->conditionalLogic) && isset($field->conditionalLogic['rules'][0]['value']) && $field->conditionalLogic['rules'][0]['value'] == 'Dator/Docka/Skärm') 
+		  || $field->label == "Kontaktuppgifter anmälare")) {
+		$memo .= "<br/><strong>" . $field_label . "</strong><br/>";
+	}
 
 		if ($field->type == "sk-equipment-name" && $casetype == 'Incident') {
 			$device_info = explode('|', $field_value);

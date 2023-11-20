@@ -1393,19 +1393,29 @@ function twig_get_attribute(Environment $env, Source $source, $object, $item, ar
 
     // object property
     if (/* Template::METHOD_CALL */ 'method' !== $type) {
-        if (isset($object->$item) || \array_key_exists((string) $item, $object)) {
+        if (is_array($object) && array_key_exists((string) $item, $object)) {
             if ($isDefinedTest) {
                 return true;
             }
-
+    
             if ($sandboxed) {
                 $env->getExtension(SandboxExtension::class)->checkPropertyAllowed($object, $item, $lineno, $source);
             }
-
+    
+            return $object[$item];
+        } elseif (isset($object->$item)) {
+            if ($isDefinedTest) {
+                return true;
+            }
+    
+            if ($sandboxed) {
+                $env->getExtension(SandboxExtension::class)->checkPropertyAllowed($object, $item, $lineno, $source);
+            }
+    
             return $object->$item;
         }
     }
-
+    
     static $cache = [];
 
     $class = \get_class($object);

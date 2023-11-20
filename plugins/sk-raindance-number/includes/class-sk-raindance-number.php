@@ -29,7 +29,7 @@ class SK_Raindance_Number {
 	 * @param  boolean $is_ajax
 	 * @return void
 	 */
-	public function enqueue_enduser_script( $form, $is_ajax ) {
+	public function enqueue_raindance_number_script( $form, $is_ajax ) {
 
 		wp_enqueue_script( 'gf_field_raindance_number', SK_GF_FIELD_RAINDANCE_NUMBER_PLUGIN_URL . 'assets/gf-field-raindance_number.js', array( 'select2_sk' ) );
 		wp_localize_script( 'gf_field_raindance_number', 'ajax', array(
