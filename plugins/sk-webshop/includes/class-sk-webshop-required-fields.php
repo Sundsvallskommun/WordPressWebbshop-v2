@@ -158,12 +158,15 @@ class SK_Webshop_Required_Fields {
 	 */
 	public function change_required( $fields ) {
 		global $woocommerce;
-		$items = $woocommerce->cart->get_cart();
-
-		if ( empty( $items ) ) {
+		if ( $woocommerce->cart === null ) {
 			return $fields;
-		}
+		} else {
+			$items = $woocommerce->cart->get_cart();
 
+			if ( empty( $items ) ) {
+				return $fields;
+			}
+		}
 		$_fields = $this->fields;
 
 		foreach ( $items as $item => $values ) {
