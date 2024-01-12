@@ -527,6 +527,9 @@ class SKIOS_Gateway extends WC_Payment_Gateway {
 			foreach ( $old_product_owners as $key => $old_po ) {
 				$found = false;
 				foreach ( $post_data[ 'product_owners' ] as $po ) {
+					if ( is_wp_error( $po ) ) {
+						continue;
+					}
 					if ( $old_po[ 'id' ] === $po[ 'id' ] ) {
 						$found = true;
 					}
