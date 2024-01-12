@@ -265,3 +265,7 @@ h1.product_title {
 		display: none;
 	}
 }
+
+.wc-block-grid__product-title {
+	color: black !important;
+}
